@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="css/home.css?v=50">
   <link rel="stylesheet" href="css/home-gallery.css?v=49">
   <link rel="stylesheet" href="css/home-bottom.css?v=5">
-  <link rel="stylesheet" href="css/home-path.css?v=20">
+  <link rel="stylesheet" href="css/home-path.css?v=22">
   <link rel="stylesheet" href="css/home-bake.css?v=3">
   <link rel="stylesheet" href="css/home-dress.css?v=5">
   <link rel="stylesheet" href="css/reviews.css?v=3">
@@ -451,11 +451,15 @@
               </div>
             </article>
             <div class="x-path__vis x-pv-design">
-              <button type="button" class="x-pv-design__deck" data-deck aria-label="Показати наступний дизайн">
-                <figure style="--r:-11deg;--x:-34%"><img src="img/cakes/lilac.jpg" alt="" loading="lazy"><figcaption>lilac</figcaption></figure>
-                <figure style="--r:9deg;--x:34%"><img src="img/cakes/gold.jpg" alt="" loading="lazy"><figcaption>gold</figcaption></figure>
-                <figure style="--r:-2deg;--x:0%"><img src="img/cakes/pink.jpg" alt="" loading="lazy"><figcaption>pink ♥</figcaption></figure>
-              </button>
+              <div class="x-pv-design__row">
+                <button type="button" class="x-pv-design__deck" data-deck aria-label="Показати наступний дизайн">
+                  <figure style="--r:-11deg;--x:-34%" data-cut="img/cutouts/gl-lilac.webp"><img src="img/cakes/lilac.jpg" alt="" loading="lazy"><figcaption>lilac</figcaption></figure>
+                  <figure style="--r:9deg;--x:34%" data-cut="img/cutouts/gl-gold.webp"><img src="img/cakes/gold.jpg" alt="" loading="lazy"><figcaption>gold</figcaption></figure>
+                  <figure style="--r:-2deg;--x:0%" data-cut="img/cutouts/gl-pink.webp"><img src="img/cakes/pink.jpg" alt="" loading="lazy"><figcaption>pink ♥</figcaption></figure>
+                </button>
+                <!-- the cake on the top card jumps out of a little stand beside the deck -->
+                <span class="x-pv-pop" data-pop aria-hidden="true"><span class="x-pv-pop__win"><img src="img/cutouts/gl-pink.webp" alt="" loading="lazy" data-pop-img></span><i class="x-pv-pop__plate"></i><i class="x-pv-pop__stem"></i><i class="x-pv-pop__foot"></i></span>
+              </div>
               <p class="x-path__note">референс із Pinterest — теж ок ♥</p>
             </div>
           </li>
@@ -504,7 +508,7 @@
             </article>
             <div class="x-path__vis x-pv-kg" data-kg data-tiers="1">
               <p class="x-pv-kg__out"><output data-kg-out>2,5</output><span>кг</span></p>
-              <div class="x-pv-kg__cake" aria-hidden="true"><img data-t="1" src="img/cutouts/fraisier.webp" alt="" loading="lazy"><img data-t="2" src="img/cutouts/candy-cake.webp" alt="" loading="lazy"><img data-t="3" src="img/cutouts/gl-roses.webp" alt="" loading="lazy"><i class="x-pv-kg__stand"></i></div>
+              <div class="x-pv-kg__cake" aria-hidden="true"><img data-t="1" src="img/cutouts/fraisier.webp" alt="" loading="lazy"><img data-t="2" src="img/cutouts/candy-cake.webp" alt="" loading="lazy"><img data-t="3" src="img/cutouts/gl-roses.webp" alt="" loading="lazy"><i class="x-pv-kg__stand"></i><span class="x-pv-kg__tape"><b data-kg-cm>Ø 21 см</b></span></div>
               <div class="x-pv-kg__plates" data-plates aria-hidden="true"></div>
               <label class="x-pv-kg__range">
                 <span>гостей: <b data-guests-out>14</b></span>
@@ -528,6 +532,8 @@
               </div>
             </article>
             <div class="x-path__vis x-pv-chat" aria-hidden="true" data-chat>
+              <i class="x-pv-chat__flash"></i>
+              <span class="x-pv-chat__shot"><img src="img/cakes/pink.jpg" alt="" loading="lazy"></span>
               <div class="x-pv-chat__head"><img src="img/hero-avatar.jpg" alt="" loading="lazy"><span><b>Mariday Cake</b><small data-chat-status>онлайн</small></span></div>
               <div class="x-pv-chat__log">
                 <p class="x-pv-chat__msg x-pv-chat__msg--me"><span>Привіт! Хочу рожевий торт на 14 гостей 🍰</span><s>✓✓</s></p>
@@ -594,16 +600,17 @@
         <div class="x-path__end">
           <div class="x-path__cake" data-path-end>
             <span class="x-path__garland" aria-hidden="true"><svg viewBox="0 0 300 56" preserveAspectRatio="none"><path pathLength="1" d="M0,6 Q150,50 300,6"/></svg><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
-            <span class="x-path__candles">
-              <button type="button" class="x-path__candle" aria-label="Задути свічку"><i></i></button>
-              <button type="button" class="x-path__candle" aria-label="Задути свічку"><i></i></button>
-              <button type="button" class="x-path__candle" aria-label="Задути свічку"><i></i></button>
-              <button type="button" class="x-path__candle" aria-label="Задути свічку"><i></i></button>
+            <span class="x-path__real" style="--cake-rim:31%;--cake-l:18%;--cake-r:82%">
+              <img src="img/cutouts/gl-pink.webp" alt="" loading="lazy" data-end-cake>
+              <span class="x-path__candles">
+                <button type="button" class="x-path__candle" aria-label="Задути свічку"><i></i></button>
+                <button type="button" class="x-path__candle" aria-label="Задути свічку"><i></i></button>
+                <button type="button" class="x-path__candle" aria-label="Задути свічку"><i></i></button>
+                <button type="button" class="x-path__candle" aria-label="Задути свічку"><i></i></button>
+              </span>
+              <span class="x-path__topper" aria-hidden="true"><svg viewBox="0 0 60 70"><path d="M30,44 C31,28 40,16 52,12" fill="none" stroke="#3d6b2c" stroke-width="3" stroke-linecap="round"/><path d="M46,14 C52,4 60,8 60,12 C54,18 48,18 46,14 Z" fill="#5f9c45"/><circle cx="30" cy="52" r="17" fill="url(#x-path-cherry)"/><ellipse cx="23" cy="45" rx="4.5" ry="3" fill="rgba(255,255,255,0.75)" transform="rotate(-30 23 45)"/></svg></span>
             </span>
-            <span class="x-path__topper" aria-hidden="true"><svg viewBox="0 0 60 70"><path d="M30,44 C31,28 40,16 52,12" fill="none" stroke="#3d6b2c" stroke-width="3" stroke-linecap="round"/><path d="M46,14 C52,4 60,8 60,12 C54,18 48,18 46,14 Z" fill="#5f9c45"/><circle cx="30" cy="52" r="17" fill="url(#x-path-cherry)"/><ellipse cx="23" cy="45" rx="4.5" ry="3" fill="rgba(255,255,255,0.75)" transform="rotate(-30 23 45)"/></svg></span>
-            <i class="x-path__tier x-path__tier--top" aria-hidden="true"></i>
-            <i class="x-path__tier x-path__tier--bottom" aria-hidden="true"></i>
-            <i class="x-path__stand" aria-hidden="true"></i>
+            <i class="x-path__floor" aria-hidden="true"></i>
           </div>
           <div class="x-path__fin" aria-live="polite">
             <p class="x-path__fin-kick x-hand">кінець шляху ✦</p>
@@ -823,7 +830,7 @@
   <script src="js/layout.js?v=12"></script>
   <script src="js/app.js?v=13"></script>
   <script src="js/home.js?v=85"></script>
-  <script src="js/home-path.js?v=20"></script>
+  <script src="js/home-path.js?v=22"></script>
   <script src="js/home-bottom.js?v=3"></script>
   <script src="js/reviews.js?v=4"></script>
   <script src="js/home-post.js?v=4"></script>

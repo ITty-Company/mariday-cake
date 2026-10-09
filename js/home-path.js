@@ -118,6 +118,18 @@
       drift.fromTo(sp, { y: 80 + (i % 4) * 60 }, { y: -80 - (i % 4) * 60, rotation: r + (i % 2 ? 120 : -120), ease: "none" }, 0);
     });
 
+    // big soft pastel circles drift past behind everything
+    const bokeh = document.createElement("div");
+    bokeh.className = "x-path__bokeh";
+    bokeh.setAttribute("aria-hidden", "true");
+    sec.prepend(bokeh);
+    [[-6, 12, "#f5bcc8"], [78, 24, "#fbe6b8"], [-10, 46, "#bcd6f3"], [74, 60, "#f5bcc8"], [-4, 82, "#f2d29b"], [80, 92, "#e9c6f0"]].forEach(([x, y, c], i) => {
+      const b = document.createElement("i");
+      b.style.cssText = `left:${x}%;top:${y}%;background:${c}`;
+      bokeh.appendChild(b);
+      gsap.fromTo(b, { y: 140 + (i % 3) * 80 }, { y: -140 - (i % 3) * 80, ease: "none", scrollTrigger: { trigger: sec, start: "top bottom", end: "bottom top", scrub: 1 } });
+    });
+
     opener.intro();
 
     // the real cakes beside the road drift at their own depth and bob gently
@@ -192,7 +204,9 @@
       gsap.fromTo(flags, { y: -40, opacity: 0, rotation: -50 }, { y: 0, opacity: 1, rotation: 0, duration: 1.1, delay: 0.5, stagger: 0.06, ease: "elastic.out(1, 0.45)" });
       lights.forEach((c, k) => lightTimers.push(setTimeout(() => c.classList.remove("is-unlit"), 900 + k * 260)));
       gsap.fromTo(wish, { clipPath: HIDDEN }, { clipPath: "inset(-80% -30% -80% -30%)", duration: 1.2, delay: 0.5, ease: "power2.inOut" });
-      gsap.delayedCall(0.6, () => fx.rain(cake, 70));
+      gsap.delayedCall(0.6, () => fx.rain(cake, 120));
+      gsap.delayedCall(1.1, () => { fx.hearts(cake, 9); fx.pop(cake, 36, 1.5); });
+      gsap.delayedCall(2.2, () => fx.rain(cake, 50));
     };
 
     // the cherry rides on the line 58% down the screen; the stops it has passed are open
@@ -313,8 +327,8 @@
         const r = s.getBoundingClientRect();
         return [r.left + r.width / 2 - box.left, r.top + r.height / 2 - box.top];
       });
-      const c = cake.getBoundingClientRect();
-      pts.push([c.left + c.width / 2 - box.left, c.top - box.top + topper.offsetTop + topper.offsetWidth * 0.867]);
+      const c = cake.getBoundingClientRect(), t = topper.getBoundingClientRect();
+      pts.push([c.left + c.width / 2 - box.left, t.top - box.top + t.height * 0.74]);
       // how far a leg may swing out: well inside the lane between the chapters
       const cols = getComputedStyle(stops[0].parentElement).gridTemplateColumns.split(" ").map(parseFloat);
       const lane = cols.length > 2 ? cols[1] : cols[0];
@@ -568,12 +582,38 @@
     const SLOTS = [["-11deg", "-34%"], ["9deg", "34%"], ["-2deg", "0%"]];
     const figs = () => $$("figure", el);
     const place = () => figs().forEach((f, i) => { f.style.setProperty("--r", SLOTS[i][0]); f.style.setProperty("--x", SLOTS[i][1]); });
+    // the cake on the top card jumps out of the little stand beside the deck — and the cake at the end of the road
+    // is that one too, with its candles on its rim
+    const pop = $("[data-pop]", sec), popImg = $("[data-pop-img]", pop), popPlate = $(".x-pv-pop__plate", pop);
+    const endCake = $("[data-end-cake]", sec), endReal = endCake.closest(".x-path__real");
+    const RIMS = { "gl-pink": [31, 18, 82], "gl-gold": [33, 14, 86], "gl-lilac": [11, 10, 90] };
+    let popTl = null;
+    const popTo = (f, instant) => {
+      const src = f.dataset.cut, key = src.replace(/^.*\//, "").replace(/\.\w+$/, "");
+      if (endCake.getAttribute("src") !== src) {
+        endCake.src = src;
+        const [rim, l, r] = RIMS[key] || [30, 15, 85];
+        endReal.style.setProperty("--cake-rim", `${rim}%`);
+        endReal.style.setProperty("--cake-l", `${l}%`);
+        endReal.style.setProperty("--cake-r", `${r}%`);
+      }
+      if (!hasLibs) { popImg.src = src; popImg.style.transform = "none"; return; }
+      if (reduce || instant) { popImg.src = src; gsap.set(popImg, { yPercent: 0 }); return; }
+      if (popTl) popTl.kill();
+      popTl = gsap.timeline()
+        .to(popImg, { yPercent: 110, duration: 0.32, ease: "back.in(1.6)" })
+        .call(() => { popImg.src = src; })
+        .to(popPlate, { scaleY: 0.8, duration: 0.1, transformOrigin: "50% 100%" })
+        .to(popPlate, { scaleY: 1, duration: 0.6, ease: "elastic.out(1, 0.35)" })
+        .to(popImg, { yPercent: 0, duration: 0.9, ease: "back.out(2.2)" }, "<0.05")
+        .call(() => fx.pop(popPlate, 16, 0.6), null, "<0.2");
+    };
     let busy = false;
     let hover = false;
     const shuffle = () => {
       if (busy) return;
       const top = el.lastElementChild;
-      if (!hasLibs || reduce) { el.prepend(top); place(); return; }
+      if (!hasLibs || reduce) { el.prepend(top); place(); popTo(el.lastElementChild, true); return; }
       busy = true;
       el.classList.add("is-dealing");
       // the top card is flicked up and away, then slides in at the bottom of the pile
@@ -583,6 +623,7 @@
           el.classList.remove("is-dealing");
           el.prepend(top);
           place();
+          popTo(el.lastElementChild);
           top.style.setProperty("--fx", "0px");
           top.style.setProperty("--fy", "0px");
           top.style.setProperty("--fr", "0deg");
@@ -601,17 +642,18 @@
       el.addEventListener("pointerenter", () => { hover = true; });
       el.addEventListener("pointerleave", () => { hover = false; el.style.setProperty("--tx", "0deg"); el.style.setProperty("--ty", "0deg"); });
     }
-    if (!live) return NOOP;
+    if (!live) { popTo(el.lastElementChild, true); return NOOP; }
 
     let timer = 0;
     gsap.set(figs(), { opacity: 0 });
+    gsap.set(popImg, { yPercent: 110 });
     return {
       enter() {
         el.classList.add("is-dealing");
         const all = figs();
         all.forEach((f, i) => gsap.fromTo(f,
           { "--fx": `${gsap.utils.random(-320, 320)}px`, "--fy": "-360px", "--fr": `${gsap.utils.random(-120, 120)}deg`, opacity: 0 },
-          { "--fx": "0px", "--fy": "0px", "--fr": "0deg", opacity: 1, duration: 1.1, delay: 0.15 + i * 0.16, ease: "back.out(1.3)", onComplete: i === all.length - 1 ? () => { el.classList.remove("is-dealing"); fx.hearts(f, 5); } : null }));
+          { "--fx": "0px", "--fy": "0px", "--fr": "0deg", opacity: 1, duration: 1.1, delay: 0.15 + i * 0.16, ease: "back.out(1.3)", onComplete: i === all.length - 1 ? () => { el.classList.remove("is-dealing"); fx.hearts(f, 5); popTo(el.lastElementChild); } : null }));
         clearInterval(timer);
         timer = setInterval(() => { if (st.classList.contains("is-here") && !hover) shuffle(); }, 2800);
       },
@@ -620,6 +662,8 @@
         gsap.killTweensOf(figs());
         el.classList.remove("is-dealing");
         gsap.set(figs(), { opacity: 0 });
+        if (popTl) popTl.kill();
+        gsap.set(popImg, { yPercent: 110 });
       },
     };
   }
@@ -711,6 +755,7 @@
     const guests = $("[data-guests-out]", el);
     const plates = $("[data-plates]", el);
     const cake = $(".x-pv-kg__cake", el);
+    const cm = $("[data-kg-cm]", el);
     const animate = hasLibs && !reduce;
     let last = "";
     let tiers = "";
@@ -720,6 +765,7 @@
       const kg = Math.max(1.5, Math.round(g * 0.18 * 2) / 2);
       const txt = String(kg).replace(".", ",");
       guests.textContent = g;
+      cm.textContent = `Ø ${Math.round(14 + kg * 2.6)} см`;
       // one plate per guest
       const have = plates.children.length;
       for (let k = have; k < g; k++) {
@@ -770,6 +816,7 @@
     const field = $("[data-chat-field]", el);
     const plane = $(".x-pv-chat__send svg", el);
     const status = $("[data-chat-status]", el);
+    const flash = $(".x-pv-chat__flash", el), shot = $(".x-pv-chat__shot", el), log = $(".x-pv-chat__log", el);
     const PH = field.textContent;
     const react = document.createElement("i");
     react.className = "x-pv-chat__react";
@@ -782,6 +829,8 @@
       if (tl) tl.kill();
       gsap.set([...msgs, pic, typing, react], { autoAlpha: 0 });
       gsap.set(plane, { x: 0, y: 0, rotation: 0, opacity: 1 });
+      gsap.set([flash, shot], { opacity: 0 });
+      gsap.set(shot, { x: 0, y: 0, scale: 1, rotation: 0 });
       el.classList.remove("is-read");
       field.textContent = PH;
       field.classList.add("is-ph");
@@ -807,10 +856,16 @@
     return {
       enter() {
         reset();
+        // where the photo lands: on the picture bubble, which is laid out but still invisible
+        const dx = log.offsetLeft + pic.offsetLeft - shot.offsetLeft, dy = log.offsetTop + pic.offsetTop - shot.offsetTop;
         tl = gsap.timeline({ delay: 0.5 })
           .add(type(m1))
           .add(send(m1), "+=0.15")
-          .add(send(pic), "+=0.35")
+          .to(flash, { opacity: 0.9, duration: 0.07, yoyo: true, repeat: 1 }, "+=0.25")
+          .fromTo(shot, { x: -170, y: 50, scale: 0.5, rotation: -14, opacity: 0 }, { x: -130, y: 36, opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, "<")
+          .to(shot, { x: dx, y: dy, scale: 0.72, rotation: 6, duration: 0.55, ease: "power2.inOut" }, "+=0.2")
+          .set(shot, { opacity: 0 })
+          .add(send(pic), "<")
           .add(type(m2), "+=0.3")
           .add(send(m2), "+=0.15")
           .call(() => { field.textContent = PH; field.classList.add("is-ph"); el.classList.add("is-read"); status.textContent = "друкує…"; }, null, "+=0.4")
