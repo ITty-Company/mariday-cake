@@ -319,7 +319,8 @@
     const phone = matchMedia("(max-width: 760px)");
     const api = { el, onBuild: null, hop: 0, cur: 0 };
     const roseHost = $(".x-path__roses", el);
-    let len = 0, ys = [], ls = [], marks = [], prev = 0, roses = [];
+    const startImg = $("[data-path-start]", el), startSign = $(".x-path__sign--start", el);
+    let len = 0, ys = [], ls = [], marks = [], prev = 0, roses = [], lms = [], sy = 0, cup = null;
 
     const build = () => {
       const box = el.getBoundingClientRect();
@@ -335,7 +336,16 @@
       const swing = phone.matches ? 20 : Math.min(lane * 0.42, 100);
       const f = (n) => n.toFixed(1);
       // vertical S-curves: each leg leaves its stop heading down and swings out to one side before the next
-      let d = `M${f(pts[0][0])},0 L${f(pts[0][0])},${f(pts[0][1])}`;
+      // the cupcake the cherry starts on sits by the road's first point; the road comes out from under it
+      sy = 0;
+      if (startImg) {
+        startImg.style.left = `${pts[0][0].toFixed(1)}px`;
+        const r = startImg.getBoundingClientRect();
+        cup = r.height ? [r.left + r.width / 2 - box.left, r.top - box.top + r.height * 0.1] : null;
+        if (cup) sy = Math.max(0, Math.min(r.bottom - box.top - 10, pts[0][1] - 60));
+      }
+      if (startSign) startSign.style.left = `${(pts[0][0] + (phone.matches ? 30 : 42)).toFixed(1)}px`;
+      let d = `M${f(pts[0][0])},${f(sy)} L${f(pts[0][0])},${f(pts[0][1])}`;
       for (let i = 1; i < pts.length; i++) {
         const [ax, ay] = pts[i - 1], [bx, by] = pts[i], dy = by - ay, w = (i % 2 ? -1 : 1) * swing;
         // the last leg drops straight down onto the cake, between the candles
@@ -353,6 +363,8 @@
         ys.push(Math.max(q.y, ys.length ? ys[ys.length - 1] : 0)); ls.push(l);
       }
       marks = pts.map(([, y]) => api.at(y));
+      // the cakes beside the road, by the height they hang at
+      lms = $$(".x-path__lm", el).map((im) => ({ el: im, y: (parseFloat(im.style.getPropertyValue("--y")) / 100) * el.clientHeight, on: false }));
       // rosettes along the road, kept clear of the stops and the cake
       roseHost.innerHTML = "";
       roses = [];
@@ -393,7 +405,16 @@
       const lean = (Math.atan2(q2.x - q.x, q2.y - q.y) * 180) / Math.PI;
       const s = Math.min(Math.abs(l - prev) / 50, 0.24);
       prev = l;
-      cherry.style.transform = `translate(${q.x.toFixed(1)}px, ${(q.y + api.hop).toFixed(1)}px) rotate(${(lean * 0.55 + Math.sin(l / 26) * 4).toFixed(1)}deg) scale(${(1 - s * 0.45).toFixed(3)}, ${(1 + s).toFixed(3)})`;
+      // at the very start the cherry perches on the cupcake and hops off it onto the road
+      const perch = cup ? Math.max(0, 1 - l / 80) : 0;
+      const px = cup ? (cup[0] - q.x) * perch : 0, py = cup ? (cup[1] - q.y) * perch - 44 * Math.sin(Math.PI * perch) : 0;
+      cherry.style.transform = `translate(${(q.x + px).toFixed(1)}px, ${(q.y + api.hop + py).toFixed(1)}px) rotate(${(lean * 0.55 + Math.sin(l / 26) * 4 - perch * 12).toFixed(1)}deg) scale(${(1 - s * 0.45).toFixed(3)}, ${(1 + s).toFixed(3)})`;
+      lms.forEach((m) => {
+        const on = q.y >= m.y;
+        if (on === m.on) return;
+        m.on = on;
+        if (live) gsap.fromTo(m.el, { scaleX: 1.22, scaleY: 0.82 }, { scaleX: 1, scaleY: 1, duration: 0.9, ease: "elastic.out(1, 0.3)", overwrite: "auto" });
+      });
       roses.forEach((r) => { const on = l >= r.l; if (on !== r.on) { r.on = on; r.el.classList.toggle("is-on", on); } });
       let stop = -1;
       for (let i = 0; i < stops.length; i++) if (l >= marks[i] - 4) stop = i;
@@ -407,6 +428,7 @@
     else addEventListener("resize", rebuild);
     document.fonts?.ready.then(rebuild);
     addEventListener("load", rebuild);
+    if (startImg) { if (startImg.complete) rebuild(); else startImg.addEventListener("load", rebuild); }
     return api;
   }
 
@@ -419,6 +441,7 @@
     const inner = $(".x-path__w1 > span", head);
     const script = $(".x-path__script", head);
     const bag = $(".x-path__bag", head);
+    const qdot = $(".x-path__qdot", head);
     const floats = $$(".x-fl", head);
     const animate = hasLibs && !reduce;
 
@@ -531,6 +554,8 @@
           script.style.clipPath = `inset(-80% ${((1 - o.p) * 155 - 30).toFixed(1)}% -80% -30%)`;
         } })
         .call(() => { script.style.clipPath = "none"; fx.pop(bag, 16, 0.5); })
+        // the dot of the question mark is a cherry — it pops up last
+        .fromTo(qdot, { scale: 0, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.8, ease: "elastic.out(1, 0.4)" }, "<")
         // and is lifted away
         .to(bag, { y: "-=140", x: "+=80", rotation: 25, opacity: 0, duration: 0.6, ease: "power2.in" });
     };
@@ -543,6 +568,8 @@
         tl.from(floats, { scale: 0, opacity: 0, duration: 0.9, stagger: 0.05, ease: "back.out(2.4)" }, 0)
           // the letters drop in one by one and bounce on the cake
           .from(letters, { yPercent: -280, rotation: () => gsap.utils.random(-45, 45), opacity: 0, duration: 1, stagger: 0.07, ease: "bounce.out" }, 0.15)
+          // every other letter kicks up sprinkles as it lands
+          .call(() => letters.forEach((lt, i) => { if (i % 2) return; gsap.delayedCall(i * 0.07 + 0.72, () => fx.pop(lt, 7, 0.35)); }), null, 0.15)
           // the glaze starts to drip
           .call(() => {
             dripsHidden = false;
