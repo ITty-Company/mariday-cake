@@ -1,0 +1,110 @@
+/* ─── ⑭ Occasion: the cake wheel ───
+   One cake from above, eight slices — eight occasions. Spin it; the slice under the cake server
+   slides out of the cake and its story appears next to it. Built by js/home-occasion.js. */
+
+.x-fest {
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  grid-template-areas: "head wheel" "info wheel" "chips wheel";
+  grid-template-rows: auto auto 1fr;
+  align-items: start;
+  column-gap: clamp(30px, 5vw, 90px);
+  row-gap: clamp(20px, 2.4vw, 34px);
+  overflow: clip;
+}
+
+/* heading: the question mark keeps rocking until the cake is spun */
+.x-fest__head { grid-area: head; }
+.x-fest__head .x-eyebrow { margin-bottom: 1rem; }
+.x-fest__title { margin: 0; font-family: var(--font-wide); font-weight: 800; font-size: clamp(2.6rem, 5.4vw, 5.6rem); line-height: 0.95; letter-spacing: -0.05em; text-transform: uppercase; color: var(--pink-deep); }
+.x-fest__q { display: inline-block; color: var(--cherry); transform-origin: 50% 88%; animation: xf-rock 2.6s ease-in-out infinite; }
+.x-fest.is-played .x-fest__q { animation: xf-rock 2.6s ease-in-out 1 forwards; }
+@keyframes xf-rock { 0%, 100% { rotate: -10deg; } 50% { rotate: 12deg; } }
+
+/* ── the wheel ── */
+.x-fest__wheel { grid-area: wheel; position: relative; justify-self: center; align-self: center; width: min(100%, 720px); aspect-ratio: 1; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; outline: none; }
+.x-fest__wheel.is-drag { cursor: grabbing; }
+.x-fest__wheel:focus-visible .x-fest__svg { outline: 3px solid var(--cherry); outline-offset: 10px; border-radius: 50%; }
+.x-fest__glow { position: absolute; inset: -6%; border-radius: 50%; background: radial-gradient(closest-side, rgba(245, 188, 200, 0.85), rgba(245, 188, 200, 0.25) 60%, transparent); filter: blur(20px); pointer-events: none; }
+.x-fest__svg { position: relative; display: block; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 34px 40px rgba(61, 4, 5, 0.22)) drop-shadow(0 6px 10px rgba(61, 4, 5, 0.12)); }
+
+/* scroll-in: the plate is set on the table */
+.x-fest:not(.is-in) .x-fest__svg { opacity: 0; transform: scale(0.82) translateY(40px); }
+.x-fest__svg { transition: opacity 0.6s, transform 1.4s var(--expo); }
+
+/* slices */
+.x-fest__slice { cursor: pointer; transition: transform 0.7s cubic-bezier(0.34, 1.5, 0.5, 1), filter 0.5s; }
+.x-fest__crumb { fill: #f5bcc8; }
+.x-fest__cut { fill: none; stroke: #fff8f4; stroke-width: 6; stroke-linejoin: round; }
+.x-fest__slice:hover { filter: brightness(1.06); }
+.x-fest__wheel.is-picked .x-fest__slice:not(.is-on) { filter: saturate(0.55) brightness(0.86); }
+.x-fest__slice.is-on { transform: translateY(-46px); filter: drop-shadow(0 24px 18px rgba(61, 4, 5, 0.35)); }
+.x-fest__base { transition: opacity 0.4s; }
+
+/* names on the plate rim */
+.x-fest__label { font-family: var(--font-wide); font-weight: 600; font-size: 25px; letter-spacing: 0.14em; text-transform: uppercase; fill: rgba(109, 8, 9, 0.38); transition: fill 0.4s; }
+.x-fest__label.is-on { fill: var(--cherry); font-weight: 800; }
+
+/* the cake server at 12 o'clock: clicks over each cut like a wheel-of-fortune flapper */
+.x-fest__server { position: absolute; z-index: 3; left: 50%; top: -4.2%; width: 7.2%; aspect-ratio: 0.82; translate: -50% 0; transform-origin: 50% 20%; pointer-events: none; }
+.x-fest__server::before { content: ""; position: absolute; left: 50%; top: 0; width: 100%; aspect-ratio: 1; translate: -50% 0; border-radius: 50% 50% 50% 0; rotate: -45deg; background: radial-gradient(circle at 38% 32%, #d63045, var(--cherry) 55%, var(--cherry-deep)); box-shadow: 0 0 0 4px #fff, 0 10px 18px rgba(61, 4, 5, 0.35); }
+.x-fest__server i { position: absolute; left: 50%; top: 31%; width: 30%; aspect-ratio: 1; translate: -50% 0; border-radius: 50%; background: #fff; }
+.x-fest__server.is-tick { animation: xf-tick 0.28s ease-out; }
+@keyframes xf-tick { 30% { rotate: -16deg; } 70% { rotate: 6deg; } }
+
+.x-fest__yours { position: absolute; z-index: 3; left: calc(50% + 7%); top: -3%; margin: 0; rotate: -7deg; white-space: nowrap; font-size: clamp(1.15rem, 1.7vw, 1.5rem); opacity: 0; translate: -10px 6px; transition: opacity 0.4s, translate 0.6s var(--expo); pointer-events: none; }
+.x-fest__yours::before { content: "↙"; margin-right: 0.2em; }
+.x-fest__wheel.is-picked .x-fest__yours { opacity: 1; translate: 0 0; }
+
+.x-fest__spin-hint { position: absolute; z-index: 3; left: -2%; bottom: 4%; margin: 0; rotate: -10deg; pointer-events: none; transition: opacity 0.5s; }
+.x-fest.is-played .x-fest__spin-hint { opacity: 0; }
+
+/* ── the story of the chosen slice ── */
+.x-fest__info { grid-area: info; max-width: 520px; color: var(--cherry); }
+.x-fest__n { display: flex; align-items: baseline; gap: 4px; margin: 0; font-family: var(--font-wide); font-variant-numeric: tabular-nums; }
+.x-fest__n b { font-weight: 800; font-size: 1.05rem; letter-spacing: 0.04em; }
+.x-fest__n span { font-size: 0.75rem; opacity: 0.5; }
+.x-fest__name { margin: 0.15em 0 0.35em; font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: clamp(2.6rem, 4.4vw, 4.2rem); line-height: 1; letter-spacing: -0.02em; }
+.x-fest__text { margin: 0 0 1.1rem; max-width: 36ch; font-size: 1.04rem; line-height: 1.6; color: var(--ink-soft); }
+.x-fest__tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 1.6rem; padding: 0; list-style: none; }
+.x-fest__tags li { padding: 0.5em 0.95em; border: 1.5px solid var(--line-strong); border-radius: 999px; font: 600 0.66rem/1 var(--font-wide); letter-spacing: 0.08em; text-transform: uppercase; }
+.x-fest__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; }
+.x-fest__lucky { display: inline-flex; align-items: center; gap: 0.5em; padding: 0.4em 0; border: 0; border-bottom: 1.5px dashed currentColor; background: none; color: var(--cherry); font: 600 0.72rem/1 var(--font-wide); letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+.x-fest__lucky span { display: inline-block; font-size: 1.1rem; transition: rotate 0.6s var(--expo); }
+.x-fest__lucky:hover span { rotate: 360deg; }
+.x-fest__lucky:focus-visible { outline: 2px solid var(--cherry); outline-offset: 4px; }
+
+.x-fest__info.is-swap > * { animation: xf-in 0.8s var(--expo) both; }
+.x-fest__info.is-swap > :nth-child(2) { animation-delay: 0.05s; }
+.x-fest__info.is-swap > :nth-child(3) { animation-delay: 0.1s; }
+.x-fest__info.is-swap > :nth-child(4) { animation-delay: 0.15s; }
+.x-fest__info.is-swap > :nth-child(5) { animation-delay: 0.2s; }
+@keyframes xf-in { from { opacity: 0; transform: translateY(18px); } }
+
+/* ── chips: a quick index of all eight ── */
+.x-fest__chips { grid-area: chips; display: flex; flex-wrap: wrap; gap: 8px; max-width: 520px; }
+.x-fest__chip { padding: 0.62em 1em; border: 1px solid var(--line); border-radius: 999px; background: rgba(255, 255, 255, 0.5); color: var(--cherry); font: 600 0.64rem/1 var(--font-wide); letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background 0.3s, color 0.3s, border-color 0.3s, transform 0.4s var(--expo); }
+.x-fest__chip:hover { border-color: var(--cherry); transform: translateY(-2px); }
+.x-fest__chip[aria-pressed="true"] { background: var(--cherry); border-color: var(--cherry); color: var(--bg); }
+.x-fest__chip:focus-visible { outline: 2px solid var(--cherry); outline-offset: 3px; }
+
+/* ── Responsive ── */
+@media (max-width: 1000px) {
+  .x-fest { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "wheel" "chips" "info"; grid-template-rows: none; }
+  .x-fest__wheel { width: min(100%, 580px); margin: 40px 0 10px; }
+  .x-fest__info, .x-fest__chips { max-width: none; }
+}
+@media (max-width: 560px) {
+  .x-fest__wheel { width: 100%; margin-top: 34px; }
+  .x-fest__server { width: 9%; }
+  .x-fest__yours { left: calc(50% + 9%); top: -5%; }
+  .x-fest__spin-hint { left: 0; bottom: -2%; font-size: 1.2rem; }
+  .x-fest__label { font-size: 26px; letter-spacing: 0.04em; }
+  .x-fest__chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 calc(var(--gutter) * -1); padding: 4px var(--gutter); scrollbar-width: none; }
+  .x-fest__chips::-webkit-scrollbar { display: none; }
+  .x-fest__chip { flex: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .x-fest__q, .x-fest__server.is-tick, .x-fest__info.is-swap > * { animation: none !important; }
+  .x-fest__slice, .x-fest__svg { transition: none; }
+}

@@ -1,0 +1,94 @@
+/* The house style of the titles, shared by every inner page — the same materials as «Обрані роботи» on the home page:
+   heavy letters in glossy cherry glaze standing on layers of cream, and the second line piped across in white cream
+   with a cherry outline. Loaded after the page styles, so it only restyles the titles. */
+@import url("https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Pacifico&display=swap");
+
+/* ── the big words of the hero */
+.p-title,
+.ed-hero__title {
+  font-family: "Dela Gothic One", var(--font-wide);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+.p-title { font-size: clamp(2.8rem, 10.5vw, 10rem); line-height: 0.9; }
+/* Dela Gothic is wider than Unbounded: sizes are set so the longest word of each kind fits its column */
+.ed-hero__title { font-size: clamp(2.3rem, 11.4cqi, 8rem); line-height: 0.92; }
+.ed-hero__title--xl { font-size: clamp(2.8rem, 16cqi, 10rem); }
+.ed-hero__title--long { font-size: clamp(2rem, 8.6cqi, 6.4rem); }
+.ed-hero__title--long .p-script { font-size: 0.62em; }
+
+.p-title [data-chars],
+.ed-hero__title [data-chars] {
+  /* the cream the letters stand on, and their shadow on the wall */
+  filter:
+    drop-shadow(0 0.025em 0 #fff8ef)
+    drop-shadow(0 0.02em 0 #f0dccb)
+    drop-shadow(0 0.025em 0 #fff8ef)
+    drop-shadow(0 0.015em 0 #e2c3aa)
+    drop-shadow(0 0.16em 0.14em rgba(61, 4, 5, 0.22));
+}
+/* each letter is glazed on its own, lit from above-left like the lamp on the home page */
+.p-title [data-chars],
+.p-title [data-chars] .p-ch,
+.ed-hero__title [data-chars],
+.ed-hero__title [data-chars] .p-ch {
+  background: radial-gradient(circle 1.6em at 28% -0.5em, #ff9c94 0, #d8323a 18%, #a3161b 40%, var(--cherry) 66%, #3a0304 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* once the word is split into letters, only the letters carry the glaze */
+.p-title [data-chars]:has(.p-ch),
+.ed-hero__title [data-chars]:has(.p-ch) { background: none; }
+.p-title [data-chars] .p-ch,
+.ed-hero__title [data-chars] .p-ch { padding-bottom: 0.06em; }
+
+/* ── the second line, piped in cream */
+.p-title .p-script,
+.ed-hero__title .p-script,
+.ab-hero__title .p-script {
+  width: max-content;
+  max-width: 100%;
+  padding: 0.05em 0.2em 0.25em;
+  font-family: "Pacifico", var(--font-script);
+  font-weight: 400;
+  font-size: 0.46em;
+  line-height: 1.15;
+  letter-spacing: 0;
+  text-transform: none;
+  /* solid cream (a gradient clipped to the text draws a box behind it in Chrome once rotated and filtered) */
+  color: #fff8f0;
+  filter:
+    drop-shadow(0.025em 0 0 var(--cherry)) drop-shadow(-0.025em 0 0 var(--cherry))
+    drop-shadow(0 0.025em 0 var(--cherry)) drop-shadow(0 -0.025em 0 var(--cherry))
+    drop-shadow(0 0.06em 0 #470304)
+    drop-shadow(0 10px 18px rgba(61, 4, 5, 0.3));
+  animation: glaze-pipe 1.4s var(--expo) 0.7s both;
+}
+/* written in from the left; the reveal leaves room for the soft shadow, so it never shows a cut edge */
+@keyframes glaze-pipe {
+  from { clip-path: inset(-150% 100% -150% -20%); opacity: 0.3; }
+  to { clip-path: inset(-150% -30% -150% -20%); opacity: 1; }
+}
+.p-title .p-script { margin-top: -0.12em; }
+.ed-hero__title .p-script { margin-top: -0.1em; }
+.ab-hero__title .p-script { font-size: 0.3em; text-shadow: none; }
+
+/* ── section headings: the light word is piped too, in rose */
+.p-h2 .p-light {
+  font-family: "Pacifico", var(--font-script);
+  font-weight: 400;
+  font-size: 0.82em;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--pink-deep, #c9506d);
+}
+
+@media (max-width: 700px) {
+  .p-title .p-script, .ed-hero__title .p-script { font-size: 0.62em; margin-left: 1.2rem; }
+  .ed-hero__title--long .p-script { font-size: 0.72em; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .p-title .p-script, .ed-hero__title .p-script, .ab-hero__title .p-script { animation: none; }
+}

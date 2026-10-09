@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Карта смаків — Mariday Cake</title>
+  <meta name="description" content="9 начинок Mariday Cake у розрізі, тест «який смак мій» і дегустаційний сет.">
+  <meta name="theme-color" content="#6d0809">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236d0809'/%3E%3Cpath d='M14 44h36v6H14z' fill='%23dbefed'/%3E%3Cpath d='M20 28h24v16H20z' fill='%23f5bcc8'/%3E%3Cpath d='M25 18h14v10H25z' fill='%23dbefed'/%3E%3Ccircle cx='32' cy='13' r='5' fill='%23f5bcc8'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="../css/main.css?v=10">
+  <link rel="stylesheet" href="../css/pages.css?v=12">
+  <link rel="stylesheet" href="../css/glaze.css?v=1">
+</head>
+<body data-page="flavors" class="inner inner--default">
+  <div class="grain" aria-hidden="true"></div>
+  <a class="p-skip" href="#main">До вмісту</a>
+  <div id="site-header"></div>
+  <main id="main">
+    <header class="p-hero p-hero--pink">
+      <img class="p-hero__cherry p-hero__cherry--a" data-depth="1.4" src="../img/cakes/cherries.png" alt="">
+      <img class="p-hero__cherry p-hero__cherry--b" data-depth="0.7" src="../img/cakes/cherries.png" alt="">
+      <div class="p-hero__top">
+        <nav class="p-crumbs" aria-label="Хлібні крихти"><a href="../index.html">Головна</a><i>/</i><span>Смаки</span></nav>
+        <p class="p-eyebrow">( 9 начинок у розрізі )</p>
+      </div>
+      <h1 class="p-title"><span class="p-title__word" data-chars>Карта</span><em class="p-script">смаків</em></h1>
+      <div class="p-hero__bottom">
+        <p class="p-lede" data-up>Кожна начинка — результат довгого пошуку балансу. Дивіться шари в розрізі, фільтруйте за настроєм або пройдіть тест.</p>
+        <div class="p-hero__actions" data-up><a class="p-btn" href="#quiz"><span>Який смак мій?</span></a><a class="p-link" href="#tasting">Дегустаційний сет →</a></div>
+      </div>
+    </header>
+    <div class="p-ribbon " data-marquee aria-hidden="true"><div class="p-ribbon__track"><span>Фісташка–малина</span><b>🍒</b><span>Снікерс</span><b>🍒</b><span>Лісові ягоди</span><b>🍒</b><span>Банан–карамель</span><b>🍒</b><span>Kinder Bueno</span><b>🍒</b><span>Малина–лимон</span><b>🍒</b><span>Пломбір</span><b>🍒</b><span>Фісташка–малина</span><b>🍒</b><span>Снікерс</span><b>🍒</b><span>Лісові ягоди</span><b>🍒</b><span>Банан–карамель</span><b>🍒</b><span>Kinder Bueno</span><b>🍒</b><span>Малина–лимон</span><b>🍒</b><span>Пломбір</span><b>🍒</b></div></div>
+    <section class="p-wrap p-section">
+      <div class="cat-stickers" id="flavor-moods" role="group" aria-label="Настрій"></div>
+      <div class="f-grid" id="flavors-grid"></div>
+    </section>
+    <section class="quiz" id="quiz" data-sprinkles>
+      <div class="p-wrap quiz__inner">
+        <div class="quiz__copy">
+          <p class="p-eyebrow light" data-up>( Тест · 3 питання )</p>
+          <h2 class="p-h2 light" data-rise>Який смак <span class="p-light">ваш?</span></h2>
+          <p class="p-hand light" data-up>відповідайте серцем, а не розумом ♥</p>
+        </div>
+        <div class="quiz__card" id="flavor-quiz" aria-live="polite"></div>
+      </div>
+    </section>
+    <section class="p-wrap p-section tasting" id="tasting">
+      <div class="tasting__copy">
+        <p class="p-eyebrow" data-up>( Дегустаційний сет )</p>
+        <h2 class="p-h2" data-rise>9 смаків <span class="p-light">в одній коробці</span></h2>
+        <p class="p-lede" data-up>Міні-трайфли з усіма начинками — ідеально перед весіллям чи великим замовленням. Після дегустації — знижка на торт від 8 кг.</p>
+        <div class="tasting__buy" data-up><b>€45</b><button type="button" class="p-btn p-btn--big" id="tasting-add"><span>Замовити сет</span></button></div>
+      </div>
+      <div class="t-cups" id="tasting-cups"></div>
+    </section>
+    <section class="p-cta" data-sprinkles>
+      <div class="p-cta__inner">
+        <p class="p-eyebrow light" data-up>( Ваша черга )</p>
+        <h2 class="p-cta__title" data-rise>Обрали <em>смак?</em></h2>
+        <a class="p-magnet" href="constructor.html"><span>Зібрати торт</span></a>
+        
+        <p class="p-cta__hint">Клікніть будь-де — буде посипка ✦</p>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/vendor/gsap.min.js"></script>
+  <script src="../js/vendor/ScrollTrigger.min.js"></script>
+  <script src="../js/vendor/lenis.min.js"></script>
+  <script src="../js/data.js?v=12"></script>
+  <script src="../js/content.js?v=1"></script>
+  <script src="../js/cart.js?v=10"></script>
+  <script src="../js/layout.js?v=12"></script>
+  <script src="../js/app.js?v=14"></script>
+  <script src="../js/pages.js?v=11"></script>
+</body>
+</html>

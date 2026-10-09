@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mariday Cake — luxury cakes · Alkmaar</title>
+  <meta name="description" content="Весільні торти, бенто та десерти в Alkmaar. Mariday Cake — luxury cakes, за якими їдуть з усієї країни.">
+  <meta name="theme-color" content="#6d0809">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236d0809'/%3E%3Cpath d='M14 44h36v6H14z' fill='%23dbefed'/%3E%3Cpath d='M20 28h24v16H20z' fill='%23f5bcc8'/%3E%3Cpath d='M25 18h14v10H25z' fill='%23dbefed'/%3E%3Ccircle cx='32' cy='13' r='5' fill='%23f5bcc8'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Unbounded:wght@300;400;600;800&family=Great+Vibes&family=Caveat:wght@500;700&family=Manrope:wght@300;400;500;600;700&family=Dela+Gothic+One&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="img/cakes/showreel-poster.jpg">
+  <link rel="preload" as="image" href="img/cakes/cream-wide.jpg?v=2" media="(min-aspect-ratio: 1/1)">
+  <link rel="preload" as="image" href="img/cakes/cream-tall.jpg?v=2" media="(max-aspect-ratio: 1/1)">
+  <link rel="stylesheet" href="css/main.css?v=10">
+  <link rel="stylesheet" href="css/home.css?v=50">
+  <link rel="stylesheet" href="css/home-gallery.css?v=49">
+  <link rel="stylesheet" href="css/home-bottom.css?v=5">
+  <link rel="stylesheet" href="css/home-make.css?v=5">
+  <link rel="stylesheet" href="css/home-bake.css?v=3">
+  <link rel="stylesheet" href="css/home-dress.css?v=5">
+  <link rel="stylesheet" href="css/reviews.css?v=3">
+  <link rel="stylesheet" href="css/home-post.css?v=4">
+</head>
+<body data-page="home" class="home">
+  <div class="grain" aria-hidden="true"></div>
+  <svg class="x-defs" aria-hidden="true" focusable="false">
+    <filter id="x-rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="4" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <radialGradient id="x-path-cherry" cx="0.35" cy="0.3" r="0.75"><stop offset="0" stop-color="#ff8fa3"/><stop offset="0.35" stop-color="#c0142a"/><stop offset="1" stop-color="#5a0206"/></radialGradient>
+    <path id="x-seal-ring" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0"/>
+  </svg>
+
+  <!-- Preloader -->
+  <div class="x-loader" aria-hidden="true">
+    <div class="x-loader__curtain">
+      <div class="x-loader__fill"></div>
+      <svg class="x-loader__drip" viewBox="0 0 1440 140" preserveAspectRatio="none"><path d=""/></svg>
+    </div>
+    <canvas class="x-loader__canvas"></canvas>
+    <div class="x-loader__center">
+      <p class="x-loader__kicker">Cake atelier · Alkmaar</p>
+      <div class="x-loader__logo">
+        <span class="x-loader__outline">MARIDAY</span>
+        <span class="x-loader__layer x-loader__layer--pink">MARIDAY</span>
+        <span class="x-loader__layer x-loader__layer--cream">MARIDAY</span>
+        <span class="x-loader__script">cake</span>
+      </div>
+      <div class="x-loader__bar"><i></i></div>
+      <div class="x-loader__meta">
+        <span class="x-loader__hint">готуємо щось смачне…</span>
+        <b><span data-loader-count>0</span>%</b>
+      </div>
+    </div>
+    <div class="x-loader__cream">
+      <i class="x-loader__cream-base"></i>
+      <canvas class="x-loader__brush"></canvas>
+      <svg class="x-loader__cream-drip" viewBox="0 0 1440 140" preserveAspectRatio="none"><path d=""/></svg>
+    </div>
+  </div>
+
+  <div class="x-progress" aria-hidden="true"></div>
+  <div class="x-curtain" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <div id="site-header"></div>
+
+  <main>
+    <!-- ① HERO -->
+    <section class="x-hero">
+      <div class="x-hero__frame">
+        <video class="x-hero__video" src="video/showreel.mp4" poster="img/cakes/showreel-poster.jpg" autoplay muted loop playsinline preload="auto"></video>
+        <div class="x-hero__shade"></div>
+      </div>
+
+      <img class="x-hero__cherry x-hero__cherry--1" data-depth="1.4" src="img/cakes/cherries.png" alt="">
+      <img class="x-hero__cherry x-hero__cherry--2" data-depth="0.7" src="img/cakes/cherries.png" alt="">
+      <img class="x-hero__cherry x-hero__cherry--3" data-depth="1" src="img/cakes/cherries.png" alt="">
+
+      <div class="x-hero__inner">
+        <p class="x-hero__side x-hero__side--l" data-hero-fade>Cake atelier &amp; design ✦ Alkmaar · Nederland</p>
+        <p class="x-hero__side x-hero__side--r" data-hero-fade>#mariday.cake ✦ гортайте вниз</p>
+
+        <div class="x-hero__center">
+          <h1 class="x-hero__title" aria-label="Mariday Cake">
+            <span class="x-hero__word" data-split-chars>MARIDAY</span>
+            <span class="x-hero__script" data-hero-script>Cake</span>
+          </h1>
+          <div class="x-note x-note--top" data-hero-fade><span>luxury: <b>весільні яруси</b></span><i></i></div>
+          <div class="x-note x-note--bottom" data-hero-fade><i></i><span>handmade: <b>Alkmaar · NL</b></span></div>
+        </div>
+
+        <div class="x-hero__bottom">
+          <a class="x-proof" href="https://www.instagram.com/mariday.cake/" target="_blank" rel="noopener" data-hero-fade>
+            <span class="x-proof__ring"><img src="img/hero-avatar.jpg" alt=""></span>
+            <span class="x-proof__text"><strong>3 979 підписників</strong><small>@mariday.cake</small></span>
+          </a>
+
+          <nav class="x-chips" data-hero-fade aria-label="Швидка навігація">
+            <a href="pages/cakes.html">торти</a>
+            <span aria-hidden="true">✦</span>
+            <a href="pages/bento.html">бенто</a>
+            <span aria-hidden="true">&gt;&gt;&gt;&gt;&gt;</span>
+            <a href="pages/constructor.html">конструктор</a>
+            <span aria-hidden="true">♥</span>
+            <a href="pages/desserts.html">candy bar</a>
+            <span aria-hidden="true">✺</span>
+          </nav>
+
+          <a href="#manifesto" class="x-badge" data-hero-fade aria-label="Гортати далі">
+            <svg viewBox="0 0 200 200" aria-hidden="true">
+              <defs><path id="x-circ" d="M100,100 m-76,0 a76,76 0 1,1 152,0 a76,76 0 1,1 -152,0"/></defs>
+              <text><textPath href="#x-circ">luxury cakes ✦ alkmaar ✦ mariday ✦ </textPath></text>
+            </svg>
+            <span class="x-badge__core"><img src="img/cakes/cherries.png" alt=""></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ③ Why Mariday: cake that comes apart layer by layer -->
+    <section class="x-cut" id="inside" aria-label="Що всередині торта Mariday">
+      <div class="x-cut__pin">
+        <header class="x-cut__head">
+          <p class="x-eyebrow">( Чому Mariday )</p>
+          <h2 class="x-h2">Що всередині <span class="x-light">торта?</span></h2>
+        </header>
+        <div class="x-cut__stage">
+          <div class="x-cut__glow" aria-hidden="true"></div>
+          <div class="x-cut__garnish" aria-hidden="true">
+            <i class="g-rasp" style="--x:18%;--y:22%;--d:1.2"></i>
+            <i class="g-leaf" style="--x:76%;--y:18%;--d:0.8"></i>
+            <i class="g-pearl" style="--x:30%;--y:62%;--d:1.5"></i>
+            <i class="g-rasp" style="--x:82%;--y:58%;--d:1"></i>
+            <i class="g-pearl" style="--x:68%;--y:38%;--d:0.6"></i>
+            <i class="g-leaf" style="--x:12%;--y:48%;--d:1.3"></i>
+            <img class="g-cherry" src="img/cakes/cherries.png" alt="" style="--x:86%;--y:30%;--d:1.1">
+            <img class="g-cherry" src="img/cakes/cherries.png" alt="" style="--x:6%;--y:34%;--d:0.9">
+            <i class="g-pearl" style="--x:50%;--y:12%;--d:1.1"></i>
+          </div>
+          <div class="x-cut__cake">
+            <div class="x-cut__layer" data-kind="plate"></div>
+            <div class="x-cut__layer" data-kind="sponge">
+            <div class="x-cut__label x-cut__label--r">
+              <svg class="x-cut__wire" viewBox="0 0 90 40" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2,30 C30,30 50,6 88,6"/><circle cx="2" cy="30" r="3.5"/></svg>
+              <div class="x-cut__card">
+                <span class="x-cut__n"><b>01</b></span>
+                <img class="x-cut__thumb" src="img/cakes/slice.jpg" alt="" loading="lazy">
+                <div class="x-cut__txt">
+                  <strong>Вологий бісквіт</strong>
+                  <p>Печемо під ваш смак — м'який, вологий, з ніжною крихтою.</p>
+                  <ul class="x-cut__chips"><li>ваніль</li><li>шоколад</li><li>горіх</li></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+            <div class="x-cut__layer" data-kind="cream">
+            <div class="x-cut__label x-cut__label--l">
+              <svg class="x-cut__wire" viewBox="0 0 90 40" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2,30 C30,30 50,6 88,6"/><circle cx="2" cy="30" r="3.5"/></svg>
+              <div class="x-cut__card">
+                <span class="x-cut__n"><b>02</b></span>
+                <img class="x-cut__thumb" src="img/cakes/piping.jpg" alt="" loading="lazy">
+                <div class="x-cut__txt">
+                  <strong>Кремчиз</strong>
+                  <p>Ніжний крем у кожній начинці: тримає форму й не перебиває смак.</p>
+                  <ul class="x-cut__chips"><li>кремчиз</li><li>вершки</li></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+            <div class="x-cut__layer" data-kind="berry">
+            <div class="x-cut__label x-cut__label--r">
+              <svg class="x-cut__wire" viewBox="0 0 90 40" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2,30 C30,30 50,6 88,6"/><circle cx="2" cy="30" r="3.5"/></svg>
+              <div class="x-cut__card">
+                <span class="x-cut__n"><b>03</b></span>
+                <img class="x-cut__thumb" src="img/cakes/raspberries.jpg" alt="" loading="lazy">
+                <div class="x-cut__txt">
+                  <strong>Ягоди й конфі</strong>
+                  <p>Сезонні ягоди та яскраве конфі — кислинка, що балансує солодке.</p>
+                  <ul class="x-cut__chips"><li>малина</li><li>вишня</li><li>полуниця</li></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+            <div class="x-cut__layer" data-kind="choco">
+            <div class="x-cut__label x-cut__label--l">
+              <svg class="x-cut__wire" viewBox="0 0 90 40" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2,30 C30,30 50,6 88,6"/><circle cx="2" cy="30" r="3.5"/></svg>
+              <div class="x-cut__card">
+                <span class="x-cut__n"><b>04</b></span>
+                <img class="x-cut__thumb" src="img/cakes/forest.jpg" alt="" loading="lazy">
+                <div class="x-cut__txt">
+                  <strong>9 смаків</strong>
+                  <p>Від фісташки з малиною до Kinder Bueno. Дегустаційний сет допоможе обрати.</p>
+                  <ul class="x-cut__chips"><li>фісташка</li><li>снікерс</li><li>kinder</li></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+            <div class="x-cut__layer" data-kind="top"><img class="x-cut__cherries" src="img/cakes/cherries.png" alt="">
+            <div class="x-cut__label x-cut__label--r">
+              <svg class="x-cut__wire" viewBox="0 0 90 40" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2,30 C30,30 50,6 88,6"/><circle cx="2" cy="30" r="3.5"/></svg>
+              <div class="x-cut__card">
+                <span class="x-cut__n"><b>05</b></span>
+                <img class="x-cut__thumb" src="img/cakes/roses.jpg" alt="" loading="lazy">
+                <div class="x-cut__txt">
+                  <strong>Декор</strong>
+                  <p>Квіти, вишні, напис чи золото — збираємо під ваше свято й референс.</p>
+                  <ul class="x-cut__chips"><li>квіти</li><li>вишні</li><li>золото</li></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
+        </div>
+        <div class="x-cut__final">
+          <p class="x-hand">кожен шар — вручну, під ваше свято</p>
+          <a class="x-btn x-btn--cherry" href="pages/constructor.html"><span>Зібрати свій торт</span></a>
+        </div>
+        <div class="x-cut__facts">
+          <div><b>9</b><span>смаків на вибір</span></div>
+          <div><b data-min-price>€145</b><span>торти від</span></div>
+          <div><b>1 день</b><span>бенто</span></div>
+        </div>
+        <p class="x-cut__hint x-hand">гортайте — торт розбереться на шари ↓</p>
+      </div>
+    </section>
+
+    <!-- ④ Manifesto 1/3: falling letters + cream-piped line -->
+    <section class="x-drop" id="manifesto" aria-label="Маніфест">
+      <p class="x-sr">Ми не печемо «просто торти». Ми створюємо головну сцену свята — з квітів, ягід, глянцю і смаку, за яким повертаються знову.</p>
+      <div class="x-drop__top" aria-hidden="true">
+        <div class="x-pipe">
+          <p class="x-pipe__text" style="background-image:url('img/cakes/cream-wide.jpg?v=2')">ми створюємо головну сцену свята</p>
+          <svg class="x-pipe__bag" viewBox="0 0 120 210" aria-hidden="true">
+            <defs>
+              <linearGradient id="x-bag" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f3a7b8"/><stop offset="0.45" stop-color="#fde3ea"/><stop offset="1" stop-color="#e98aa1"/></linearGradient>
+              <linearGradient id="x-tip" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9aa5ae"/><stop offset="0.5" stop-color="#f4f6f8"/><stop offset="1" stop-color="#8e99a3"/></linearGradient>
+            </defs>
+            <path d="M30,30 Q60,14 92,30 L66,168 Q60,176 54,168 Z" fill="url(#x-bag)" stroke="rgba(109,8,9,0.25)" stroke-width="1.5"/>
+            <path d="M44,40 Q58,90 58,150" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="3" stroke-linecap="round"/>
+            <path d="M30,30 Q44,6 60,14 Q78,2 92,30 Q62,20 30,30 Z" fill="#e98aa1"/>
+            <path d="M52,166 L68,166 L63,200 L57,200 Z" fill="url(#x-tip)"/>
+          </svg>
+        </div>
+      </div>
+      <div class="x-drop__bokeh" aria-hidden="true">
+        <img src="img/cakes/cherries.png" alt="" style="--x:6%;--y:18%;--s:260px;--b:10px;--d:0s">
+        <img src="img/cakes/cherries.png" alt="" style="--x:74%;--y:8%;--s:200px;--b:7px;--d:-4s">
+        <img src="img/cakes/cherries.png" alt="" style="--x:44%;--y:30%;--s:140px;--b:14px;--d:-8s">
+        <img src="img/cakes/cherries.png" alt="" style="--x:86%;--y:46%;--s:120px;--b:4px;--d:-2s">
+      </div>
+      <div class="x-drop__world" aria-hidden="true"></div>
+    </section>
+
+    <!-- ⑥ Pinned horizontal collection: an exhibition — cut-out cakes on marble plinths of different heights, under a travelling spotlight; a shelf of miniatures tracks the way -->
+    <section class="gl" id="collection" aria-label="Колекція тортів">
+      <div class="gl__rail" aria-hidden="true"></div>
+      <div class="gl__spot" aria-hidden="true"><span class="gl__beam"><span class="gl__dust"><i style="--x:38%;--y:22%;--s:3px;--t:9s;--dl:0s;--dx:14px"></i><i style="--x:52%;--y:40%;--s:2px;--t:11s;--dl:-3s;--dx:-10px"></i><i style="--x:45%;--y:62%;--s:3px;--t:8s;--dl:-5s;--dx:18px"></i><i style="--x:60%;--y:28%;--s:2px;--t:10s;--dl:-1s;--dx:-16px"></i><i style="--x:48%;--y:78%;--s:4px;--t:12s;--dl:-7s;--dx:8px"></i><i style="--x:56%;--y:55%;--s:2px;--t:9s;--dl:-2s;--dx:22px"></i><i style="--x:42%;--y:46%;--s:2px;--t:10s;--dl:-6s;--dx:-20px"></i><i style="--x:63%;--y:70%;--s:3px;--t:11s;--dl:-4s;--dx:10px"></i><i style="--x:50%;--y:15%;--s:2px;--t:8s;--dl:-8s;--dx:-6px"></i><i style="--x:40%;--y:84%;--s:3px;--t:12s;--dl:-9s;--dx:16px"></i><i style="--x:58%;--y:88%;--s:2px;--t:9s;--dl:-5s;--dx:-12px"></i><i style="--x:47%;--y:33%;--s:3px;--t:10s;--dl:-2s;--dx:6px"></i></span></span><i class="gl__lamp"></i></div>
+      <div class="gl__track">
+        <!-- the first room of the hall: the title alone on the wall; the cakes roll in after it, never across it -->
+        <div class="gl__hall">
+          <header class="gl__intro">
+            <!-- poured into the letters of «Обрані» frame by frame (see horizontal() in js/home.js) -->
+            <video class="gl__reel" src="video/showreel.mp4" muted loop playsinline preload="auto" aria-hidden="true"></video>
+            <h2 class="gl__title" aria-label="Обрані роботи"><span class="gl__w1" aria-hidden="true">Обрані</span><span class="gl__light" aria-hidden="true">роботи</span></h2>
+            <img class="gl__berry gl__berry--1" src="img/cakes/cherries.png" alt="" aria-hidden="true">
+            <img class="gl__berry gl__berry--2" src="img/cakes/cherries.png" alt="" aria-hidden="true">
+            <p class="gl__call gl__call--top"><span>luxury: <b>8 тортів, за якими до нас їдуть</b></span><i aria-hidden="true"></i></p>
+            <p class="gl__call gl__call--bottom"><i aria-hidden="true"></i><span>з усієї країни: <b>під конкретну людину ♡</b></span></p>
+          </header>
+          <!-- under the title: all eight cakes on a slowly turning cake stand; scrolling spins it, a click goes to that cake -->
+          <div class="gl__carousel" data-gl-carousel aria-hidden="true"><i class="gl__plate"></i></div>
+        </div>
+        <div class="gl__cards" id="x-cards"></div>
+        <a class="ex ex--yours" href="pages/constructor.html" data-name="Ваш торт" style="--bg:#dbefed;--ac:#2f8f83;--ph:0.12">
+          <span class="ex__stage">
+            <span class="ex__lift">
+              <svg class="ex__ghost" viewBox="40 16 120 154" aria-hidden="true">
+                <path d="M70,58 C70,40 130,40 130,58 L130,92 C130,104 70,104 70,92 Z"/>
+                <path d="M46,104 C46,88 154,88 154,104 L154,150 C154,168 46,168 46,150 Z"/>
+                <path d="M100,40 L100,24 M94,30 C96,22 104,22 106,30"/>
+              </svg>
+              <b class="ex__plus" aria-hidden="true">+</b>
+            </span>
+          </span>
+          <span class="ex__plinth"><span class="ex__plate"><span class="ex__no" data-gl-yours>09</span><span class="ex__orn" aria-hidden="true">✦</span><b>Ваш торт</b><em>зібрати в конструкторі →</em></span></span>
+        </a>
+      </div>
+      <div class="gl__foot" aria-hidden="true">
+        <span class="gl__now" data-gl-now></span>
+        <span class="gl__bar"><i class="gl__cream"></i><img class="gl__cherry" src="img/cakes/cherries.png" alt=""><span class="gl__dots" data-gl-dots></span></span>
+      </div>
+    </section>
+
+    <!-- ⑨ What you can order: scroll-driven cake turntable -->
+    <section class="x-order" id="x-order" aria-label="Що можна замовити" style="--tint: #f5bcc8">
+      <div class="x-order__pin">
+        <div class="x-order__flood" aria-hidden="true"></div>
+        <div class="x-order__giant" aria-hidden="true">
+          <span class="is-on">Торти</span><span>Бенто</span><span>Капкейки</span><span>Candy bar</span>
+        </div>
+
+        <header class="x-order__head">
+          <p class="x-eyebrow">( Меню Mariday · 4 смаки свята )</p>
+          <h2 class="x-h2" data-rise>Ви можете <span class="x-light">замовити</span></h2>
+        </header>
+
+        <nav class="x-order__nav" aria-label="Категорії">
+          <button type="button" class="is-on" aria-pressed="true" data-dish="0"><i>01</i>Торти</button>
+          <button type="button" aria-pressed="false" data-dish="1"><i>02</i>Бенто</button>
+          <button type="button" aria-pressed="false" data-dish="2"><i>03</i>Капкейки</button>
+          <button type="button" aria-pressed="false" data-dish="3"><i>04</i>Candy bar</button>
+          <span class="x-order__cherry" aria-hidden="true"><img src="img/cakes/cherries.png" alt=""></span>
+        </nav>
+
+        <div class="x-order__stage" aria-hidden="true">
+          <div class="x-dish">
+            <div class="x-dish__halo"></div>
+            <div class="x-dish__orbit"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <svg class="x-dish__ring" viewBox="0 0 500 500">
+              <defs><path id="x-dish-arc" d="M250,250 m-218,0 a218,218 0 1,1 436,0 a218,218 0 1,1 -436,0"/></defs>
+              <text><textPath href="#x-dish-arc" textLength="1360" lengthAdjust="spacing">торти ✦ бенто ✦ капкейки ✦ candy bar ✦ ручна робота ✦ з любов'ю ✦ mariday ✦ </textPath></text>
+            </svg>
+            <div class="x-dish__plate">
+              <svg class="x-dish__doily" viewBox="0 0 400 400"></svg>
+            </div>
+            <div class="x-dish__treats">
+              <figure class="x-treat is-on">
+                <span style="--x: 50%; --w: 78%"><img src="img/cutouts/forest.webp" alt=""></span>
+              </figure>
+              <figure class="x-treat">
+                <span style="--x: 50%; --w: 84%"><img src="img/cutouts/fraisier.webp" alt="" loading="lazy"></span>
+              </figure>
+              <figure class="x-treat">
+                <span style="--x: 50%; --w: 72%"><img src="img/cutouts/cherrycup.webp" alt="" loading="lazy"></span>
+              </figure>
+              <figure class="x-treat">
+                <span style="--x: 57%; --w: 44%; --b: 5%"><img src="img/cutouts/candy-cake.webp" alt="" loading="lazy"></span>
+                <span style="--x: 24%; --w: 33%; --b: -5%"><img src="img/cutouts/candy-cup.webp" alt="" loading="lazy"></span>
+                <span style="--x: 80%; --w: 30%; --b: -8%"><img src="img/cutouts/candy-mac.webp" alt="" loading="lazy"></span>
+              </figure>
+            </div>
+            <div class="x-dish__burst"></div>
+            <span class="x-dish__stamp"><b data-dish-num>01</b><em>/ 04</em></span>
+          </div>
+        </div>
+
+        <div class="x-order__info">
+          <article class="x-menu is-on" data-tint="#f5bcc8">
+            <p class="x-menu__kicker">Головна зірка свята</p>
+            <h3>Торти</h3>
+            <p>Весільні яруси, скульптурні й тематичні торти від 1,5 кг.</p>
+            <ul><li>від 1,5 кг</li><li>яруси</li><li>тематичні</li></ul>
+            <a class="x-menu__go" href="pages/cakes.html">Обрати торт <span aria-hidden="true">→</span></a>
+          </article>
+          <article class="x-menu" data-tint="#fbe6b8">
+            <p class="x-menu__kicker">Маленький, але гучний</p>
+            <h3>Бенто</h3>
+            <p>Міні-торти з написом — ідеальний подарунок, готові від 1 дня.</p>
+            <ul><li>з написом</li><li>від 1 дня</li><li>у подарунок</li></ul>
+            <a class="x-menu__go" href="pages/bento.html">Обрати бенто <span aria-hidden="true">→</span></a>
+          </article>
+          <article class="x-menu" data-tint="#bcd6f3">
+            <p class="x-menu__kicker">Свято в долоні</p>
+            <h3>Капкейки</h3>
+            <p>Ніжний крем, ягідна начинка і декор у стилі вашого свята.</p>
+            <ul><li>ягідна начинка</li><li>ніжний крем</li><li>ваш декор</li></ul>
+            <a class="x-menu__go" href="pages/desserts.html">Обрати капкейки <span aria-hidden="true">→</span></a>
+          </article>
+          <article class="x-menu" data-tint="#e9c6f0">
+            <p class="x-menu__kicker">Солодкий стіл під ключ</p>
+            <h3>Candy bar</h3>
+            <p>Макарони, трайфли й міні-десерти для солодкого столу.</p>
+            <ul><li>макарони</li><li>трайфли</li><li>міні-десерти</li></ul>
+            <a class="x-menu__go" href="pages/desserts.html">Зібрати candy bar <span aria-hidden="true">→</span></a>
+          </article>
+        </div>
+
+        <div class="x-order__bar" aria-hidden="true"><i></i></div>
+        <p class="x-order__hint x-hand" aria-hidden="true">гортайте — тарілка крутиться ↓</p>
+      </div>
+    </section>
+
+    <!-- ⑩ How to order: the making of your cake. One cake stands in the middle of the page from the first chapter to
+         the last — it is sketched from a reference, cut open and filled, weighed, photographed into a chat, booked with
+         a wax seal, piped into the real thing and boxed up; at the end the box opens on it with the candles lit.
+         The six chapters scroll past on either side of it (js/home-make.js). Without the script, or with reduced
+         motion, the finished cake is simply shown. -->
+    <section class="x-make" id="how-to-order" aria-labelledby="x-make-title">
+      <header class="x-make__head">
+        <!-- ingredients floating round the title at different depths; they drift with the mouse and the scroll -->
+        <div class="x-make__float" aria-hidden="true">
+          <i class="x-fl x-fl--cherry" data-depth="0.9" style="--x:7%;--y:20%;--s:1.1;--r:-14deg"><svg viewBox="0 0 60 70"><defs><radialGradient id="x-make-cherry" cx="0.35" cy="0.3" r="0.75"><stop offset="0" stop-color="#ff8fa3"/><stop offset="0.35" stop-color="#c0142a"/><stop offset="1" stop-color="#5a0206"/></radialGradient></defs><path d="M30,44 C31,28 40,16 52,12" fill="none" stroke="#3d6b2c" stroke-width="3" stroke-linecap="round"/><path d="M46,14 C52,4 60,8 60,12 C54,18 48,18 46,14 Z" fill="#5f9c45"/><circle cx="30" cy="52" r="17" fill="url(#x-make-cherry)"/><ellipse cx="23" cy="45" rx="4.5" ry="3" fill="rgba(255,255,255,0.75)" transform="rotate(-30 23 45)"/></svg></i>
+          <i class="x-fl x-fl--cherry" data-depth="0.5" style="--x:93%;--y:44%;--s:0.75;--r:18deg"><svg viewBox="0 0 60 70"><path d="M30,44 C31,28 40,16 52,12" fill="none" stroke="#3d6b2c" stroke-width="3" stroke-linecap="round"/><path d="M46,14 C52,4 60,8 60,12 C54,18 48,18 46,14 Z" fill="#5f9c45"/><circle cx="30" cy="52" r="17" fill="url(#x-make-cherry)"/><ellipse cx="23" cy="45" rx="4.5" ry="3" fill="rgba(255,255,255,0.75)" transform="rotate(-30 23 45)"/></svg></i>
+          <i class="x-fl x-fl--mac" data-depth="0.35" style="--x:88%;--y:12%;--c:#f5bcc8;--r:12deg"></i>
+          <i class="x-fl x-fl--mac" data-depth="0.75" style="--x:12%;--y:66%;--c:#bcd6f3;--s:0.85;--r:-20deg"></i>
+          <i class="x-fl x-fl--mac" data-depth="0.25" style="--x:4%;--y:42%;--c:#fbe6b8;--s:0.6;--r:30deg"></i>
+          <i class="x-fl x-fl--kiss" data-depth="0.6" style="--x:84%;--y:72%;--r:-8deg"></i>
+          <i class="x-fl x-fl--kiss" data-depth="0.4" style="--x:24%;--y:8%;--s:0.6;--r:14deg;--c:#f5bcc8"></i>
+          <i class="x-fl x-fl--spr" data-depth="1" style="--x:30%;--y:84%;--c:#e2849a;--r:40deg"></i>
+          <i class="x-fl x-fl--spr" data-depth="0.8" style="--x:70%;--y:6%;--c:#9ed9b8;--r:-30deg"></i>
+          <i class="x-fl x-fl--spr" data-depth="0.6" style="--x:76%;--y:88%;--c:#bcd6f3;--r:70deg"></i>
+          <i class="x-fl x-fl--spr" data-depth="0.9" style="--x:18%;--y:36%;--c:#fbe6b8;--r:-60deg"></i>
+        </div>
+
+        <h2 class="x-make__title" id="x-make-title" aria-label="Як зробити замовлення?">
+          <span class="x-make__w1" aria-hidden="true"><span>Як зробити</span></span>
+          <span class="x-make__script" aria-hidden="true">замовлення?</span>
+          <span class="x-make__bag" aria-hidden="true"><svg viewBox="0 0 60 92"><path d="M6 4h48v9H6z" fill="#e2849a"/><path d="M8 12h44L33.5 74h-7Z" fill="#fff8ef" stroke="rgba(109,8,9,.3)" stroke-width="1.5"/><path d="M14 22c8 4 24 4 32 0M17 36c7 3 19 3 26 0M21 50c5 2 13 2 18 0" fill="none" stroke="rgba(226,132,154,.55)" stroke-width="2" stroke-linecap="round"/><path d="M26.5 74h7l-1.6 14h-3.8Z" fill="#b6c0c8"/><circle cx="30" cy="90" r="2.4" fill="#fff8ef"/></svg></span>
+          <span class="x-make__call x-make__call--l" aria-hidden="true"><span><i class="x-make__watch"></i>займе ≈ 5 хвилин</span><svg viewBox="0 0 60 40"><path d="M6 6c10 18 26 26 46 26"/><path d="M42 24l10 8-12 4"/></svg></span>
+        </h2>
+        <p class="x-make__sub">щоб замовити <em>ідеальний торт</em>, вам&nbsp;потрібно лише <mark>шість кроків</mark> — і&nbsp;торт народиться у&nbsp;вас на&nbsp;очах</p>
+        <div class="x-make__cta">
+          <button type="button" class="x-btn x-btn--cherry x-make__go" data-make-go><span>Почати з кроку 01</span><i aria-hidden="true">↓</i></button>
+          <a class="x-link" href="pages/constructor.html">або одразу в конструктор</a>
+          <span class="x-make__call x-make__call--r" aria-hidden="true">вишенка вже чекає<svg viewBox="0 0 60 40"><path d="M50 4C50 20 36 32 12 36"/><path d="M22 28l-10 8 12 3"/></svg></span>
+        </div>
+      </header>
+
+      <div class="x-make__body">
+        <!-- the stage: a cake stand that stays in the middle of the screen while the chapters scroll past -->
+        <div class="x-make__stagewrap">
+          <div class="x-make__stage" data-stage>
+            <div class="x-make__scene" data-scene>
+              <i class="x-mk-light" aria-hidden="true"></i>
+
+              <!-- 01 · references pegged on a line; pick one and it gets sketched -->
+              <div class="x-mk-line" data-line role="group" aria-label="Референси для ескізу">
+                <svg class="x-mk-string" viewBox="0 0 460 80" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M0,14 Q230,78 460,14"/></svg>
+                <button type="button" class="x-mk-ref" data-ref data-cut="img/cutouts/gl-pink.webp" data-name="рожевий drip" data-short="pink" aria-pressed="true" aria-label="Намалювати ескіз за фото: рожевий drip-торт" style="--x:64px;--y:29px;--r:-7deg"><img src="img/cakes/pink.jpg" alt="" loading="lazy" style="object-position:62% 30%"><span>pink</span></button>
+                <button type="button" class="x-mk-ref" data-ref data-cut="img/cutouts/gl-gold.webp" data-name="золото й макарон" data-short="gold" aria-pressed="false" aria-label="Намалювати ескіз за фото: торт із макаронс" style="--x:175px;--y:44px;--r:5deg"><img src="img/cakes/gold.jpg" alt="" loading="lazy"><span>gold</span></button>
+                <button type="button" class="x-mk-ref" data-ref data-cut="img/cutouts/gl-lilac.webp" data-name="бузок і ожина" data-short="lilac" aria-pressed="false" aria-label="Намалювати ескіз за фото: торт із бузком і ожиною" style="--x:285px;--y:44px;--r:-4deg"><img src="img/cakes/lilac.jpg" alt="" loading="lazy"><span>lilac</span></button>
+                <button type="button" class="x-mk-ref x-mk-ref--yours" data-ref data-cut="img/cutouts/gl-roses.webp" data-name="з вашого фото" data-short="ваш" aria-pressed="false" aria-label="Намалювати ескіз за вашим фото з Pinterest" style="--x:396px;--y:29px;--r:6deg"><img src="img/cakes/roses.jpg" alt="" loading="lazy"><b class="x-mk-ref__plus" aria-hidden="true"><i>+</i></b><span>ваше фото</span></button>
+              </div>
+
+              <!-- before the first chapter: the empty stand and a dashed cake waiting to be drawn -->
+              <span class="x-mk-ghost" aria-hidden="true"><i></i><i></i><b>тут буде ваш торт</b></span>
+
+              <!-- the sheet of paper the cake is drawn on; by the end it is the real cake standing on the stand -->
+              <div class="x-mk-paper" data-paper aria-hidden="true">
+                <i class="x-mk-paper__sheet"></i>
+                <i class="x-mk-paper__tape"></i>
+                <p class="x-mk-paper__head"><span>ескіз №<b data-sketch-no>017</b></span><span data-sketch-name>рожевий drip</span></p>
+                <img class="x-mk-still" src="img/cutouts/gl-pink.webp" alt="" loading="lazy" data-still>
+                <canvas class="x-mk-cv" data-cv></canvas>
+                <!-- 02 · the cut face: layers of the chosen flavour -->
+                <div class="x-mk-slice" data-slice>
+                  <i class="x-mk-slice__berry"></i>
+                  <i class="l-top"></i><i class="l-sp"></i><i class="l-cr"></i><i class="l-fi"></i><i class="l-sp"></i><i class="l-cr"></i><i class="l-fi"></i><i class="l-sp"></i>
+                </div>
+              </div>
+
+              <!-- the tools: each wrapper's origin is the tool's tip, which the script moves around -->
+              <span class="x-mk-tool x-mk-tool--pencil" data-tool="pencil" aria-hidden="true"><svg viewBox="0 0 150 24"><path d="M1 12 11 8.3v7.4Z" fill="#3b2626"/><path d="M11 8.3 28 2v20l-17-6.3Z" fill="#f6d7ae"/><path d="M28 2c-2 3-2 5 0 6.7-2 2-2 4.6 0 6.6-2 2-2 4.6 0 6.7" fill="none" stroke="#e3b98a" stroke-width="1.2"/><rect x="28" y="2" width="92" height="20" fill="#c0142a"/><rect x="28" y="2" width="92" height="6" fill="#e2394a"/><rect x="28" y="16" width="92" height="6" fill="#8f0f14"/><rect x="120" y="1.5" width="13" height="21" fill="#e9cf86"/><path d="M124.5 1.5v21M128.5 1.5v21" stroke="#c9a85a" stroke-width="1.2"/><rect x="133" y="1.5" width="15" height="21" rx="5" fill="#f5bcc8"/></svg></span>
+              <span class="x-mk-tool x-mk-tool--brush" data-tool="brush" aria-hidden="true"><svg viewBox="0 0 150 24"><path class="x-mk-bristle" d="M1 12C8 6.5 18 4.5 31 6v12C18 19.5 8 17.5 1 12Z"/><path d="M5 11.2C12 8.5 20 7.6 30 8" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.4" stroke-linecap="round"/><rect x="30" y="4.5" width="17" height="15" rx="2" fill="#c8d0d6"/><path d="M34 4.5v15M38 4.5v15" stroke="#9aa4ab" stroke-width="1"/><path d="M47 6.5 147 9.6c1.5 0 1.5 4.8 0 4.8L47 17.5Z" fill="#6d0809"/></svg></span>
+              <span class="x-mk-tool x-mk-tool--bag" data-tool="bag" aria-hidden="true"><svg viewBox="0 0 60 92"><path d="M6 4h48v9H6z" fill="#e2849a"/><path d="M8 12h44L33.5 74h-7Z" fill="#fff8ef" stroke="rgba(109,8,9,.3)" stroke-width="1.5"/><path d="M14 22c8 4 24 4 32 0M17 36c7 3 19 3 26 0M21 50c5 2 13 2 18 0" fill="none" stroke="rgba(226,132,154,.55)" stroke-width="2" stroke-linecap="round"/><path d="M26.5 74h7l-1.6 14h-3.8Z" fill="#b6c0c8"/><circle cx="30" cy="90" r="2.4" fill="#fff8ef"/></svg></span>
+              <span class="x-mk-knife" data-knife aria-hidden="true"></span>
+
+              <!-- 03 · the stand turns into a kitchen scale -->
+              <span class="x-mk-dial" data-dial aria-hidden="true"><i class="x-mk-dial__needle"></i><b data-dial-kg>2,5</b></span>
+
+              <!-- 04 · the phone the request is sent from -->
+              <div class="x-mk-phone" data-phone aria-hidden="true">
+                <i class="x-mk-phone__notch"></i>
+                <div class="x-mk-chat" data-chat>
+                  <div class="x-mk-chat__head"><img src="img/hero-avatar.jpg" alt="" loading="lazy"><span><b>Mariday Cake</b><small data-chat-status>онлайн</small></span></div>
+                  <div class="x-mk-chat__log">
+                    <p class="x-mk-chat__msg x-mk-chat__msg--me"><span data-chat-m1>Привіт! Хочу такий торт на 14 гостей 🍰</span><s>✓✓</s></p>
+                    <p class="x-mk-chat__pic"><img src="img/cakes/pink.jpg" alt="" loading="lazy" data-chat-pic><s>✓✓</s></p>
+                    <p class="x-mk-chat__msg x-mk-chat__msg--me"><span data-chat-m2>з фісташкою й малиною ♥</span><s>✓✓</s></p>
+                    <p class="x-mk-chat__msg"><span>Вітаємо! Дата вільна ✨ Надсилаю деталі</span></p>
+                    <p class="x-mk-chat__typing"><i></i><i></i><i></i></p>
+                  </div>
+                  <div class="x-mk-chat__compose"><span class="is-ph" data-chat-field>Повідомлення…</span><i class="x-mk-chat__send"><svg viewBox="0 0 24 24"><path d="M3 11.5 21 3l-6.5 18-3.2-7.3L3 11.5Z"/><path d="m11.3 13.7 4-4"/></svg></i></div>
+                </div>
+              </div>
+              <span class="x-mk-flash" data-flash aria-hidden="true"></span>
+              <span class="x-mk-shot" data-shot aria-hidden="true"><img src="img/cakes/pink.jpg" alt="" loading="lazy" data-shot-img></span>
+
+              <!-- 05 · the order ticket, booked with a wax seal -->
+              <div class="x-mk-ticket" data-ticket aria-hidden="true">
+                <span class="x-mk-ticket__kick">замовлення № <b data-ticket-no>2317</b></span>
+                <ul class="x-mk-ticket__spec">
+                  <li><i>✓</i><span>дизайн</span><b data-spec-design>pink</b></li>
+                  <li><i>✓</i><span>начинка</span><b data-spec-flavor>фісташка-малина</b></li>
+                  <li><i>✓</i><span>вага</span><b data-spec-kg>2,5 кг · 14 гостей</b></li>
+                </ul>
+                <div class="x-mk-ticket__date"><span>ваша дата</span><b data-date-day>19</b><em data-date-month>жовтня</em><svg class="x-mk-ticket__ring" viewBox="0 0 60 50"><path pathLength="1" d="M44 9C36 3 14 4 7 15c-6 10 0 25 18 28 16 3 30-5 31-17 1-9-7-15-15-17"/></svg></div>
+                <span class="x-mk-ticket__pay"><span><b>50%</b> торт</span><span><b>100%</b> бенто</span><span>iDEAL</span></span>
+                <span class="x-mk-seal" data-seal><b>50%</b><small>заброньовано</small></span>
+              </div>
+
+              <!-- 06 · the box; the bow opens it -->
+              <div class="x-mk-box" data-box aria-hidden="true">
+                <i class="x-mk-box__back"></i>
+                <i class="x-mk-box__side x-mk-box__side--l"></i>
+                <i class="x-mk-box__side x-mk-box__side--r"></i>
+                <span class="x-mk-box__front"><b>Mariday</b><small>luxury cakes · Alkmaar</small><em class="x-mk-box__sticker" data-sticker>самовивіз · Alkmaar</em></span>
+                <i class="x-mk-box__lid"></i>
+                <i class="x-mk-box__rib x-mk-box__rib--v"></i>
+                <i class="x-mk-box__rib x-mk-box__rib--h"></i>
+                <span class="x-mk-box__bow" data-bow><i></i><i></i><i></i><i></i></span>
+                <span class="x-mk-box__tag" data-tag><i class="x-mk-box__tag-string"></i><span class="x-mk-box__tag-card"><b>для вас ♥</b><small data-tag-1>pink · фісташка-малина</small><small data-tag-2>2,5 кг · 14 гостей</small><em data-tag-3>19 жовтня</em></span></span>
+              </div>
+
+              <!-- the party: bunting and candles -->
+              <span class="x-mk-garland" data-garland aria-hidden="true"><svg viewBox="0 0 300 56" preserveAspectRatio="none"><path pathLength="1" d="M0,6 Q150,50 300,6"/></svg><i style="left:10%;top:13.9px"></i><i style="left:20%;top:20.1px"></i><i style="left:30%;top:24.5px"></i><i style="left:40%;top:27.1px"></i><i style="left:50%;top:28.0px"></i><i style="left:60%;top:27.1px"></i><i style="left:70%;top:24.5px"></i><i style="left:80%;top:20.1px"></i><i style="left:90%;top:13.9px"></i></span>
+              <span class="x-mk-candles" data-candles>
+                <button type="button" class="x-mk-candle" aria-label="Задути свічку"><i></i></button>
+                <button type="button" class="x-mk-candle" aria-label="Задути свічку"><i></i></button>
+                <button type="button" class="x-mk-candle" aria-label="Задути свічку"><i></i></button>
+                <button type="button" class="x-mk-candle" aria-label="Задути свічку"><i></i></button>
+              </span>
+
+              <!-- the cherry waits on the stand and goes on top at the end -->
+              <svg class="x-mk-cherry" data-cherry viewBox="0 0 60 70" aria-hidden="true"><path d="M30,44 C31,28 40,16 52,12" fill="none" stroke="#3d6b2c" stroke-width="3" stroke-linecap="round"/><path d="M46,14 C52,4 60,8 60,12 C54,18 48,18 46,14 Z" fill="#5f9c45"/><circle cx="30" cy="52" r="17" fill="url(#x-make-cherry)"/><ellipse cx="23" cy="45" rx="4.5" ry="3" fill="rgba(255,255,255,0.75)" transform="rotate(-30 23 45)"/></svg>
+
+              <div class="x-mk-stand" aria-hidden="true"><i class="x-mk-floor"></i><i class="x-mk-stand__foot"></i><i class="x-mk-stand__stem"></i><i class="x-mk-stand__plate"></i></div>
+              <span class="x-mk-fx" data-fx aria-hidden="true"></span>
+            </div>
+            <p class="visually-hidden" aria-live="polite" data-make-live></p>
+          </div>
+        </div>
+
+        <ol class="x-make__steps">
+          <!-- 01 · design -->
+          <li class="x-make__st" data-step="1" style="--c: var(--pink)">
+            <article class="x-make__card">
+              <p class="x-make__no"><span>№</span>01</p>
+              <h3>Оберіть <em>дизайн</em></h3>
+              <p>Гортайте каталог, збирайте торт у конструкторі або надішліть свій референс — адаптуємо його під стиль Mariday. Оберіть фото на мотузці — і олівець намалює ескіз.</p>
+              <div class="x-make__tags">
+                <a class="x-make__tag" href="pages/cakes.html" style="--r:-4deg"><small>15 дизайнів</small><span>Каталог <i aria-hidden="true">↗</i></span></a>
+                <a class="x-make__tag x-make__tag--pink" href="pages/constructor.html" style="--r:3deg"><small>з нуля</small><span>Конструктор <i aria-hidden="true">↗</i></span></a>
+                <a class="x-make__tag x-make__tag--butter" href="https://www.instagram.com/mariday.cake/" target="_blank" rel="noopener" style="--r:-2deg"><small>фото з Pinterest</small><span>Свій референс <i aria-hidden="true">↗</i></span></a>
+              </div>
+              <p class="x-make__note">референс із Pinterest — теж ок ♥</p>
+            </article>
+            <aside class="x-make__aside" aria-hidden="true"><span class="x-make__ghost">01</span><span class="x-make__call x-make__call--to">олівець малює ваш референс<svg viewBox="0 0 60 40"><path d="M54 8C44 26 30 34 8 32"/><path d="M16 24l-8 8 10 4"/></svg></span></aside>
+          </li>
+
+          <!-- 02 · flavour -->
+          <li class="x-make__st" data-step="2" style="--c: var(--butter)">
+            <article class="x-make__card">
+              <p class="x-make__no"><span>№</span>02</p>
+              <h3>Оберіть <em>начинку</em></h3>
+              <p>9 смаків — від фісташки з малиною до Kinder Bueno. Не можете вирішити? Дегустаційний сет із 9 міні-трайфлів.</p>
+              <div class="x-make__ctl">
+                <div class="x-make__chips" role="radiogroup" aria-label="Начинка">
+                  <button type="button" role="radio" aria-checked="true" data-flavor="0" style="--dot:#d8344f">фісташка-малина</button>
+                  <button type="button" role="radio" aria-checked="false" data-flavor="1" style="--dot:#8a5530">kinder bueno</button>
+                  <button type="button" role="radio" aria-checked="false" data-flavor="2" style="--dot:#6d1a3c">лісові ягоди</button>
+                  <button type="button" role="radio" aria-checked="false" data-flavor="3" style="--dot:#f7c948">малина-лимон</button>
+                </div>
+                <p class="x-make__desc" data-flavor-desc>горіховий бісквіт · кремчиз з фісташкою · малинове конфі</p>
+              </div>
+              <div class="x-make__tags">
+                <a class="x-make__tag" href="pages/flavors.html" style="--r:-4deg"><small>9 смаків</small><span>Карта смаків <i aria-hidden="true">↗</i></span></a>
+                <a class="x-make__tag x-make__tag--pink" href="pages/flavors.html#quiz" style="--r:3deg"><small>30 секунд</small><span>Тест смаку <i aria-hidden="true">↗</i></span></a>
+                <a class="x-make__tag x-make__tag--butter" href="pages/flavors.html#tasting" style="--r:-2deg"><small>€45</small><span>Дегустація <i aria-hidden="true">↗</i></span></a>
+              </div>
+            </article>
+            <aside class="x-make__aside" aria-hidden="true"><span class="x-make__ghost">02</span><span class="x-make__call x-make__call--to">а всередині — ваша начинка<svg viewBox="0 0 60 40"><path d="M6 8c10 18 24 26 46 24"/><path d="M44 24l10 8-12 4"/></svg></span></aside>
+          </li>
+
+          <!-- 03 · weight -->
+          <li class="x-make__st" data-step="3" style="--c: var(--sky)">
+            <article class="x-make__card">
+              <p class="x-make__no"><span>№</span>03</p>
+              <h3>Порахуйте <em>вагу</em></h3>
+              <p>Норма — 150–200 г на гостя. Посуньте повзунок: торт на терезах підросте сам і підкаже розмір.</p>
+              <div class="x-make__ctl x-make__kg" data-kg>
+                <p class="x-make__kg-out"><output data-kg-out>2,5</output><span>кг</span><small data-kg-size>Ø 20 см · 14 порцій</small></p>
+                <label class="x-make__range">
+                  <span>гостей: <b data-guests-out>14</b></span>
+                  <input type="range" min="4" max="60" value="14" data-guests aria-label="Кількість гостей">
+                </label>
+                <div class="x-make__plates" data-plates aria-hidden="true"></div>
+              </div>
+              <div class="x-make__tags">
+                <a class="x-make__tag" href="pages/cake-price.html" style="--r:-4deg"><small>гості → кг</small><span>Калькулятор <i aria-hidden="true">↗</i></span></a>
+                <a class="x-make__tag x-make__tag--pink" href="pages/journal-weight.html" style="--r:3deg"><small>шпаргалка</small><span>Скільки брати <i aria-hidden="true">↗</i></span></a>
+              </div>
+            </article>
+            <aside class="x-make__aside" aria-hidden="true"><span class="x-make__ghost">03</span><span class="x-make__call x-make__call--to">≈ 180 г на гостя<svg viewBox="0 0 60 40"><path d="M54 8C44 26 30 34 8 32"/><path d="M16 24l-8 8 10 4"/></svg></span></aside>
+          </li>
+
+          <!-- 04 · request -->
+          <li class="x-make__st" data-step="4" style="--c: #fff3f5">
+            <article class="x-make__card">
+              <p class="x-make__no"><span>№</span>04</p>
+              <h3>Залиште <em>заявку</em></h3>
+              <p>Додайте торт у кошик і заповніть заявку — вона полетить менеджеру у WhatsApp або на email. Фото ескізу прикріпиться саме.</p>
+              <div class="x-make__tags">
+                <a class="x-make__tag" href="pages/constructor.html" style="--r:-4deg"><small>у кошик</small><span>Зібрати торт <i aria-hidden="true">↗</i></span></a>
+                <a class="x-make__tag x-make__tag--pink" href="https://wa.me/31600000000" target="_blank" rel="noopener" style="--r:3deg"><small>відповідаємо швидко</small><span>WhatsApp <i aria-hidden="true">↗</i></span></a>
+                <a class="x-make__tag x-make__tag--butter" href="https://www.instagram.com/mariday.cake/" target="_blank" rel="noopener" style="--r:-2deg"><small>@mariday.cake</small><span>Instagram <i aria-hidden="true">↗</i></span></a>
+              </div>
+              <p class="x-make__note">або в Instagram @mariday.cake</p>
+            </article>
+            <aside class="x-make__aside" aria-hidden="true"><span class="x-make__ghost">04</span><span class="x-make__call x-make__call--to">фото летить менеджеру<svg viewBox="0 0 60 40"><path d="M6 8c10 18 24 26 46 24"/><path d="M44 24l10 8-12 4"/></svg></span></aside>
+          </li>
+
+          <!-- 05 · prepayment -->
+          <li class="x-make__st" data-step="5" style="--c: var(--champagne)">
+            <article class="x-make__card">
+              <p class="x-make__no"><span>№</span>05</p>
+              <h3>Підтвердьте <em>передоплатою</em></h3>
+              <p>Менеджер уточнить деталі й закріпить дату. Передоплата — 50% за торт, 100% за бенто та десертні сети.</p>
+              <div class="x-make__tags">
+                <a class="x-make__tag" href="pages/delivery.html#pay" style="--r:-4deg"><small>50% · iDEAL</small><span>Оплата <i aria-hidden="true">↗</i></span></a>
+                <a class="x-make__tag x-make__tag--pink" href="pages/faq.html" style="--r:3deg"><small>чесно й коротко</small><span>Питання <i aria-hidden="true">↗</i></span></a>
+              </div>
+              <p class="x-make__note">дата — ваша, сургуч — наш</p>
+            </article>
+            <aside class="x-make__aside" aria-hidden="true"><span class="x-make__ghost">05</span><span class="x-make__call x-make__call--to">дата закріплена ♥<svg viewBox="0 0 60 40"><path d="M54 8C44 26 30 34 8 32"/><path d="M16 24l-8 8 10 4"/></svg></span></aside>
+          </li>
+
+          <!-- 06 · party -->
+          <li class="x-make__st" data-step="6" style="--c: var(--pink)">
+            <article class="x-make__card">
+              <p class="x-make__no"><span>№</span>06</p>
+              <h3>Заберіть і <em>святкуйте</em></h3>
+              <p>Самовивіз в Alkmaar — безкоштовно. Доставка по Нідерландах — за домовленістю з менеджером. А далі — коробка, бант і свято.</p>
+              <div class="x-make__ctl">
+                <div class="x-make__chips" role="radiogroup" aria-label="Як отримати торт">
+                  <button type="button" role="radio" aria-checked="true" data-pickup="0" style="--dot:#e2849a">самовивіз · Alkmaar</button>
+                  <button type="button" role="radio" aria-checked="false" data-pickup="1" style="--dot:#bcd6f3">доставка по NL</button>
+                </div>
+              </div>
+              <div class="x-make__tags">
+                <a class="x-make__tag" href="pages/delivery.html" style="--r:-4deg"><small>по всій NL</small><span>Доставка <i aria-hidden="true">↗</i></span></a>
+                <a class="x-make__tag x-make__tag--pink" href="pages/journal-storage.html" style="--r:3deg"><small>до подачі</small><span>Як зберігати <i aria-hidden="true">↗</i></span></a>
+              </div>
+              <p class="x-make__note">дістаньте за 30 хв до подачі</p>
+            </article>
+            <aside class="x-make__aside" aria-hidden="true"><span class="x-make__ghost">06</span><span class="x-make__call x-make__call--to">та-дам! ваш торт у коробці<svg viewBox="0 0 60 40"><path d="M6 8c10 18 24 26 46 24"/><path d="M44 24l10 8-12 4"/></svg></span></aside>
+          </li>
+        </ol>
+      </div>
+
+      <!-- the end: the box opens on the cake -->
+      <div class="x-make__fin" data-fin>
+        <p class="x-eyebrow">( Крок 07 · найсолодший )</p>
+        <h3>Торт — <em>ваш</em>. Свято — <em>теж</em>.</h3>
+        <div class="x-make__fin-cta">
+          <a class="x-btn x-btn--cherry" href="pages/constructor.html"><span>Зібрати свій торт</span></a>
+          <a class="x-link" href="pages/cakes.html">або обрати з каталогу</a>
+        </div>
+        <p class="x-make__fin-hint x-hand" data-candle-hint>задуйте свічки — і загадайте бажання ✦</p>
+      </div>
+      <div class="x-make__burst" aria-hidden="true"></div>
+    </section>
+
+    <!-- ⑭ Occasion: one cake, eight parties. The stage is pinned; every bit of scroll dresses the same cake for the
+         next occasion — it twirls, changes tiers and colours, swaps its decorations (js/home-dress.js) -->
+    <section class="x-dress" id="occasion" aria-labelledby="x-dress-title">
+      <div class="x-dress__pin">
+        <p class="x-dress__word" aria-hidden="true"><span data-dress-word>весілля</span></p>
+
+        <header class="x-dress__head">
+          <p class="x-eyebrow">( Один торт — вісім свят )</p>
+          <h2 class="x-dress__title" id="x-dress-title" aria-label="Для якого свята?">
+            <span class="x-dress__w1" aria-hidden="true"><span>Для якого</span></span>
+            <span class="x-dress__script" aria-hidden="true">свята?</span>
+          </h2>
+        </header>
+
+        <div class="x-dress__stage">
+          <button type="button" class="x-dress__cake" data-dress-cake data-tiers="3" aria-label="Переодягнути торт для наступного свята">
+            <span class="x-dress__side" aria-hidden="true">
+              <span class="x-dress__deco" data-for="2"><i class="x-dk-bal x-dk-bal--pink"></i><i class="x-dk-bal x-dk-bal--blue"></i></span>
+              <span class="x-dress__deco" data-for="4"><i class="x-dk-bento"></i><i class="x-dk-bento x-dk-bento--r"></i></span>
+              <span class="x-dress__deco" data-for="5"><i class="x-dk-heart" style="--x:8%;--y:30%">♥</i><i class="x-dk-heart" style="--x:88%;--y:22%">♥</i><i class="x-dk-heart" style="--x:14%;--y:62%">♥</i><i class="x-dk-heart" style="--x:84%;--y:56%">♥</i></span>
+              <span class="x-dress__deco" data-for="6"><i class="x-dk-cup" style="--x:6%"></i><i class="x-dk-cup" style="--x:17%"></i><i class="x-dk-cup" style="--x:83%"></i><i class="x-dk-cup" style="--x:94%"></i></span>
+              <span class="x-dress__deco" data-for="7"><b class="x-dk-bubble">бо можна 😉</b></span>
+              <span class="x-dress__deco" data-for="1"><i class="x-dk-conf" style="--x:6%;--y:20%;--c:#f5bcc8"></i><i class="x-dk-conf" style="--x:92%;--y:30%;--c:#bcd6f3"></i><i class="x-dk-conf" style="--x:12%;--y:48%;--c:#fbe6b8"></i><i class="x-dk-conf" style="--x:88%;--y:60%;--c:#e2849a"></i><i class="x-dk-conf" style="--x:22%;--y:12%;--c:#9ed9b8"></i><i class="x-dk-conf" style="--x:78%;--y:10%;--c:#6d0809"></i></span>
+            </span>
+            <span class="x-dress__crown" aria-hidden="true">
+              <span class="x-dress__deco" data-for="0"><i class="x-dk-rose" style="--x:30%"></i><i class="x-dk-rose x-dk-rose--b" style="--x:50%"></i><i class="x-dk-rose" style="--x:70%"></i><i class="x-dk-tophearts">♥♥</i></span>
+              <span class="x-dress__deco" data-for="1"><i class="x-dk-candle" style="--x:14%"></i><i class="x-dk-candle" style="--x:32%"></i><i class="x-dk-candle" style="--x:50%"></i><i class="x-dk-candle" style="--x:68%"></i><i class="x-dk-candle" style="--x:86%"></i></span>
+              <span class="x-dress__deco" data-for="2"><b class="x-dk-qmark">?</b></span>
+              <span class="x-dress__deco" data-for="3"><i class="x-dk-flower" style="--x:10%"></i><i class="x-dk-flower" style="--x:30%"></i><i class="x-dk-flower" style="--x:50%"></i><i class="x-dk-flower" style="--x:70%"></i><i class="x-dk-flower" style="--x:90%"></i><i class="x-dk-star">✦</i></span>
+              <span class="x-dress__deco" data-for="4"><i class="x-dk-cloud"></i></span>
+              <span class="x-dress__deco" data-for="5"><b class="x-dk-plaque">ми ♥</b></span>
+              <span class="x-dress__deco" data-for="6"><b class="x-dk-flag">TEAM</b></span>
+              <span class="x-dress__deco" data-for="7"><b class="x-dk-sign">просто так ♥</b></span>
+            </span>
+            <i class="x-dress__tier" data-t="3" aria-hidden="true"></i>
+            <i class="x-dress__tier" data-t="2" aria-hidden="true"></i>
+            <i class="x-dress__tier" data-t="1" aria-hidden="true"></i>
+            <span class="x-dress__front" aria-hidden="true">
+              <span class="x-dress__deco" data-for="0"><i class="x-dk-rose x-dk-rose--s" style="--x:12%;--y:30%"></i><i class="x-dk-rose x-dk-rose--s x-dk-rose--b" style="--x:20%;--y:62%"></i><i class="x-dk-rose x-dk-rose--s" style="--x:88%;--y:40%"></i></span>
+              <span class="x-dress__deco" data-for="2"><i class="x-dk-cut"></i></span>
+              <span class="x-dress__deco" data-for="3"><i class="x-dk-bow"></i></span>
+              <span class="x-dress__deco" data-for="6"><b class="x-dk-logo">YOUR<br>LOGO</b></span>
+            </span>
+            <i class="x-dress__stand" aria-hidden="true"></i>
+          </button>
+          <p class="x-dress__tap x-hand" aria-hidden="true">тапніть торт — переодягнеться ✦</p>
+
+          <figure class="x-dress__photo" aria-hidden="true">
+            <img src="img/cakes/roses.jpg" alt="" data-dress-img>
+            <figcaption data-dress-cap>справжній, з нашої вітрини</figcaption>
+          </figure>
+        </div>
+
+        <div class="x-dress__info" aria-live="polite">
+          <p class="x-dress__n"><b data-dress-n>01</b><span>/08</span></p>
+          <h3 class="x-dress__name" data-dress-name>Весілля</h3>
+          <p class="x-dress__text" data-dress-text>Яруси, живі квіти й дегустація начинок перед замовленням. Вагу рахуємо за нормою 150–200 г на гостя.</p>
+          <ul class="x-dress__tags" data-dress-tags><li>яруси</li><li>живі квіти</li><li>дегустація</li></ul>
+          <div class="x-dress__actions">
+            <a class="x-btn x-btn--cherry" href="pages/cakes.html" data-dress-cta><span>Весільні торти</span></a>
+            <button type="button" class="x-dress__lucky" data-dress-lucky><span aria-hidden="true">🎲</span> Навмання</button>
+          </div>
+        </div>
+
+        <nav class="x-dress__chips" aria-label="Оберіть свято" data-dress-chips>
+          <i class="x-dress__dot" aria-hidden="true"></i>
+        </nav>
+      </div>
+    </section>
+
+    <!-- ⑮ Reviews: guest mail. The desk is pinned; as you scroll, postcards slide out of a big envelope one by one,
+         fly up and land on a pile, each stamped as it lands (js/home-post.js; data and composer from js/reviews.js) -->
+    <section class="x-post" id="reviews" aria-labelledby="x-post-title">
+      <div class="x-post__pin">
+        <header class="x-post__head">
+          <p class="x-eyebrow">( Пошта від гостей )</p>
+          <h2 class="x-post__title" id="x-post-title" aria-label="Що кажуть гості">
+            <span class="x-post__w1" aria-hidden="true"><span>Що кажуть</span></span>
+            <span class="x-post__script" aria-hidden="true">гості</span>
+          </h2>
+          <p class="x-post__sub x-hand">гортайте — листівки самі вилітають з конверта; клік — перевернути ↻</p>
+        </header>
+
+        <div class="x-rvseal x-post__seal" data-post-seal role="img" aria-label="Середня оцінка гостей"></div>
+
+        <div class="x-post__meta">
+          <p class="x-post__count" aria-live="polite"><span>листівка</span> <b data-post-n>01</b><i>/</i><span data-post-total>01</span></p>
+          <div class="x-post__nav">
+            <button type="button" class="x-post__btn" data-post-go="-1" aria-label="Попередня листівка">←</button>
+            <button type="button" class="x-post__btn" data-post-go="1" aria-label="Наступна листівка">→</button>
+          </div>
+          <button type="button" class="x-env" data-post-write><span class="x-env__ico" aria-hidden="true"></span>Написати листівку</button>
+          <a class="x-link" href="pages/reviews.html">Усі відгуки →</a>
+        </div>
+
+        <div class="x-post__desk" data-post-desk tabindex="0" aria-label="Листівки від гостей: стрілки ← → гортають">
+          <div class="x-post__pile" data-post-pile></div>
+          <div class="x-post__env" aria-hidden="true">
+            <i class="x-post__env-back"></i>
+            <i class="x-post__env-flap"></i>
+            <i class="x-post__env-front"><b>Mariday ✦ пошта від гостей</b><small>Alkmaar · NL</small></i>
+            <span class="x-post__env-seal">M</span>
+          </div>
+        </div>
+      </div>
+
+      <dialog class="x-mail" id="x-mail" aria-labelledby="x-mail-title" data-lenis-prevent>
+        <div class="x-mail__box">
+          <button type="button" class="x-mail__close" data-mail-close aria-label="Закрити">×</button>
+          <p class="x-mail__eyebrow">( Листівка для Mariday )</p>
+          <h3 class="x-mail__title" id="x-mail-title">Напишіть нам <em>пару слів</em></h3>
+          <div data-composer></div>
+        </div>
+      </dialog>
+    </section>
+
+    <!-- ⑲ Final CTA: bake your own cake. The oven preheats as it scrolls in; hold the button and it bakes — the batter
+         rises, the timer runs down, the bell rings, the door drops and the cake rides out to be iced (js/home-bake.js) -->
+    <section class="x-cta x-bake" id="order-now" aria-labelledby="x-bake-title">
+      <canvas class="x-cta__canvas" aria-hidden="true"></canvas>
+      <div class="x-bake__bg" aria-hidden="true">
+        <p><span>Замовимо ✦ торт ✦ без приводу ✦ просто так ✦ Замовимо ✦ торт ✦ без приводу ✦ просто так ✦&nbsp;</span><span>Замовимо ✦ торт ✦ без приводу ✦ просто так ✦ Замовимо ✦ торт ✦ без приводу ✦ просто так ✦&nbsp;</span></p>
+        <p><span>дієта з понеділка ✦ ще шматочок ✦ 0 ккал ✦ дієта з понеділка ✦ ще шматочок ✦ 0 ккал ✦&nbsp;</span><span>дієта з понеділка ✦ ще шматочок ✦ 0 ккал ✦ дієта з понеділка ✦ ще шматочок ✦ 0 ккал ✦&nbsp;</span></p>
+      </div>
+
+      <div class="x-bake__inner">
+        <header class="x-bake__head">
+          <p class="x-eyebrow light">( Ваша черга )</p>
+          <h2 class="x-bake__title" id="x-bake-title" aria-label="Замовимо щось неймовірне?">
+            <span class="x-bake__w1" aria-hidden="true"><span>Замовимо</span></span>
+            <span class="x-bake__script" aria-hidden="true">щось неймовірне?</span>
+          </h2>
+        </header>
+
+        <div class="x-bake__stage" aria-hidden="true">
+          <span class="x-bake__smell"><i></i><i></i><i></i></span>
+          <div class="x-oven" data-oven>
+            <span class="x-oven__bell" data-bell>дзинь!</span>
+            <div class="x-oven__top">
+              <i class="x-oven__knob" data-knob></i>
+              <span class="x-oven__lcd" data-oven-lcd>0°</span>
+              <i class="x-oven__lamp"></i>
+              <i class="x-oven__knob" data-knob></i>
+            </div>
+            <div class="x-oven__body">
+              <div class="x-oven__inside">
+                <i class="x-oven__glow"></i>
+                <i class="x-oven__rack"></i>
+                <span class="x-oven__tin"><i class="x-oven__batter" data-batter></i></span>
+                <span class="x-oven__heat"><i></i><i></i><i></i></span>
+              </div>
+              <div class="x-oven__door" data-oven-door>
+                <i class="x-oven__handle"></i>
+                <i class="x-oven__glass"></i>
+              </div>
+            </div>
+            <i class="x-oven__feet"></i>
+          </div>
+          <div class="x-bake__cake" data-baked>
+            <i class="x-bake__cherry"></i>
+            <i class="x-bake__icing"></i>
+            <i class="x-bake__sponge"></i>
+            <i class="x-bake__plate"></i>
+          </div>
+        </div>
+
+        <div class="x-bake__side">
+          <p class="x-bake__lead" data-bake-lead>Привід є щодня.<br>Торт — на ваш вибір.</p>
+          <div class="x-bake__play" data-bake-play>
+            <button type="button" class="x-bake__hold" data-bake-hold aria-describedby="x-bake-how">
+              <svg class="x-bake__ring" viewBox="0 0 120 120" aria-hidden="true"><circle class="x-bake__ring-bg" cx="60" cy="60" r="54"/><circle class="x-bake__ring-fill" cx="60" cy="60" r="54" pathLength="1" data-bake-ring/></svg>
+              <span data-bake-label>Тримайте,<br>щоб спекти</span>
+            </button>
+            <p class="x-bake__how" id="x-bake-how" data-bake-how>затисніть кнопку (або пробіл) і тримайте, поки не дзенькне</p>
+            <a class="x-link light" href="pages/constructor.html">або одразу зібрати торт →</a>
+          </div>
+          <div class="x-bake__done" data-bake-done>
+            <p class="x-bake__ready"><b>Готово!</b> А справжній спечемо ми ✦</p>
+            <a class="x-magnet" href="pages/constructor.html"><span>Зібрати торт</span></a>
+            <button type="button" class="x-bake__again" data-bake-again>спекти ще раз ↻</button>
+          </div>
+          <nav class="x-bake__links" aria-label="Швидкі посилання">
+            <a href="https://www.instagram.com/mariday.cake/" target="_blank" rel="noopener" style="--r:-4deg"><i aria-hidden="true">📸</i>Instagram</a>
+            <a href="pages/bento.html" style="--r:3deg"><i aria-hidden="true">🍱</i>Бенто</a>
+            <a href="pages/desserts.html" style="--r:-2deg"><i aria-hidden="true">🍭</i>Candy bar</a>
+            <a href="pages/contacts.html" style="--r:4deg"><i aria-hidden="true">💌</i>Контакти</a>
+          </nav>
+        </div>
+      </div>
+      <p class="visually-hidden" aria-live="polite" data-bake-live></p>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="js/vendor/gsap.min.js"></script>
+  <script src="js/vendor/ScrollTrigger.min.js"></script>
+  <script src="js/vendor/lenis.min.js"></script>
+  <script src="js/data.js?v=14"></script>
+  <script src="js/content.js?v=1"></script>
+  <script src="js/cart.js?v=10"></script>
+  <script src="js/layout.js?v=12"></script>
+  <script src="js/app.js?v=13"></script>
+  <script src="js/home.js?v=85"></script>
+  <script src="js/home-make.js?v=4"></script>
+  <script src="js/home-bottom.js?v=3"></script>
+  <script src="js/reviews.js?v=4"></script>
+  <script src="js/home-post.js?v=4"></script>
+  <script src="js/home-bake.js?v=3"></script>
+  <script src="js/home-dress.js?v=1"></script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+/* ═══════════════════════════════════════════
+   MARIDAY — home · occasion (⑭)
+   one cake, eight parties: the stage is pinned and every bit of scroll dresses the same cake for the next
+   occasion. Sizes of the cake are in em, so the whole cake scales from one font-size. Built by js/home-dress.js.
+   ═══════════════════════════════════════════ */
+
+@property --c1 { syntax: "<color>"; inherits: true; initial-value: #fffaf3; }
+@property --c2 { syntax: "<color>"; inherits: true; initial-value: #fffaf3; }
+@property --c3 { syntax: "<color>"; inherits: true; initial-value: #fffaf3; }
+@property --drip { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --rim { syntax: "<color>"; inherits: true; initial-value: #f5dde3; }
+@property --wash { syntax: "<color>"; inherits: true; initial-value: #fbeff0; }
+
+.x-dress { --wash: #fbeff0; position: relative; transition: --wash 1s ease; }
+.x-dress__pin {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  min-height: 660px;
+  overflow: hidden;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.25fr);
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas: "head stage" "info stage" "chips chips";
+  column-gap: clamp(24px, 4vw, 70px);
+  padding: clamp(84px, 11vh, 120px) var(--gutter) clamp(18px, 3vh, 34px);
+  background:
+    linear-gradient(var(--bg), transparent 90px),
+    radial-gradient(circle at 1px 1px, rgba(109, 8, 9, 0.07) 1.2px, transparent 0) 0 0 / 26px 26px,
+    var(--wash);
+}
+
+/* the occasion's name, huge and outlined, behind the cake */
+.x-dress__word { position: absolute; z-index: -1; left: 0; right: 0; top: 50%; margin: 0; overflow: hidden; translate: 0 -46%; text-align: center; pointer-events: none; }
+.x-dress__word span { display: inline-block; font-family: "Dela Gothic One", var(--font-wide); font-size: clamp(5rem, 15vw, 15rem); line-height: 1.05; letter-spacing: -0.02em; text-transform: uppercase; white-space: nowrap; color: rgba(255, 255, 255, 0.55); -webkit-text-stroke: 2px rgba(109, 8, 9, 0.12); }
+
+/* ─── head: glazed title + piped script, like «Обрані роботи» ─── */
+.x-dress__head { grid-area: head; position: relative; z-index: 2; }
+.x-dress__head .x-eyebrow { margin-bottom: 1rem; }
+.x-dress__title { position: relative; display: inline-block; margin: 0 0 0.5em; font-family: "Dela Gothic One", var(--font-wide); font-weight: 400; font-size: clamp(2.4rem, 5.6vw, 5.8rem); line-height: 0.9; letter-spacing: -0.02em; text-transform: uppercase; white-space: nowrap; color: var(--cherry); }
+.x-dress__w1 { position: relative; z-index: 1; display: block; filter: drop-shadow(0 0.025em 0 #fff8ef) drop-shadow(0 0.02em 0 #f6e2cf) drop-shadow(0 0.03em 0 #fff8ef) drop-shadow(0 0.015em 0 #e9cdb4) drop-shadow(0 0.1em 0.12em rgba(61, 4, 5, 0.25)); }
+.x-dress__w1 > span { display: block; padding: 0.04em 0.02em 0.1em; background: radial-gradient(circle 3.6em at 30% -1em, #ff9c94 0, #d8323a 14%, #a3161b 32%, var(--cherry) 56%, #3a0304 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.x-dress__script { position: absolute; z-index: 3; right: -0.6em; bottom: -0.7em; padding: 0.1em 0.25em 0.25em; rotate: -8deg; font-family: "Pacifico", var(--font-script); font-weight: 400; font-size: 0.62em; line-height: 1; letter-spacing: 0; text-transform: none; background: linear-gradient(100deg, #fffaf4 0%, #fdeee0 30%, #ffffff 46%, #fdeee0 56%, #fff7ee 80%, #f6e2cf 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0.02em 0 0 var(--cherry)) drop-shadow(-0.02em 0 0 var(--cherry)) drop-shadow(0 0.02em 0 var(--cherry)) drop-shadow(0 -0.02em 0 var(--cherry)) drop-shadow(0 0.05em 0 #470304) drop-shadow(0 12px 22px rgba(61, 4, 5, 0.3)); pointer-events: none; }
+
+/* ─── info ─── */
+.x-dress__info { grid-area: info; position: relative; z-index: 2; align-self: center; max-width: 440px; }
+.x-dress__n { display: flex; align-items: baseline; gap: 0.2em; margin: 0 0 0.3rem; font-family: var(--font-luxe); font-style: italic; color: var(--cherry); }
+.x-dress__n b { display: inline-block; font-weight: 400; font-size: clamp(2.6rem, 4vw, 3.6rem); line-height: 1; text-shadow: 0 0.035em 0 #f6e2cf, 0 0.07em 0 #e9cdb4; }
+.x-dress__n span { font-size: 1.2rem; color: var(--pink-deep); }
+.x-dress__name { margin: 0 0 0.5em; font-family: var(--font-wide); font-weight: 600; font-size: clamp(1.7rem, 2.8vw, 2.7rem); line-height: 1.02; letter-spacing: -0.035em; color: var(--cherry); }
+.x-dress__name .w { display: inline-block; }
+.x-dress__text { margin: 0 0 1rem; max-width: 38ch; color: var(--ink-soft); line-height: 1.6; }
+.x-dress__tags { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0 0 1.4rem; padding: 0; list-style: none; }
+.x-dress__tags li { padding: 0.35em 0.85em 0.4em; border: 1.5px dashed rgba(109, 8, 9, 0.4); border-radius: 999px; background: rgba(255, 255, 255, 0.6); font-family: var(--font-hand); font-size: 1.12rem; font-weight: 600; line-height: 1; color: var(--cherry); }
+.x-dress__tags li:nth-child(2) { rotate: -3deg; }
+.x-dress__tags li:nth-child(3) { rotate: 2deg; }
+.x-dress__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem 1.4rem; }
+.x-dress__actions .x-btn { box-shadow: 0 0.35rem 0 var(--cherry-deep); }
+.x-dress__lucky { display: inline-flex; align-items: center; gap: 0.4em; padding: 0.7em 1.1em; border: 1.5px solid var(--cherry); border-radius: 999px; background: #fff; color: var(--cherry); font-family: var(--font-wide); font-size: 0.64rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 0 var(--cherry); transition: translate 0.4s cubic-bezier(0.34, 1.9, 0.5, 1), box-shadow 0.3s; }
+.x-dress__lucky span { font-size: 1.3em; }
+.x-dress__lucky:hover { translate: 0 -3px; box-shadow: 0 7px 0 var(--cherry); }
+.x-dress__lucky:focus-visible, .x-dress__chips button:focus-visible { outline: 2px dashed var(--cherry); outline-offset: 4px; }
+
+/* ─── chips: one per occasion, a cherry dot slides under the current one ─── */
+.x-dress__chips { grid-area: chips; position: relative; z-index: 3; display: flex; gap: 0.4rem; justify-content: center; padding: 0.5rem 0 0.9rem; overflow-x: auto; scrollbar-width: none; }
+.x-dress__chips::-webkit-scrollbar { display: none; }
+.x-dress__chips button { flex: 0 0 auto; padding: 0.55em 1em; border: 1.5px solid transparent; border-radius: 999px; background: rgba(255, 255, 255, 0.55); color: var(--cherry); font-family: var(--font-body); font-size: 0.86rem; font-weight: 600; white-space: nowrap; cursor: pointer; transition: background 0.3s, color 0.3s, border-color 0.3s; }
+.x-dress__chips button:hover { border-color: rgba(109, 8, 9, 0.35); }
+.x-dress__chips button[aria-current="true"] { background: var(--cherry); color: var(--bg); }
+.x-dress__dot { position: absolute; left: 0; bottom: 0.15rem; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ff8fa3, #c0142a 45%, #5a0206); box-shadow: 0 2px 4px rgba(61, 4, 5, 0.3); pointer-events: none; }
+
+/* ─── stage ─── */
+.x-dress__stage { grid-area: stage; position: relative; z-index: 1; display: grid; place-items: center; min-height: 0; }
+.x-dress__tap { position: absolute; left: 50%; bottom: 0.4rem; margin: 0; translate: -50% 0; font-size: clamp(1.05rem, 1.4vw, 1.3rem); color: var(--pink-deep); white-space: nowrap; rotate: -2deg; }
+
+/* a polaroid of a real cake for the occasion, pinned beside the drawing */
+.x-dress__photo { position: absolute; z-index: 2; left: 0; top: 2%; width: clamp(130px, 13vw, 190px); margin: 0; padding: 7px 7px 34px; border-radius: 4px; background: #fff; box-shadow: 0 18px 34px rgba(61, 4, 5, 0.2); rotate: -7deg; }
+.x-dress__photo img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 2px; }
+.x-dress__photo figcaption { position: absolute; left: 0; right: 0; bottom: 6px; font-family: var(--font-hand); font-size: 1.05rem; font-weight: 600; line-height: 1; text-align: center; color: var(--cherry); }
+.x-dress__photo::before { content: ""; position: absolute; z-index: 1; left: 50%; top: -12px; width: 70px; height: 24px; margin-left: -35px; background: rgba(245, 188, 200, 0.75); rotate: -4deg; }
+.x-dress__photo--fly { pointer-events: none; }
+
+/* ─── the cake: tiers, stand, and three layers of decorations (side, crown on top, front on the bottom tier) ─── */
+.x-dress__cake {
+  --stand: 4.4em;
+  --w1: 26em;
+  --h: 24em;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  width: 40em;
+  height: 40em;
+  padding: 0 0 3em;
+  border: 0;
+  background: none;
+  font-size: clamp(6.5px, min(0.95vw, 1.45svh), 13px);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: --c1 0.6s, --c2 0.6s, --c3 0.6s, --drip 0.6s, --rim 0.6s;
+}
+.x-dress__cake:focus-visible { outline: 2px dashed var(--cherry); outline-offset: 6px; border-radius: 24px; }
+.x-dress__cake[data-tiers="2"] { --h: 17em; }
+.x-dress__cake[data-tiers="1"] { --h: 9em; }
+.x-dress__cake[data-size="s"] { --w1: 18em; }
+.x-dress__cake[data-size="s"][data-tiers="1"] { --h: 8em; }
+
+.x-dress__tier {
+  --c: var(--c1);
+  display: block;
+  flex: none;
+  border-radius: 1.1em 1.1em 0.7em 0.7em;
+  background:
+    radial-gradient(ellipse 0.75em 1.5em at 1.1em 1.1em, var(--drip) 0 98%, transparent) 0 0 / 2.2em 100% repeat-x,
+    radial-gradient(ellipse 0.5em 0.9em at 0.4em 1.1em, var(--drip) 0 98%, transparent) 0 0 / 3.1em 100% repeat-x,
+    linear-gradient(var(--drip) 0 1.15em, transparent 0),
+    radial-gradient(circle at 1.1em 0, var(--rim) 0 0.9em, transparent 0.95em) 0 0 / 2.2em 100% repeat-x,
+    radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 0.35em, transparent 0.4em) 0 calc(100% - 0.35em) / 1.3em 1em repeat-x,
+    var(--c);
+  box-shadow: inset -1.6em 0 0 rgba(109, 8, 9, 0.06), 0 0.3em 0 rgba(109, 8, 9, 0.05);
+  transition: width 0.7s cubic-bezier(0.34, 1.4, 0.5, 1), height 0.7s cubic-bezier(0.34, 1.4, 0.5, 1), opacity 0.4s, margin 0.7s;
+}
+.x-dress__tier[data-t="1"] { width: var(--w1); height: 9em; }
+.x-dress__tier[data-t="2"] { --c: var(--c2); width: 19em; height: 8em; }
+.x-dress__tier[data-t="3"] { --c: var(--c3); width: 13em; height: 7em; }
+.x-dress__cake[data-size="s"] .x-dress__tier[data-t="1"] { height: 8em; }
+.x-dress__cake[data-tiers="1"] [data-t="2"], .x-dress__cake[data-tiers="1"] [data-t="3"], .x-dress__cake[data-tiers="2"] [data-t="3"] { height: 0; opacity: 0; }
+.x-dress__stand { position: relative; display: block; flex: none; width: calc(var(--w1) + 6em); height: 1.4em; border-radius: 999px; background: var(--cherry); box-shadow: 0 1.4em 2.4em rgba(61, 4, 5, 0.2); transition: width 0.7s cubic-bezier(0.34, 1.4, 0.5, 1); }
+.x-dress__stand::after { content: ""; position: absolute; left: 50%; top: 100%; width: 7em; height: 3em; translate: -50% 0; background: var(--cherry-deep); clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%); }
+
+.x-dress__side, .x-dress__crown, .x-dress__front { position: absolute; pointer-events: none; }
+.x-dress__side { inset: 0; }
+.x-dress__crown { left: 50%; bottom: calc(var(--stand) + var(--h)); width: 14em; height: 9em; margin-left: -7em; transition: bottom 0.7s cubic-bezier(0.34, 1.4, 0.5, 1); }
+.x-dress__front { left: 50%; bottom: var(--stand); width: var(--w1); height: 9em; translate: -50% 0; transition: width 0.7s cubic-bezier(0.34, 1.4, 0.5, 1); }
+.x-dress__deco { position: absolute; inset: 0; visibility: hidden; }
+.x-dress__deco.is-on { visibility: visible; }
+/* every decoration is placed with left/top/rotate, so the script is free to animate transform */
+.x-dress__deco > * { position: absolute; display: block; font-style: normal; }
+
+/* wedding: roses, hearts on a pick */
+.x-dk-rose { left: var(--x); bottom: 0; width: 3.4em; height: 3.4em; margin-left: -1.7em; border-radius: 50%; background: radial-gradient(circle at 50% 50%, transparent 0 0.35em, rgba(160, 30, 60, 0.35) 0.4em 0.5em, transparent 0.55em 0.85em, rgba(160, 30, 60, 0.3) 0.9em 1em, transparent 1.05em), radial-gradient(circle at 40% 35%, #ffd3dc, #f19bb0 60%, #d96b86); box-shadow: 0 0.3em 0.4em rgba(61, 4, 5, 0.18); }
+.x-dk-rose--b { width: 4.2em; height: 4.2em; margin-left: -2.1em; bottom: 0.4em; }
+.x-dk-rose--s { left: var(--x); top: var(--y); bottom: auto; width: 2.6em; height: 2.6em; margin: -1.3em 0 0 -1.3em; }
+.x-dk-tophearts { left: 50%; bottom: 4.4em; translate: -50% 0; font-size: 2.6em; line-height: 1; letter-spacing: -0.15em; color: var(--pink-deep); text-shadow: 0 0.05em 0 var(--cherry); }
+.x-dk-tophearts::after { content: ""; position: absolute; left: 50%; top: 90%; width: 0.06em; height: 1.2em; background: #c9a66b; }
+
+/* birthday: candles and confetti */
+.x-dk-candle { left: var(--x); bottom: 0; width: 1.1em; height: 4.4em; margin-left: -0.55em; border-radius: 0.25em; background: repeating-linear-gradient(-45deg, #fff 0 0.45em, var(--pink-deep) 0.45em 0.9em); box-shadow: inset -0.25em 0 0 rgba(109, 8, 9, 0.1); }
+.x-dk-candle::before { content: ""; position: absolute; left: 50%; bottom: 100%; width: 0.18em; height: 0.5em; translate: -50% 0; background: var(--cherry-deep); }
+.x-dk-candle::after { content: ""; position: absolute; left: 50%; bottom: calc(100% + 0.4em); width: 1.1em; height: 1.8em; translate: -50% 0; border-radius: 50% 50% 50% 50% / 64% 64% 36% 36%; background: radial-gradient(circle at 50% 74%, #fffbe6 0 16%, #ffd36b 34%, #ff9a3c 64%, #ff6a3d 100%); box-shadow: 0 0 0.9em 0.3em rgba(255, 190, 90, 0.45); transform-origin: 50% 100%; animation: x-dress-flame 1.3s ease-in-out infinite alternate; }
+.x-dk-candle:nth-child(even)::after { animation-duration: 1s; animation-delay: -0.4s; }
+@keyframes x-dress-flame { 0% { transform: rotate(-5deg) scale(1, 1); } 50% { transform: rotate(4deg) scale(0.9, 1.12); } 100% { transform: rotate(-1deg) scale(1.06, 0.94); } }
+.x-dk-conf { left: var(--x); top: var(--y); width: 0.7em; height: 1.9em; border-radius: 0.35em; background: var(--c); rotate: 30deg; }
+.x-dk-conf:nth-child(even) { rotate: -50deg; }
+
+/* gender party: a question mark, two balloons and a colour surprise inside the cut */
+.x-dk-qmark { left: 50%; bottom: 0; translate: -50% 0; font-family: "Dela Gothic One", var(--font-wide); font-weight: 400; font-size: 7em; line-height: 0.9; color: #fff; -webkit-text-stroke: 0.03em var(--cherry); text-shadow: 0.04em 0.05em 0 var(--pink), -0.04em 0.05em 0 var(--sky); }
+.x-dk-bal { top: 4%; width: 7em; height: 8.4em; border-radius: 50% 50% 48% 48% / 56% 56% 44% 44%; }
+.x-dk-bal::before { content: ""; position: absolute; left: 50%; top: 100%; width: 0.12em; height: 12em; background: rgba(109, 8, 9, 0.35); }
+.x-dk-bal::after { content: ""; position: absolute; left: 22%; top: 16%; width: 1.4em; height: 2.4em; border-radius: 50%; background: rgba(255, 255, 255, 0.55); rotate: 20deg; }
+.x-dk-bal--pink { left: auto; right: 15%; top: 0; background: radial-gradient(circle at 35% 30%, #ffd5df, #f5a3b8 60%, #e2849a); rotate: -8deg; }
+.x-dk-bal--blue { right: 1%; top: 10%; background: radial-gradient(circle at 35% 30%, #e1efff, #a9c8f0 60%, #86aee0); rotate: 9deg; }
+.x-dk-cut { right: 12%; top: 1.1em; width: 6em; height: 7.4em; clip-path: polygon(0 0, 100% 0, 50% 100%); background: repeating-linear-gradient(#f5a3b8 0 1.1em, #fffaf3 1.1em 1.5em, #a9c8f0 1.5em 2.6em, #fffaf3 2.6em 3em); box-shadow: inset 0 0 1em rgba(0, 0, 0, 0.1); }
+
+/* christening: little flowers, a bow, a gold star */
+.x-dk-flower { left: var(--x); bottom: 0; width: 2.4em; height: 2.4em; margin-left: -1.2em; scale: 0.86; border-radius: 50%; background: radial-gradient(circle, #f2d29b 0 0.4em, transparent 0.45em), radial-gradient(circle at 50% 18%, #fff 0 0.7em, transparent 0.75em), radial-gradient(circle at 82% 45%, #fff 0 0.7em, transparent 0.75em), radial-gradient(circle at 70% 84%, #fff 0 0.7em, transparent 0.75em), radial-gradient(circle at 30% 84%, #fff 0 0.7em, transparent 0.75em), radial-gradient(circle at 18% 45%, #fff 0 0.7em, transparent 0.75em); filter: drop-shadow(0 0.15em 0.2em rgba(61, 4, 5, 0.2)); }
+.x-dk-star { left: 50%; bottom: 0.5em; translate: -50% 0; font-size: 4.4em; line-height: 1; color: #e8c06a; text-shadow: 0 0 0.3em rgba(242, 210, 155, 0.9), 0 0.04em 0 #b8862e; }
+.x-dk-bow { left: 50%; top: 2.6em; width: 0; height: 0; }
+.x-dk-bow::before, .x-dk-bow::after { content: ""; position: absolute; top: -1.4em; width: 4em; height: 2.8em; border: 0.7em solid #c9b3e6; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; }
+.x-dk-bow::before { right: -0.2em; rotate: 18deg; }
+.x-dk-bow::after { left: -0.2em; rotate: -18deg; }
+
+/* baby shower: a cloud and two bento boxes on the table */
+.x-dk-cloud { left: 50%; bottom: 0.8em; width: 9em; height: 3.4em; translate: -50% 0; border-radius: 2em; background: #fff; box-shadow: 0 0.3em 0.6em rgba(61, 4, 5, 0.12); }
+.x-dk-cloud::before, .x-dk-cloud::after { content: ""; position: absolute; border-radius: 50%; background: #fff; }
+.x-dk-cloud::before { left: 1.4em; top: -1.8em; width: 3.6em; height: 3.6em; }
+.x-dk-cloud::after { left: 3.8em; top: -2.6em; width: 4.4em; height: 4.4em; }
+.x-dk-bento { left: 3%; bottom: 4.6em; width: 8em; height: 6em; border-radius: 0.8em; background: radial-gradient(circle at 50% 30%, #fff 0 0.6em, transparent 0.65em), radial-gradient(circle at 1em 0, #fff 0 0.6em, transparent 0.65em) 0 0 / 2em 100% repeat-x, #f5bcc8; box-shadow: inset -0.8em 0 0 rgba(109, 8, 9, 0.06), 0 0.5em 0.8em rgba(61, 4, 5, 0.12); }
+.x-dk-bento::after { content: ""; position: absolute; left: -0.5em; right: -0.5em; bottom: -0.6em; height: 0.8em; border-radius: 0.4em; background: #fff; box-shadow: 0 0.2em 0 rgba(109, 8, 9, 0.12); }
+.x-dk-bento--r { left: auto; right: 3%; background-color: #fbe6b8; }
+
+/* anniversary: floating hearts, a plaque */
+.x-dk-heart { left: var(--x); top: var(--y); font-size: 3.4em; line-height: 1; color: #e2849a; text-shadow: 0 0.05em 0 var(--cherry); animation: x-dress-float 3s ease-in-out infinite alternate; }
+.x-dk-heart:nth-child(2) { animation-delay: -1s; color: var(--cherry); }
+.x-dk-heart:nth-child(3) { animation-delay: -2s; font-size: 2.4em; }
+@keyframes x-dress-float { from { translate: 0 0; } to { translate: 0 -0.4em; } }
+.x-dk-plaque, .x-dk-flag, .x-dk-sign { left: 50%; bottom: 3.2em; translate: -50% 0; padding: 0.35em 0.8em 0.45em; border-radius: 0.5em; background: #fff; font-family: var(--font-script); font-size: 2.4em; font-weight: 400; line-height: 1; white-space: nowrap; color: var(--cherry); box-shadow: 0 0.1em 0 #e9cdb4, 0 0.3em 0.5em rgba(61, 4, 5, 0.15); }
+.x-dk-plaque::after, .x-dk-flag::after, .x-dk-sign::after { content: ""; position: absolute; left: 50%; top: 100%; width: 0.08em; height: 1.4em; background: #c9a66b; }
+
+/* corporate: a logo on the front, cupcakes round the stand */
+.x-dk-logo { left: 50%; top: 50%; translate: -50% -42%; display: grid; place-items: center; width: 7em; height: 5em; border: 0.18em dashed var(--cherry); border-radius: 0.6em; background: #fff; font-family: var(--font-wide); font-size: 1em; font-weight: 800; line-height: 1.05; letter-spacing: 0.08em; text-align: center; color: var(--cherry); }
+.x-dk-flag { font-family: var(--font-wide); font-size: 1.5em; font-weight: 800; letter-spacing: 0.15em; border-radius: 0.2em; background: var(--cherry); color: var(--butter); }
+.x-dk-cup { left: var(--x); bottom: 4.5em; width: 4.4em; height: 5.4em; margin-left: -2.2em; }
+.x-dk-cup::before { content: ""; position: absolute; left: 0.5em; right: 0.5em; bottom: 0; height: 2.4em; clip-path: polygon(0 0, 100% 0, 86% 100%, 14% 100%); background: repeating-linear-gradient(90deg, #f5bcc8 0 0.5em, #e2849a 0.5em 0.7em); }
+.x-dk-cup::after { content: ""; position: absolute; left: 0; right: 0; top: 0.4em; height: 3.2em; border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%; background: radial-gradient(circle at 50% 12%, #c0142a 0 0.55em, transparent 0.6em), radial-gradient(circle at 40% 40%, #fff, #fbe6b8); }
+
+/* just because: a sign and a speech bubble */
+.x-dk-sign { font-size: 2em; }
+.x-dk-bubble { right: 0; top: 8%; padding: 0.6em 1em; border-radius: 1.2em 1.2em 1.2em 0.2em; background: #fff; font-family: var(--font-hand); font-size: 2.2em; font-weight: 700; line-height: 1; white-space: nowrap; color: var(--cherry); box-shadow: 0 0.2em 0.6em rgba(61, 4, 5, 0.15); rotate: 6deg; }
+
+/* ─── tablet / phone ─── */
+@media (max-width: 1024px) {
+  .x-dress__photo { width: 120px; top: 0; }
+}
+@media (max-width: 760px) {
+  .x-dress__pin { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto; grid-template-areas: "head" "stage" "info" "chips"; row-gap: 6px; padding-top: 78px; }
+  .x-dress__head .x-eyebrow { display: none; }
+  .x-dress__title { font-size: 10.5vw; margin-bottom: 0.4em; }
+  .x-dress__cake { font-size: clamp(5px, min(1.9vw, 1.05svh), 9px); }
+  .x-dress__photo { width: 76px; padding: 4px 4px 12px; top: 10px; }
+  .x-dress__photo figcaption { display: none; }
+  .x-dress__photo::before { width: 40px; height: 14px; margin-left: -20px; top: -7px; }
+  .x-dress__tap { display: none; }
+  .x-dress__n { display: none; }
+  .x-dress__name { font-size: 1.5rem; margin-bottom: 0.3em; }
+  .x-dress__text { margin-bottom: 0.7rem; font-size: 0.92rem; line-height: 1.45; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+  .x-dress__tags { display: none; }
+  .x-dress__chips { justify-content: flex-start; margin: 0 calc(var(--gutter) * -1); padding-inline: var(--gutter); }
+  .x-dress__word span { font-size: 26vw; }
+}
+
+/* without the pin (reduced motion), the stage is just a normal block */
+.x-dress:not(.is-live) .x-dress__pin { height: auto; min-height: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .x-dress *, .x-dress *::before, .x-dress *::after { animation: none !important; transition: none !important; }
+}
