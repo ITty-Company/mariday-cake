@@ -147,6 +147,10 @@
       return;
     }
     sec.classList.add("is-live");
+    const tint = document.createElement("i");
+    tint.className = "x-make__tint";
+    tint.setAttribute("aria-hidden", "true");
+    sec.prepend(tint);
 
     // sprinkles scattered around the edges, drifting at different depths while the section scrolls by
     const SPRINKLES = [[4, 6, -30], [95, 9, 40], [3, 30, -60], [97, 34, 20], [6, 52, 75], [94, 58, -15], [3, 76, 50], [96, 82, -45], [8, 94, 30], [92, 97, 65]];
@@ -182,6 +186,7 @@
       if (n > prev) for (let k = prev; k < Math.min(n, 6); k++) cards[k].restart();
       else for (let k = n; k < 6; k++) cards[k].pause(0);
       sec.classList.toggle("is-party", n === 7);
+      sec.style.setProperty("--c-wash", n >= 1 ? getComputedStyle(steps[Math.min(n, 6) - 1]).getPropertyValue("--c").trim() : "transparent");
       liveText.textContent = n === 0 ? "" : n === 7 ? "Торт готовий — коробка відкрита" : `Крок ${n} з 6: ${TITLES[n - 1]}`;
       stage.go(n);
     };
@@ -192,58 +197,37 @@
     ScrollTrigger.create({ trigger: $("[data-fin]", sec), start: "top 98%", onEnter: () => setStep(7), onLeaveBack: () => setStep(6) });
   }
 
-  // a chapter's text: the number rolls like an odometer, words jump in, the script word is written and underlined,
-  // the controls and the link tickets drop in. Built paused at its start, so the chapter waits until it is reached.
+  // a chapter's text: the step stamp slams down, the glazed word drops in letter by letter, the script verb is piped
+  // across it and underlined, the controls and the link tickets drop in. Built paused at its start, so the chapter
+  // waits until it is reached.
   function cardIn(st) {
     const card = $(".x-make__card", st);
-    const no = $(".x-make__no", card);
-    const h3 = $("h3", card);
-    const em = $("em", h3);
-    [...no.childNodes].filter((n) => n.nodeType === 3 && n.textContent.trim()).forEach((n) => {
-      const frag = document.createDocumentFragment();
-      // the real number stays as text for copying and screen readers; the rolling columns are decoration
-      const real = document.createElement("span");
-      real.className = "x-make__sr";
-      real.textContent = n.textContent.trim();
-      frag.appendChild(real);
-      [...n.textContent.trim()].forEach((d) => {
-        const odo = document.createElement("span");
-        odo.className = "x-make__odo";
-        odo.setAttribute("aria-hidden", "true");
-        odo.innerHTML = `<span data-d="${d}">${"<i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i>".repeat(2)}</span>`;
-        frag.appendChild(odo);
-      });
-      n.replaceWith(frag);
+    const kick = $(".x-make__kick", card);
+    const big = $(".x-make__big", card);
+    const scr = $(".x-make__scr", card);
+    const letters = [...big.textContent].map((ch) => {
+      const l = document.createElement("span");
+      l.className = "x-make__bl";
+      l.textContent = ch;
+      return l;
     });
-    [...h3.childNodes].filter((n) => n.nodeType === 3).forEach((n) => {
-      const frag = document.createDocumentFragment();
-      n.textContent.split(/(\s+)/).forEach((w) => {
-        if (!w) return;
-        if (/^\s+$/.test(w)) return frag.appendChild(document.createTextNode(w));
-        const s = document.createElement("span");
-        s.className = "x-make__wd";
-        s.textContent = w;
-        frag.appendChild(s);
-      });
-      n.replaceWith(frag);
-    });
-    em.insertAdjacentHTML("beforeend", SWASH);
+    big.textContent = "";
+    letters.forEach((l) => big.appendChild(l));
+    scr.insertAdjacentHTML("beforeend", SWASH);
 
-    const cols = $$(".x-make__odo > span", no);
-    const words = $$(".x-make__wd", h3);
-    const p = $(":scope > p:not(.x-make__no):not(.x-make__note)", card);
+    const p = $(":scope > p:not(.x-make__kick):not(.x-make__note)", card);
     const ctl = $(".x-make__ctl", card);
     const tags = $$(".x-make__tag", card);
     const note = $(".x-make__note", card);
     const tl = gsap.timeline({ paused: true, onStart: () => card.classList.add("is-anim"), onComplete: () => card.classList.remove("is-anim") });
-    tl.fromTo(cols, { yPercent: 0 }, { yPercent: (i, el) => -((10 + +el.dataset.d) / 20) * 100, duration: 1.4, stagger: 0.15, ease: "expo.out" }, 0)
-      .fromTo(words, { yPercent: 110, opacity: 0, rotation: 8 }, { yPercent: 0, opacity: 1, rotation: 0, duration: 0.7, stagger: 0.07, ease: "back.out(1.8)" }, 0.1)
-      .fromTo(em, { clipPath: "inset(-80% 130% -80% -30%)" }, { clipPath: "inset(-80% -30% -80% -30%)", duration: 0.9, ease: "power2.inOut" }, 0.3)
-      .fromTo($(".x-make__swash path", em), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" }, 1)
-      .fromTo(p, { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "expo.out" }, 0.45);
-    if (ctl) tl.fromTo(ctl, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "expo.out" }, 0.6);
-    tl.fromTo(tags, { y: -60, opacity: 0, rotation: (i) => (i % 2 ? 1 : -1) * 28 }, { y: 0, opacity: 1, rotation: 0, duration: 1, stagger: 0.1, ease: "elastic.out(1, 0.55)", clearProps: "transform" }, 0.7);
-    if (note) tl.fromTo(note, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: "back.out(3)" }, 1.2);
+    tl.fromTo(kick, { scale: 2.6, rotation: -30, opacity: 0 }, { scale: 1, rotation: 0, opacity: 1, duration: 0.32, ease: "power4.in" }, 0)
+      .fromTo(letters, { yPercent: -150, opacity: 0, rotation: () => gsap.utils.random(-35, 35) }, { yPercent: 0, opacity: 1, rotation: 0, duration: 0.9, stagger: 0.06, ease: "bounce.out" }, 0.2)
+      .fromTo(scr, { clipPath: "inset(-80% 130% -80% -30%)" }, { clipPath: "inset(-80% -30% -80% -30%)", duration: 0.8, ease: "power2.inOut" }, 0.7)
+      .fromTo($(".x-make__swash path", scr), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.5, ease: "power2.inOut" }, 1.35)
+      .fromTo(p, { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "expo.out" }, 0.75);
+    if (ctl) tl.fromTo(ctl, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "expo.out" }, 0.9);
+    tl.fromTo(tags, { y: -60, opacity: 0, rotation: (i) => (i % 2 ? 1 : -1) * 28 }, { y: 0, opacity: 1, rotation: 0, duration: 1, stagger: 0.1, ease: "elastic.out(1, 0.55)", clearProps: "transform" }, 1);
+    if (note) tl.fromTo(note, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: "back.out(3)" }, 1.5);
     tl.progress(1).progress(0);
     return tl;
   }
