@@ -82,6 +82,7 @@
     const opener = opening(sec, fx);
     bookingDate(sec);
     const stations = $$(".x-path__st", sec);
+    const deeps = stations.map((st, i) => diorama(st, DEEP[i]));
     const scenes = [deck(sec, fx), slice(sec, fx), weight(sec), chat(sec, fx), booking(sec, fx), cakeBox(sec, fx)];
     candles(sec, fx);
 
@@ -139,16 +140,20 @@
       gsap.from(im, { scale: 0, opacity: 0, duration: 1, ease: "back.out(2)", scrollTrigger: { trigger: im, start: "top 92%", once: true } });
     });
 
-    // every chapter gets a huge outlined number drifting behind it, and its own entrance timeline
-    const cards = stations.map((st, i) => {
-      const ghost = document.createElement("span");
-      ghost.className = "x-path__ghost";
-      ghost.setAttribute("aria-hidden", "true");
-      ghost.textContent = String(i + 1).padStart(2, "0");
-      st.appendChild(ghost);
-      gsap.fromTo(ghost, { yPercent: -35 }, { yPercent: 35, ease: "none", scrollTrigger: { trigger: st, start: "top bottom", end: "bottom top", scrub: 0.8 } });
-      return cardIn(st);
-    });
+    // the dioramas drift with the scroll, each layer at its own depth, and tilt with the pointer
+    stations.forEach((st, i) => $$(".x-path__layer", deeps[i]).forEach((el) => {
+      const z = +el.dataset.z || 0, d = 0.6 + z / 160;
+      gsap.set(el, { z });
+      gsap.fromTo(el, { y: 80 * d }, { y: -80 * d, ease: "none", scrollTrigger: { trigger: st, start: "top bottom", end: "bottom top", scrub: 0.8 } });
+    }));
+    if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      const tilts = $$(".x-path__deep-tilt", sec), T = { rx: 0, ry: 0 };
+      const apply = () => tilts.forEach((t) => { t.style.transform = `rotateX(${T.rx.toFixed(2)}deg) rotateY(${T.ry.toFixed(2)}deg)`; });
+      const rxTo = gsap.quickTo(T, "rx", { duration: 0.9, ease: "power3.out", onUpdate: apply }), ryTo = gsap.quickTo(T, "ry", { duration: 0.9, ease: "power3.out", onUpdate: apply });
+      sec.addEventListener("pointermove", (e) => { rxTo((0.5 - e.clientY / innerHeight) * 10); ryTo((e.clientX / innerWidth - 0.5) * 14); });
+    }
+    // every chapter's entrance timeline
+    const cards = stations.map((st) => cardIn(st));
 
     const enter = (i) => {
       const st = stations[i];
@@ -229,6 +234,12 @@
           gsap.fromTo(sp, { rotation: gsap.utils.random(0, 180), scale: 1 }, { x: gsap.utils.random(-22, 22), y: gsap.utils.random(-8, 18), rotation: "+=" + gsap.utils.random(-120, 120), scale: 0.6, opacity: 0, duration: gsap.utils.random(1.4, 2.2), ease: "power2.out", onComplete: () => sp.remove() });
         }
         trailAt = [r.x, r.y];
+      }
+      if (r.hit >= 0) {
+        // a macaron on the road: the cherry hops over it and it squashes a little
+        const st = road.stone(r.hit);
+        if (st) { gsap.fromTo(st, { scaleX: 1.3, scaleY: 0.7 }, { scaleX: 1, scaleY: 1, duration: 0.8, ease: "elastic.out(1, 0.3)" }); fx.pop(st, 8, 0.4); }
+        gsap.fromTo(road, { hop: 0 }, { hop: -26, duration: 0.17, yoyo: true, repeat: 1, ease: "power2.out", onUpdate: () => road.draw(road.cur) });
       }
       if (r.stop !== reached) {
         stations.forEach((s, i) => { s.classList.toggle("is-on", i <= r.stop); s.classList.toggle("is-here", i === r.stop); });
@@ -320,7 +331,11 @@
     const api = { el, onBuild: null, hop: 0, cur: 0 };
     const roseHost = $(".x-path__roses", el);
     const startImg = $("[data-path-start]", el), startSign = $(".x-path__sign--start", el);
-    let len = 0, ys = [], ls = [], marks = [], prev = 0, roses = [], lms = [], sy = 0, cup = null;
+    const stoneHost = document.createElement("div");
+    stoneHost.className = "x-path__stones";
+    stoneHost.setAttribute("aria-hidden", "true");
+    el.appendChild(stoneHost);
+    let len = 0, ys = [], ls = [], marks = [], prev = 0, roses = [], lms = [], sy = 0, cup = null, stones = [];
 
     const build = () => {
       const box = el.getBoundingClientRect();
@@ -378,12 +393,30 @@
         roseHost.appendChild(r);
         roses.push({ el: r, l, on: false });
       }
+      // real macarons lying on the road, between the stops
+      stoneHost.innerHTML = "";
+      stones = [];
+      [0.2, 0.47, 0.76].forEach((p) => {
+        let sl = len * p;
+        if (marks.some((m) => Math.abs(m - sl) < 90)) sl += 130;
+        if (sl > len - 80) return;
+        const q = cream.getPointAtLength(sl);
+        const im = document.createElement("img");
+        im.src = "img/cutouts/candy-mac.webp";
+        im.alt = "";
+        im.className = "x-path__stone";
+        im.style.left = `${q.x.toFixed(1)}px`;
+        im.style.top = `${q.y.toFixed(1)}px`;
+        stoneHost.appendChild(im);
+        stones.push({ el: im, l: sl, on: api.cur >= sl });
+      });
       el.classList.add("is-drawn");
       if (api.onBuild) api.onBuild();
       else api.draw(api.cur);
     };
 
     api.total = () => len;
+    api.stone = (k) => (stones[k] ? stones[k].el : null);
     api.at = (y) => {
       if (!ls.length || y <= ys[0]) return 0;
       if (y >= ys[ys.length - 1]) return len;
@@ -418,7 +451,9 @@
       roses.forEach((r) => { const on = l >= r.l; if (on !== r.on) { r.on = on; r.el.classList.toggle("is-on", on); } });
       let stop = -1;
       for (let i = 0; i < stops.length; i++) if (l >= marks[i] - 4) stop = i;
-      return { stop, end: l >= len - 3, x: q.x, y: q.y };
+      let hit = -1;
+      stones.forEach((st, k) => { const on = l >= st.l; if (on !== st.on) { st.on = on; hit = k; } });
+      return { stop, end: l >= len - 3, x: q.x, y: q.y, hit };
     };
 
     build();
@@ -430,6 +465,53 @@
     addEventListener("load", rebuild);
     if (startImg) { if (startImg.complete) rebuild(); else startImg.addEventListener("load", rebuild); }
     return api;
+  }
+
+  // ─── behind every stop: a little 3D diorama ───
+  // real sweets at different depths (the far ones out of focus) and a CSS object: a macaron, a stack of plates,
+  // chat bubbles, a wax seal, a gift box. Positions are % of the diorama box, z is depth in px.
+  // odd stops keep their diorama to the right of the scene, even stops to the left — in the free zones
+  const DEEP = [
+    [{ img: "candy-mac", w: 150, x: 70, y: -4, z: 80 }, { img: "candy-mac", w: 90, x: 92, y: 44, z: -120, b: 2 }, { img: "cherries", w: 120, x: 68, y: 74, z: 40 }],
+    [{ img: "candy-mac", w: 200, x: -8, y: 56, z: 60, r: -14 }, { img: "cherrycup", w: 140, x: 4, y: 88, z: -80, b: 1.5 }, { img: "cherries", w: 110, x: 62, y: 70, z: 120 }],
+    [{ plates: 1, s: 210, x: 66, y: 44, z: 40 }, { img: "candy-cake", w: 170, x: 70, y: -10, z: -100, b: 1.5 }, { img: "cherries", w: 90, x: 60, y: 86, z: 110 }],
+    [{ bubble: "Привіт! Хочу торт 🍰", me: 1, x: 5, y: 12, z: 100 }, { bubble: "♥", x: 8, y: 44, z: 160 }, { bubble: "✓✓ прочитано", x: 2, y: 68, z: -60, b: 1 }, { img: "gl-piping", w: 170, x: -2, y: 84, z: -140, b: 2 }],
+    [{ seal: 1, s: 140, x: 70, y: 46, z: 120 }, { img: "gl-gold", w: 200, x: 64, y: -10, z: -120, b: 2 }, { img: "cherries", w: 90, x: 62, y: 86, z: 60 }],
+    [{ balloon: "#f5bcc8", s: 110, x: 0, y: 2, z: 100 }, { balloon: "#fbe6b8", s: 80, x: 20, y: 30, z: -60, b: 1 }, { balloon: "#bcd6f3", s: 96, x: 4, y: 52, z: 160 }, { img: "gl-drip", w: 190, x: -2, y: 74, z: -110, b: 1.5 }, { img: "cherries", w: 100, x: 30, y: -6, z: 150 }],
+  ];
+  function diorama(st, layers) {
+    const deep = document.createElement("div");
+    deep.className = "x-path__deep";
+    deep.setAttribute("aria-hidden", "true");
+    const tilt = document.createElement("div");
+    tilt.className = "x-path__deep-tilt";
+    deep.appendChild(tilt);
+    layers.forEach((L) => {
+      const el = document.createElement("div");
+      el.className = "x-path__layer" + (L.b ? " x-path__layer--soft" : "");
+      el.style.cssText = `left:${L.x}%;top:${L.y}%;transform:translateZ(${L.z}px)${L.b ? `;--b:${L.b}px` : ""}`;
+      el.dataset.z = L.z;
+      if (L.img) {
+        const im = new Image();
+        im.src = L.img === "cherries" ? "img/cakes/cherries.png" : `img/cutouts/${L.img}.webp`;
+        im.alt = "";
+        im.loading = "lazy";
+        im.width = L.w;
+        if (L.r) im.style.rotate = `${L.r}deg`;
+        el.classList.add("x-path__layer--img");
+        el.appendChild(im);
+      } else if (L.bubble) {
+        const b = document.createElement("span");
+        b.className = "x-3d-bubble" + (L.me ? " x-3d-bubble--me" : "");
+        b.textContent = L.bubble;
+        el.appendChild(b);
+      } else if (L.plates) el.innerHTML = `<span class="x-3d-plates" style="--s:${L.s}px">${[0, 1, 2, 3, 4, 5].map((k) => `<i style="--i:${k}"></i>`).join("")}</span>`;
+      else if (L.seal) el.innerHTML = `<span class="x-3d-seal" style="--s:${L.s}px"><b>♥</b><small>дата — ваша</small></span>`;
+      else if (L.balloon) el.innerHTML = `<span class="x-3d-balloon" style="--s:${L.s}px;--c:${L.balloon}"><i></i></span>`;
+      tilt.appendChild(el);
+    });
+    st.appendChild(deep);
+    return deep;
   }
 
   // the opening: the letters of the title carry their own slice of glaze, the glaze drips off them, a piping bag
