@@ -1,9 +1,10 @@
 /* Mariday home — how to order: the making of your cake.
-   One cake stand stays in the middle of the screen while the six chapters scroll past it. The cake on it is
-   sketched from a reference (a pencil draws it from the cake's own photo), cut open and filled with the chosen
-   flavour, weighed on the stand turned kitchen scale, photographed into a chat, booked with a wax seal, then
-   painted and piped into the real cake and packed into a box — and at the end the bow is pulled and the box
-   opens on it with the candles lit. Every chapter has a settled state, so scrolling back rewinds cleanly. */
+   One cake stand stays in the middle of the screen while the six chapters scroll past it. A glass cloche waits on
+   it; when the first chapter arrives the cloche flies off and real cakes pop out of the stand one after another
+   (pick one off the line of references and it jumps out). The cake on the stand is then cut open and filled with
+   the chosen flavour, weighed on the stand turned kitchen scale, photographed into a chat, booked with a wax seal,
+   piped with cream rosettes and packed into a box — and at the end the bow is pulled and the box opens on it with
+   the candles lit. Every chapter has a settled state, so scrolling back rewinds cleanly. */
 (function () {
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches || !!(window.MARIDAY && MARIDAY.editing);
   const hasLibs = !!(window.gsap && window.ScrollTrigger);
@@ -21,14 +22,14 @@
   ];
   const TITLES = ["дизайн", "начинка", "вага", "заявка", "передоплата", "свято"];
   const SWASH = '<svg class="x-make__swash" viewBox="0 0 220 26" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M4,16 C30,4 52,24 80,14 S128,4 150,15 S196,22 216,8"/></svg>';
-  // the drawing's design space: twice the paper (320 × 350 scene px); the cake stands on the cut line CX at BY
+  // the cake's design space: twice the frame (320 × 350 scene px); the cake stands on the cut line CX, its foot at BY
   const PW = 640, PH = 700, CX = 320, BY = PH * 0.975;
-  const PAPER = { x: 70, y: 120, w: 320, h: 350 };
+  const FRAME = { x: 70, y: 120, w: 320, h: 350 };
   const bookedDate = () => new Date(Date.now() + 10 * 864e5);
   const kgOf = (g) => Math.max(1.5, Math.round(g * 0.18 * 2) / 2);
   const fmtKg = (kg) => String(kg).replace(".", ",");
-  const sizeOf = (kg) => `Ø ${Math.round(14 + kg * 2.6)} см · ${Math.round(kg * 5.6)} порцій`;
-  const breathe = () => new Promise((r) => setTimeout(r, 0));
+  const cmOf = (kg) => Math.round(14 + kg * 2.6);
+  const sizeOf = (kg) => `Ø ${cmOf(kg)} см · ${Math.round(kg * 5.6)} порцій`;
 
   function burst(host, x, y, count = 30, spread = 1, colors = SPRINKLE_COLORS, tag = "i") {
     if (!hasLibs || reduce) return;
@@ -45,37 +46,9 @@
     }
   }
 
-  /* ─── the drawing: a pencil sketch and a watercolour wash made from the cake's own cut-out ───
-     The sketch is a colour-dodge of a blurred copy (dark wherever a pixel is darker than its neighbourhood) plus
-     the silhouette and some hatching in the shadows; the wash is a blurred, brighter copy. The work is split
-     into short tasks so scrolling never stutters while a design is prepared. */
-  function boxBlur(src, w, h, r) {
-    const tmp = new Float32Array(src.length), out = new Float32Array(src.length), k = 1 / (2 * r + 1);
-    for (let y = 0; y < h; y++) {
-      const row = y * w;
-      let acc = 0;
-      for (let x = -r; x <= r; x++) acc += src[row + Math.min(w - 1, Math.max(0, x))];
-      for (let x = 0; x < w; x++) {
-        tmp[row + x] = acc * k;
-        acc += src[row + Math.min(w - 1, x + r + 1)] - src[row + Math.max(0, x - r)];
-      }
-    }
-    for (let x = 0; x < w; x++) {
-      let acc = 0;
-      for (let y = -r; y <= r; y++) acc += tmp[Math.min(h - 1, Math.max(0, y)) * w + x];
-      for (let y = 0; y < h; y++) {
-        out[y * w + x] = acc * k;
-        acc += tmp[Math.min(h - 1, y + r + 1) * w + x] - tmp[Math.max(0, y - r) * w + x];
-      }
-    }
-    return out;
-  }
-  async function softened(a, r, passes) {
-    for (let i = 0; i < passes; i++) { a = boxBlur(a, PW, PH, r); await breathe(); }
-    return a;
-  }
-
-  async function sketchCake(img) {
+  /* ─── measuring a cake: from the cut-out's alpha, where its body is (the rim and the foot), so the knife, the tape
+     measure, the rosettes and the candles land on the cake itself and not on its topper or its stand ─── */
+  function measureCake(img) {
     const c = document.createElement("canvas");
     c.width = PW; c.height = PH;
     const g = c.getContext("2d", { willReadFrequently: true });
@@ -83,17 +56,11 @@
     const box = [(PW - img.naturalWidth * s) / 2, BY - img.naturalHeight * s, img.naturalWidth * s, img.naturalHeight * s];
     g.drawImage(img, ...box);
     const d = g.getImageData(0, 0, PW, PH).data; // throws for a cross-origin image, e.g. a page opened from disk
-    const N = PW * PH;
-    const L = new Float32Array(N), A = new Float32Array(N), R = new Float32Array(N), G = new Float32Array(N), B = new Float32Array(N);
     const rowW = new Int32Array(PH), rowL = new Int32Array(PH).fill(PW), rowR = new Int32Array(PH);
-    let x0 = PW, y0 = PH, x1 = 0, y1 = 0, tr = 0, tg = 0, tb = 0, tw = 0;
-    for (let i = 0; i < N; i++) {
-      const a = d[i * 4 + 3] / 255, r = d[i * 4] / 255, gg = d[i * 4 + 1] / 255, b = d[i * 4 + 2] / 255;
-      A[i] = a;
-      L[i] = (0.3 * r + 0.59 * gg + 0.11 * b) * a + 1 - a;
-      R[i] = r * a; G[i] = gg * a; B[i] = b * a;
-      if (a > 0.5) {
-        const x = i % PW, y = (i / PW) | 0;
+    let x0 = PW, y0 = PH, x1 = 0, y1 = 0;
+    for (let y = 0; y < PH; y++) {
+      for (let x = 0; x < PW; x++) {
+        if (d[(y * PW + x) * 4 + 3] < 128) continue;
         if (x < x0) x0 = x;
         if (x > x1) x1 = x;
         if (y < y0) y0 = y;
@@ -101,9 +68,6 @@
         rowW[y]++;
         if (x < rowL[y]) rowL[y] = x;
         if (x > rowR[y]) rowR[y] = x;
-        // the brush takes the cake's most vivid colour
-        const sat = Math.max(r, gg, b) - Math.min(r, gg, b), w = sat * sat * sat;
-        tr += r * w; tg += gg * w; tb += b * w; tw += w;
       }
     }
     if (x1 < x0) throw new Error("empty image");
@@ -120,96 +84,10 @@
       }
     }
     const ry = Math.min(base, rim + 6);
-    await breathe();
-    const Lb = await softened(L, 3, 3);
-    const Ab = await softened(A, 2, 2);
-    const sk = new ImageData(PW, PH), o = sk.data;
-    for (let y = 0; y < PH; y++) {
-      for (let x = 0; x < PW; x++) {
-        const i = y * PW + x;
-        let dark = Math.max(0, 1 - L[i] / Math.max(0.02, Lb[i])) * 4.2 + Math.min(1, Math.abs(A[i] - Ab[i]) * 5);
-        const tone = (1 - Lb[i]) * A[i];
-        if (tone > 0.32 && (x + y) % 7 === 0) dark += (tone - 0.25) * 1.1;
-        if (tone > 0.6 && (x - y + PH) % 9 === 0) dark += (tone - 0.5) * 1.1;
-        o[i * 4] = 70; o[i * 4 + 1] = 38; o[i * 4 + 2] = 40;
-        o[i * 4 + 3] = Math.min(1, dark) * (0.72 + Math.random() * 0.28) * 255;
-      }
-    }
-    await breathe();
-    const Rb = await softened(R, 4, 2), Gb = await softened(G, 4, 2), Bb = await softened(B, 4, 2), Aw = await softened(A, 4, 2);
-    const wa = new ImageData(PW, PH), q = wa.data;
-    for (let i = 0; i < N; i++) {
-      const a = Aw[i];
-      if (a < 0.01) continue;
-      const r = Rb[i] / a, gg = Gb[i] / a, b = Bb[i] / a, l = 0.3 * r + 0.59 * gg + 0.11 * b;
-      // more saturated, then lifted towards the paper
-      q[i * 4] = ((l + (r - l) * 1.35) * 0.82 + 0.18) * 255;
-      q[i * 4 + 1] = ((l + (gg - l) * 1.35) * 0.82 + 0.18) * 255;
-      q[i * 4 + 2] = ((l + (b - l) * 1.35) * 0.82 + 0.18) * 255;
-      q[i * 4 + 3] = Math.min(1, a * 1.1) * 0.8 * 255;
-    }
-    const toCanvas = (id) => {
-      const cc = document.createElement("canvas");
-      cc.width = PW; cc.height = PH;
-      cc.getContext("2d").putImageData(id, 0, 0);
-      return cc;
-    };
-    const bbox = [x0, y0, x1, y1];
-    const hex = (v) => Math.round(Math.min(1, v) * 255);
-    return {
-      img, box, bbox, rim, base, rimL: rowL[ry], rimR: rowR[ry],
-      sketch: toCanvas(sk), wash: toCanvas(wa),
-      tint: tw ? `rgb(${hex(tr / tw)},${hex(tg / tw)},${hex(tb / tw)})` : "#e2849a",
-      scrib: scribble(bbox), blobs: blobs(bbox),
-    };
+    return { img, box, bbox: [x0, y0, x1, y1], rim, base, rimL: rowL[ry], rimR: rowR[ry] };
   }
-  // what the pencil, brush and bag can work with when the image can't be read: the photo is simply shown instead
-  const plainArt = () => ({ img: null, bbox: [160, 120, 480, 682], rim: 230, base: 630, rimL: 190, rimR: 450, scrib: scribble([160, 120, 480, 682]), blobs: blobs([160, 120, 480, 682]), tint: "#e2849a" });
-
-  // the pencil's route: rows of loops, left to right and back, top to bottom; a fat stroke along it reveals the sketch
-  function scribble([x0, y0, x1, y1]) {
-    x0 -= 16; x1 += 16; y0 -= 16; y1 += 10;
-    const rows = Math.max(4, Math.round((y1 - y0) / 95));
-    const gap = (y1 - y0) / rows, r = gap * 0.72;
-    const pts = [];
-    for (let i = 0; i <= rows; i++) {
-      const y = y0 + gap * i, ltr = i % 2 === 0;
-      const loops = Math.max(2, Math.round((x1 - x0) / (r * 3)));
-      const n = loops * 18;
-      for (let k = 0; k <= n; k++) {
-        const t = k / n, th = t * loops * Math.PI * 2 + i;
-        const x = ltr ? x0 + (x1 - x0) * t : x1 - (x1 - x0) * t;
-        pts.push([x + Math.cos(th) * r * 0.75 * (ltr ? 1 : -1), y + Math.sin(th) * r * 0.9]);
-      }
-    }
-    const len = [0];
-    for (let k = 1; k < pts.length; k++) len.push(len[k - 1] + Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]));
-    return { pts, len, w: gap * 1.7 };
-  }
-  // where the brush drops colour: two columns of three, snaking down, big enough to overlap into one wash
-  function blobs([x0, y0, x1, y1]) {
-    const cw = (x1 - x0) / 2, ch = (y1 - y0) / 3, R = Math.hypot(cw, ch) * 0.64;
-    const out = [];
-    for (let j = 0; j < 3; j++) {
-      for (let i = 0; i < 2; i++) {
-        const c = j % 2 ? 1 - i : i;
-        out.push({ x: x0 + cw * (c + 0.5) + (Math.random() - 0.5) * cw * 0.3, y: y0 + ch * (j + 0.5) + (Math.random() - 0.5) * ch * 0.3, r: R * (0.95 + Math.random() * 0.2), s: Math.random() * 6 });
-      }
-    }
-    return out;
-  }
-  // a watery blot: a circle with a wobbly rim
-  function blot(g, b, f) {
-    if (f <= 0) return;
-    const r = b.r * f;
-    for (let k = 0; k <= 30; k++) {
-      const a = (k / 30) * Math.PI * 2, rr = r * (1 + 0.1 * Math.sin(a * 3 + b.s) + 0.06 * Math.sin(a * 7 + b.s * 2));
-      const x = b.x + Math.cos(a) * rr, y = b.y + Math.sin(a) * rr;
-      if (k) g.lineTo(x, y);
-      else g.moveTo(x, y);
-    }
-    g.closePath();
-  }
+  // what the scene works with when the image can't be read: the photo is shown as it is
+  const plainArt = () => ({ img: null, box: null, bbox: [160, 120, 480, 682], rim: 230, base: 630, rimL: 190, rimR: 450 });
 
   function init() {
     const sec = $(".x-make");
@@ -526,8 +404,8 @@
       c.setAttribute("aria-label", "Свічку задуто");
       if (all.every((x) => x.classList.contains("is-out"))) {
         hint.textContent = "бажання прийнято ✦";
-        fx.pop($("[data-paper]", sec), 40, 1.2);
-        fx.hearts($("[data-paper]", sec), 6);
+        fx.pop($("[data-frame]", sec), 40, 1.2);
+        fx.hearts($("[data-frame]", sec), 6);
         setTimeout(() => {
           all.forEach((x) => { x.classList.remove("is-out"); x.setAttribute("aria-label", "Задути свічку"); });
           hint.textContent = text;
@@ -542,18 +420,18 @@
     const scene = $("[data-scene]", stage);
     const q = (s) => $(s, scene);
     const line = q("[data-line]"), string = q(".x-mk-string path"), refs = $$("[data-ref]", scene), yours = q(".x-mk-ref--yours");
-    const ghost = q(".x-mk-ghost");
-    const paper = q("[data-paper]"), sheet = q(".x-mk-paper__sheet"), tape = q(".x-mk-paper__tape"), head = q(".x-mk-paper__head");
-    const still = q("[data-still]"), cv = q("[data-cv]"), sketchNo = q("[data-sketch-no]"), sketchName = q("[data-sketch-name]");
+    const cloche = q("[data-cloche]"), ghost = q(".x-mk-ghost");
+    const frame = q("[data-frame]"), still = q("[data-still]"), cv = q("[data-cv]");
     const slice = q("[data-slice]"), berry = q(".x-mk-slice__berry"), layers = $$(".x-mk-slice > i:not(.x-mk-slice__berry)", scene);
-    const pencil = q('[data-tool="pencil"]'), brush = q('[data-tool="brush"]'), bag = q('[data-tool="bag"]'), knife = q("[data-knife]");
+    const tape = q("[data-tape]"), tapeLbl = q("[data-tape-lbl]"), roses = q("[data-roses]");
+    const bag = q('[data-tool="bag"]'), knife = q("[data-knife]");
     const dial = q("[data-dial]"), needle = q(".x-mk-dial__needle"), dialKg = q("[data-dial-kg]");
     const phone = q("[data-phone]"), flash = q("[data-flash]"), shot = q("[data-shot]"), shotImg = q("[data-shot-img]");
     const ticket = q("[data-ticket]");
-    const box = q("[data-box]"), back = q(".x-mk-box__back"), sides = $$(".x-mk-box__side", scene), frontWall = q(".x-mk-box__front"), sticker = q("[data-sticker]");
+    const back = q(".x-mk-box__back"), sides = $$(".x-mk-box__side", scene), frontWall = q(".x-mk-box__front"), sticker = q("[data-sticker]");
     const lid = q(".x-mk-box__lid"), ribV = q(".x-mk-box__rib--v"), ribH = q(".x-mk-box__rib--h"), bow = q("[data-bow]"), tag = q("[data-tag]");
     const garland = q("[data-garland]"), gstring = q(".x-mk-garland path"), flags = $$(".x-mk-garland i", scene);
-    const lights = $$(".x-mk-candle", scene), cherry = q("[data-cherry]"), fxHost = q("[data-fx]");
+    const lights = $$(".x-mk-candle", scene), cherry = q("[data-cherry]"), fxHost = q("[data-fx]"), plate = q(".x-mk-stand__plate");
     const wish = $$(".x-make__fin h3 em", sec);
     const animate = hasLibs && !reduce;
     const designs = refs.map((r) => ({ cut: r.dataset.cut, photo: $("img", r).getAttribute("src"), name: r.dataset.name, short: r.dataset.short }));
@@ -563,19 +441,19 @@
       f.style.top = `${(1 - t) * (1 - t) * 6 + 2 * (1 - t) * t * 50 + t * t * 6}px`;
     });
 
-    // ── the designs: prepared ahead of time, while the section is still a little way off ──
+    // ── the designs: each cake's cut-out is loaded and measured ahead of time ──
     const made = [];
     const prepare = (i) => made[i] || (made[i] = new Promise((res, rej) => {
       const im = new Image();
-      im.onload = () => sketchCake(im).then(res, rej);
+      im.onload = () => { try { res(measureCake(im)); } catch (e) { rej(e); } };
       im.onerror = rej;
       im.src = designs[i].cut;
     }));
     let art = null;
     let noCanvas = false;
     const load = async (i) => {
-      try { art = await prepare(i); paper.classList.remove("is-still"); }
-      catch (e) { art = plainArt(); noCanvas = true; paper.classList.add("is-still"); }
+      try { art = await prepare(i); frame.classList.remove("is-still"); }
+      catch (e) { art = plainArt(); noCanvas = true; frame.classList.add("is-still"); }
       still.src = designs[i].cut;
     };
 
@@ -585,8 +463,6 @@
     const dateText = () => { const d = bookedDate(); return `${d.getDate()} ${MONTHS_OF[d.getMonth()]}`; };
     const spec = () => {
       const dz = designs[order.design];
-      sketchName.textContent = dz.name;
-      sketchNo.textContent = String(17 + order.design).padStart(3, "0");
       q("[data-spec-design]").textContent = dz.short;
       q("[data-spec-flavor]").textContent = flavor().name;
       q("[data-spec-kg]").textContent = kgText();
@@ -598,100 +474,65 @@
       sticker.textContent = order.pickup ? "доставка · по NL" : "самовивіз · Alkmaar";
       q("[data-chat-pic]").src = shotImg.src = dz.photo;
       dialKg.textContent = fmtKg(kgOf(order.guests));
+      tapeLbl.textContent = `Ø ${cmOf(kgOf(order.guests))} см`;
     };
+    const press = (i) => refs.forEach((r, j) => r.setAttribute("aria-pressed", String(i === j)));
 
-    // ── drawing ──
-    const S = { sk: 0, cut: 0, z: 1, g: 1, wa: 0, re: 0 };
+    // ── drawing the cake: it rises out of the stand, gets cut in two, grows, and a shine runs over it ──
+    const S = { rise: 0, cut: 0, z: 1, g: 1, shine: -1 };
     const g = cv.getContext("2d");
-    const mask = document.createElement("canvas"), mg = mask.getContext("2d");
-    const tmp = document.createElement("canvas"), tg = tmp.getContext("2d");
-    mask.width = tmp.width = PW;
-    mask.height = tmp.height = PH;
-    let inked = 0, sc = 1;
+    let sc = 1;
     const zoom = () => S.z * S.g;
-    // a point of the drawing (PW space) in scene pixels, with the drawing's zoom about the cake's foot
-    const at = (px, py) => { const zz = zoom(); return [PAPER.x + (CX + (px - CX) * zz) / 2, PAPER.y + (BY + (py - BY) * zz) / 2]; };
-    const front = (p) => art.bbox[0] - 70 + (art.bbox[2] - art.bbox[0] + 140) * p;
-    const grow = (p, i, n) => { const t = Math.max(0, Math.min(1, (p - (0.7 * i) / n) / 0.3)); return 1 - (1 - t) ** 3; };
+    // a point of the design space in scene pixels (with the zoom about the cake's foot), and in the frame's own pixels
+    const at = (px, py) => { const zz = zoom(); return [FRAME.x + (CX + (px - CX) * zz) / 2, FRAME.y + (BY + (py - BY) * zz) / 2]; };
+    const local = (px, py) => { const [x, y] = at(px, py); return [x - FRAME.x, y - FRAME.y]; };
     const draw = () => {
       g.setTransform(1, 0, 0, 1, 0, 0);
       g.clearRect(0, 0, cv.width, cv.height);
-      if (!art || !art.sketch) return;
+      if (!art || !art.img || S.rise <= 0) return;
       const zz = zoom();
       g.setTransform(sc, 0, 0, sc, 0, 0);
       g.translate(CX, BY); g.scale(zz, zz); g.translate(-CX, -BY);
-      if (S.re >= 1 && S.cut <= 0) { g.drawImage(art.img, ...art.box); return; }
-      const base = () => {
-        if (S.wa > 0) {
-          g.save();
-          if (S.wa < 1) { g.beginPath(); art.blobs.forEach((b, i) => blot(g, b, grow(S.wa, i, art.blobs.length))); g.clip(); }
-          g.drawImage(art.wash, 0, 0);
-          g.restore();
-        }
-        if (S.sk >= 1) g.drawImage(art.sketch, 0, 0);
-        else if (S.sk > 0) {
-          tg.globalCompositeOperation = "source-over";
-          tg.clearRect(0, 0, PW, PH);
-          tg.drawImage(art.sketch, 0, 0);
-          tg.globalCompositeOperation = "destination-in";
-          tg.drawImage(mask, 0, 0);
-          g.drawImage(tmp, 0, 0);
-        }
-      };
+      g.save();
+      // whatever is below the plate line is inside the stand: the cake rises out of it
+      g.beginPath(); g.rect(-PW, -PH, PW * 3, PH + BY + 3); g.clip();
+      g.translate(0, (1 - S.rise) * (BY - art.bbox[1] + 30));
+      const body = () => g.drawImage(art.img, ...art.box);
       if (S.cut > 0) {
         // the left half stays; the right half slides away and leans back, showing the cut face between them
-        g.save(); g.beginPath(); g.rect(-PW, -PH, PW + CX, PH * 3); g.clip(); base(); g.restore();
+        g.save(); g.beginPath(); g.rect(-PW, -PH, PW + CX, PH * 3); g.clip(); body(); g.restore();
         g.save();
         g.translate(CX + 100 * S.cut, BY); g.rotate((7 * S.cut * Math.PI) / 180); g.translate(-CX, -BY);
-        g.beginPath(); g.rect(CX, -PH, PW, PH * 3); g.clip(); base();
+        g.beginPath(); g.rect(CX, -PH, PW, PH * 3); g.clip(); body();
         g.restore();
-      } else base();
-      if (S.re > 0 && S.re < 1) {
-        // the real cake is piped on from the left, behind a wavy edge of cream with a shine running along it
-        const f = front(S.re);
-        g.save();
-        g.beginPath(); g.moveTo(-10, -10);
-        for (let y = -10; y <= PH + 12; y += 12) g.lineTo(f + Math.sin(y / 30 + S.re * 9) * 18, y);
-        g.lineTo(-10, PH + 12); g.closePath(); g.clip();
-        g.drawImage(art.img, ...art.box);
-        g.restore();
+      } else body();
+      if (S.shine >= 0 && S.shine <= 1) {
+        // a slanted band of light runs across the cake, only where the cake is
+        const f = art.bbox[0] - 120 + (art.bbox[2] - art.bbox[0] + 240) * S.shine;
         g.save();
         g.globalCompositeOperation = "source-atop";
-        const gr = g.createLinearGradient(f - 80, 0, f + 24, 0);
+        g.translate(f, 0); g.transform(1, 0, -0.35, 1, 0, 0);
+        const gr = g.createLinearGradient(-70, 0, 70, 0);
         gr.addColorStop(0, "rgba(255, 250, 236, 0)");
-        gr.addColorStop(0.78, "rgba(255, 250, 236, 0.9)");
+        gr.addColorStop(0.5, "rgba(255, 250, 236, 0.8)");
         gr.addColorStop(1, "rgba(255, 250, 236, 0)");
         g.fillStyle = gr;
-        g.fillRect(f - 80, -PH, 104, PH * 3);
+        g.fillRect(-70, -PH, 140, PH * 3);
         g.restore();
       }
+      g.restore();
     };
-    // inks the pencil's route up to p on the mask; returns where the pencil tip is
-    const inkTo = (p) => {
-      const { pts, len, w } = art.scrib;
-      const target = p * len[len.length - 1];
-      let i = inked;
-      mg.lineWidth = w;
-      mg.lineCap = mg.lineJoin = "round";
-      mg.beginPath();
-      mg.moveTo(pts[i][0], pts[i][1]);
-      while (i < pts.length - 1 && len[i + 1] <= target) { i++; mg.lineTo(pts[i][0], pts[i][1]); }
-      let tip = pts[i];
-      if (i < pts.length - 1) {
-        const f = (target - len[i]) / (len[i + 1] - len[i] || 1);
-        tip = [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * f, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * f];
-        mg.lineTo(tip[0], tip[1]);
-      }
-      mg.stroke();
-      inked = i;
-      return tip;
-    };
-    // the cut face stands on the cake's foot, as tall as its body, inside the paper
+    // the cut face stands on the cake's foot, as tall as its body
     const placeSlice = () => {
       if (!art) return;
-      const zz = zoom();
-      const h = ((art.base - art.rim) * zz) / 2;
-      gsap.set(slice, { top: (BY + (art.base - BY) * zz) / 2 - h, height: h });
+      const [, yb] = local(0, art.base), [, yr] = local(0, art.rim);
+      gsap.set(slice, { top: yr, height: yb - yr });
+    };
+    // the tape measure lies across the cake's foot
+    const placeTape = () => {
+      if (!art) return;
+      const [l, yb] = local(art.rimL, art.base), [r] = local(art.rimR, art.base);
+      gsap.set(tape, { left: l - 8, top: yb - 4, width: r - l + 16 });
     };
     const paint = () => {
       Object.entries(flavor().c).forEach(([key, v]) => slice.style.setProperty(`--${key}`, v));
@@ -702,17 +543,15 @@
       const k = Math.min(w / 460, h / 600);
       scene.style.setProperty("--k", k.toFixed(4));
       const dpr = Math.min(2, devicePixelRatio || 1);
-      const cw = Math.round(PAPER.w * k * dpr), ch = Math.round(PAPER.h * k * dpr);
+      const cw = Math.round(FRAME.w * k * dpr), ch = Math.round(FRAME.h * k * dpr);
       if (cv.width !== cw || cv.height !== ch) { cv.width = cw; cv.height = ch; }
       sc = cw / PW;
       draw();
     };
 
-    // ── the tools: the tip of each sits on its wrapper's origin ──
-    const REST = { x: 404, y: 436, a: -96 };
-    const T = { pencil: { ...REST }, brush: { x: 0, y: 0, a: 0 }, bag: { x: 0, y: 0, a: 0 } };
-    const put = (tool, t) => { tool.style.transform = `translate(${t.x.toFixed(1)}px, ${t.y.toFixed(1)}px) rotate(${t.a.toFixed(1)}deg)`; };
-    const park = () => { Object.assign(T.pencil, REST); put(pencil, T.pencil); };
+    // ── the piping bag: its nozzle sits on the wrapper's origin ──
+    const T = { x: 0, y: 0, a: 0 };
+    const putBag = () => { bag.style.transform = `translate(${T.x.toFixed(1)}px, ${T.y.toFixed(1)}px) rotate(${T.a.toFixed(1)}deg)`; };
     const spark = (x, y) => {
       const s = document.createElement("i");
       s.textContent = "✦";
@@ -723,22 +562,22 @@
         .fromTo(s, { scale: 0, rotation: 0 }, { scale: gsap.utils.random(0.6, 1.3), rotation: 90, duration: 0.25, ease: "back.out(3)" })
         .to(s, { scale: 0, rotation: 200, y: gsap.utils.random(-40, -14), x: gsap.utils.random(-18, 18), duration: 0.55, ease: "power2.in" });
     };
-    const crumb = (x, y) => {
-      const b = document.createElement("b");
-      b.style.left = `${x.toFixed(1)}px`;
-      b.style.top = `${y.toFixed(1)}px`;
-      fxHost.appendChild(b);
-      gsap.fromTo(b, { x: 0, y: 0, opacity: 0.8 }, { x: gsap.utils.random(-12, 12), y: gsap.utils.random(14, 34), opacity: 0, duration: 0.8, ease: "power1.in", onComplete: () => b.remove() });
-    };
 
-    // ── the cherry, the candles and the scale ──
-    const rimPoint = (f, lift = 0) => { const zz = zoom(); return [PAPER.x + (CX + (art.rimL + (art.rimR - art.rimL) * f - CX) * zz) / 2, PAPER.y + (BY + (art.rim - BY) * zz) / 2 - lift]; };
-    const onPlate = () => gsap.set(cherry, { x: 118, y: 452, rotation: 0, scale: 1 });
+    // ── the cherry, the candles, the rosettes and the scale ──
+    const rimPoint = (f, lift = 0) => { const [x, y] = at(art.rimL + (art.rimR - art.rimL) * f, art.rim); return [x, y - lift]; };
+    const onPlate = () => gsap.set(cherry, { x: 92, y: 456, rotation: 0, scale: 1 });
     const onCake = () => { const [x, y] = rimPoint(0.12, 4); gsap.set(cherry, { x, y, rotation: 0, scale: 1 }); };
     const onLid = () => gsap.set(cherry, { x: 330, y: 128, rotation: 0, scale: 1 });
     // a hop to a point: up, then a bounce down onto it
     const hopTo = (x, y, h = 120) => gsap.timeline().to(cherry, { x, y: y - h, rotation: -20, duration: 0.32, ease: "power2.out" }).to(cherry, { y, rotation: 0, duration: 0.32, ease: "bounce.out" });
+    const hop = () => gsap.timeline().to(cherry, { y: "-=26", duration: 0.2, ease: "power2.out" }).to(cherry, { y: "+=26", duration: 0.24, ease: "bounce.out" });
     const placeCandles = () => lights.forEach((c, i) => { const [x, y] = rimPoint(0.3 + i * 0.17); gsap.set(c, { x, y }); });
+    const ROSES = [0.1, 0.3, 0.5, 0.7, 0.9];
+    const placeRoses = () => {
+      if (!art) return;
+      while (roses.children.length < ROSES.length) roses.appendChild(document.createElement("i"));
+      [...roses.children].forEach((r, i) => { const [x, y] = local(art.rimL + (art.rimR - art.rimL) * ROSES[i], art.rim); gsap.set(r, { left: x, top: y + 2 }); });
+    };
     const growth = () => Math.min(1.3, Math.pow(kgOf(order.guests) / 2.5, 0.3));
     const aim = () => { needle.style.setProperty("--a", `${(-120 + ((kgOf(order.guests) - 1.5) / 9.5) * 240).toFixed(1)}deg`); };
 
@@ -746,8 +585,66 @@
     const chat = chatScene(scene, fx);
     const booking = bookingScene(scene, fx);
 
+    // ── 01 · cakes pop out of the stand ──
+    let shown = -1, popSeq = 0, popTl = null, cycleT = 0, hover = false, touchedAt = 0, cur = 0, tl = null;
+    const popOut = () => {
+      popTl = gsap.timeline()
+        .to(S, { rise: 0, duration: 0.42, ease: "back.in(1.7)", onUpdate: draw });
+      if (noCanvas) popTl.to(still, { opacity: 0, y: 40, duration: 0.35, ease: "power2.in" }, 0);
+      return popTl;
+    };
+    const popIn = () => {
+      S.rise = 0;
+      draw();
+      popTl = gsap.timeline()
+        .to(plate, { scaleY: 0.84, duration: 0.12, ease: "power2.in", transformOrigin: "50% 100%" })
+        .to(plate, { scaleY: 1, duration: 0.7, ease: "elastic.out(1, 0.35)" })
+        .to(S, { rise: 1, duration: 0.95, ease: "back.out(2.4)", onUpdate: draw }, 0.08)
+        .call(() => fx.pop(plate, 24, 0.85), null, 0.28)
+        .add(hop(), 0.45);
+      if (noCanvas) popTl.fromTo(still, { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.8, ease: "back.out(2)" }, 0.08);
+      return popTl;
+    };
+    const upload = (i) => {
+      if (refs[i] !== yours || yours.classList.contains("is-up")) return Promise.resolve();
+      if (!animate) { yours.classList.add("is-up"); return Promise.resolve(); }
+      yours.classList.add("is-loading");
+      return new Promise((res) => setTimeout(() => {
+        yours.classList.remove("is-loading");
+        yours.classList.add("is-up");
+        fx.hearts(yours, 2);
+        res();
+      }, 800));
+    };
+    // the cake on the stand sinks back in, and design i pops out in its place
+    const pop = async (i) => {
+      const id = ++popSeq;
+      clearTimeout(cycleT);
+      if (shown >= 0 && S.rise > 0) { await popOut(); if (id !== popSeq) return; }
+      await upload(i);
+      if (id !== popSeq) return;
+      await load(i);
+      if (id !== popSeq) return;
+      shown = i;
+      order.design = i;
+      spec();
+      press(i);
+      await popIn();
+      if (id !== popSeq) return;
+      cycle();
+    };
+    // while the reader stays at the first chapter and leaves the line alone, the next design pops out by itself
+    const cycle = () => {
+      clearTimeout(cycleT);
+      cycleT = setTimeout(() => {
+        if (cur !== 1 || document.hidden || hover || Date.now() - touchedAt < 14000) return cycle();
+        const n = yours.classList.contains("is-up") ? designs.length : designs.length - 1;
+        pop((shown + 1) % n);
+      }, 3200);
+    };
+    const stopPops = () => { popSeq++; clearTimeout(cycleT); if (popTl) { popTl.kill(); popTl = null; } gsap.set(plate, { clearProps: "transform" }); };
+
     // ── the settled state of every chapter; each entrance ends in exactly this ──
-    let tl = null, cur = 0;
     const setBox = (n) => {
       const parts = [back, ...sides, frontWall, lid];
       if (n === 6) {
@@ -767,25 +664,28 @@
         gsap.set([tag, sticker], { opacity: 0 });
       }
     };
+    let demoRestore = null;
     const settle = (n, keep) => {
       if (!keep && tl) { tl.kill(); tl = null; }
+      stopPops();
       if (demoRestore) demoRestore();
       const mid = n >= 2 && n <= 5, side = n === 4 || n === 5;
       gsap.set(line, { y: n === 1 ? 0 : -150, autoAlpha: n === 1 ? 1 : 0 });
       gsap.set(string, { strokeDashoffset: 0 });
       gsap.set(refs, { clearProps: "transform,opacity" });
+      gsap.set(cloche, { y: n === 0 ? 0 : -300, rotation: 0, opacity: n === 0 ? 1 : 0 });
       gsap.set(ghost, { opacity: n === 0 ? 1 : 0, scale: 1 });
-      gsap.set(paper, { opacity: n === 0 ? 0 : 1, x: side ? -72 : 0, y: n === 0 ? 50 : 0, scale: side ? 0.88 : 1, rotation: 0 });
-      gsap.set([sheet, tape], { opacity: n >= 6 ? 0 : 1 });
-      gsap.set(head, { opacity: n >= 2 && n < 6 ? 1 : 0 });
-      gsap.set(still, { opacity: n >= 1 && noCanvas ? 1 : 0 });
-      S.sk = n >= 1 ? 1 : 0; S.cut = mid ? 1 : 0; S.z = mid ? 0.9 : 1; S.g = n >= 3 ? growth() : 1; S.wa = n >= 6 ? 1 : 0; S.re = n >= 6 ? 1 : 0;
+      gsap.set(frame, { opacity: 1, x: side ? -72 : 0, y: 0, scale: side ? 0.88 : 1, rotation: 0 });
+      gsap.set(still, { opacity: n >= 1 && noCanvas ? 1 : 0, y: 0 });
+      S.rise = n >= 1 ? 1 : 0; S.cut = mid ? 1 : 0; S.z = mid ? 0.9 : 1; S.g = n >= 3 ? growth() : 1; S.shine = -1;
+      if (n >= 1 && shown < 0) shown = order.design;
       placeSlice();
       gsap.set(slice, { opacity: mid ? 1 : 0, scaleY: 1 });
       gsap.set([berry, ...layers], { clearProps: "transform,opacity" });
-      park();
-      gsap.set(pencil, { opacity: side ? 0 : 1 });
-      gsap.set([brush, bag, knife], { opacity: 0 });
+      placeTape();
+      gsap.set(tape, { opacity: n >= 3 && n <= 5 ? 1 : 0, scaleX: 1, scaleY: 1, transformOrigin: "0 50%" });
+      gsap.set(tapeLbl, { clearProps: "transform" });
+      gsap.set([bag, knife], { opacity: 0 });
       gsap.set(dial, { scale: n >= 3 && n <= 5 ? 1 : 0, rotation: 0 });
       aim();
       gsap.set(phone, { y: n === 4 ? 0 : 160, opacity: n === 4 ? 1 : 0 });
@@ -795,6 +695,7 @@
       gsap.set(ticket, { y: n === 5 ? 0 : 140, opacity: n === 5 ? 1 : 0, rotation: 0 });
       booking.reset();
       if (n === 5) booking.done();
+      if (n >= 6 && art) { placeRoses(); gsap.set(roses.children, { opacity: 1, scale: 1 }); } else roses.innerHTML = "";
       setBox(n);
       if (n === 7 && art) onCake(); else if (n === 6) onLid(); else onPlate();
       lights.forEach((c) => c.classList.toggle("is-unlit", n !== 7));
@@ -808,41 +709,16 @@
     };
 
     // ── the entrances ──
-    // 01 · the line is strung, the references are pegged on, the paper rises and the pencil sketches the cake
-    const sketchIn = () => {
-      const t = T.pencil, o = { p: 0 };
-      let n = 0;
-      const start = () => at(...art.scrib.pts[0]);
-      const s = gsap.timeline()
-        .call(() => { mg.clearRect(0, 0, PW, PH); inked = 0; S.sk = 0.001; draw(); })
-        .to(t, { x: () => start()[0], y: () => start()[1], a: -38, duration: 0.5, ease: "power2.inOut", onUpdate: () => put(pencil, t) })
-        .to(o, {
-          p: 1, duration: 2.6, ease: "power1.inOut",
-          onUpdate: () => {
-            S.sk = Math.max(0.001, o.p);
-            const [x, y] = at(...inkTo(o.p));
-            t.x = x; t.y = y; t.a = -38 + Math.sin(o.p * 90) * 5;
-            put(pencil, t);
-            if (++n % 6 === 0) crumb(x, y);
-            draw();
-          },
-        })
-        .call(() => { S.sk = 1; draw(); })
-        .to(t, { x: REST.x, y: REST.y, a: REST.a, duration: 0.6, ease: "power2.inOut", onUpdate: () => put(pencil, t) });
-      if (noCanvas) s.fromTo(still, { opacity: 0 }, { opacity: 1, duration: 2.6, ease: "none" }, 0.5);
-      return s;
-    };
-    const hop = () => gsap.timeline().to(cherry, { y: "-=26", duration: 0.2, ease: "power2.out" }).to(cherry, { y: "+=26", duration: 0.24, ease: "bounce.out" });
+    // 01 · the line is strung, the references are pegged on, the cloche flies off — and the first cake pops out
     const enter1 = () => gsap.timeline()
       .set(line, { y: -150, autoAlpha: 1 })
-      .to(ghost, { scale: 0.6, opacity: 0, duration: 0.45, ease: "power2.in" }, 0)
       .fromTo(string, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.7, ease: "power2.inOut" }, 0.1)
       .to(line, { y: 0, duration: 0.9, ease: "elastic.out(1, 0.55)" }, 0.1)
       .fromTo(refs, { y: -80, opacity: 0, rotation: () => gsap.utils.random(-30, 30) }, { y: 0, opacity: 1, rotation: 0, duration: 1, stagger: 0.09, ease: "elastic.out(1, 0.5)", clearProps: "transform,opacity" }, 0.25)
-      .fromTo(paper, { y: 60, opacity: 0, rotation: -5 }, { y: 0, opacity: 1, rotation: 0, duration: 0.8, ease: "back.out(1.6)" }, 0.3)
-      .add(sketchIn(), 1)
-      .add(hop(), ">-0.3")
-      .call(() => fx.hearts(paper, 3), null, "<");
+      .to(ghost, { scale: 0.6, opacity: 0, duration: 0.3, ease: "power2.in" }, 0.3)
+      .to(cloche, { y: -24, duration: 0.25, ease: "power2.out" }, 0.4)
+      .to(cloche, { y: -320, rotation: -8, opacity: 0, duration: 0.8, ease: "power2.in" }, 0.65)
+      .call(() => pop(order.design), null, 0.95);
 
     // 02 · the knife comes down the middle, the right half falls away and the cut face is stacked up, layer by layer
     const stackLayers = () => gsap.timeline()
@@ -853,7 +729,6 @@
       const rimY = at(0, art.rim)[1];
       return gsap.timeline()
         .to(line, { y: -150, autoAlpha: 0, duration: 0.5, ease: "power2.in" }, 0)
-        .to(head, { opacity: 1, duration: 0.5 }, 0.4)
         .fromTo(knife, { y: rimY - 270, opacity: 0 }, { y: rimY - 110, opacity: 1, duration: 0.45, ease: "power3.in" }, 0.25)
         .call(() => fx.pop(knife, 10, 0.4))
         .to(knife, { y: rimY - 300, opacity: 0, duration: 0.4, ease: "power2.in" }, "+=0.12")
@@ -862,39 +737,42 @@
         .add(stackLayers(), "<");
     };
 
-    // 03 · the stand becomes a scale and the cake grows to the party's size
-    let touched = false, demoRestore = null;
+    // 03 · the stand becomes a scale, the tape measure unrolls, and the cake grows to the party's size
+    let touched = false;
     const weigh = (animated) => {
       spec();
       aim();
       placeSlice();
-      if (animated) gsap.to(S, { g: growth(), duration: 0.9, ease: "elastic.out(1, 0.5)", onUpdate: () => { draw(); placeSlice(); }, overwrite: "auto" });
+      placeTape();
+      if (animated) gsap.to(S, { g: growth(), duration: 0.9, ease: "elastic.out(1, 0.5)", onUpdate: () => { draw(); placeSlice(); placeTape(); }, overwrite: "auto" });
       else { S.g = growth(); draw(); }
     };
     const enter3 = () => {
+      placeTape();
       const s = gsap.timeline()
         .fromTo(dial, { scale: 0, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.8, ease: "elastic.out(1, 0.5)" }, 0)
-        .call(() => fx.pop(dial, 12, 0.5), null, 0.1);
-      if (touched) s.to(S, { g: growth(), duration: 1.2, ease: "elastic.out(1, 0.5)", onUpdate: () => { draw(); placeSlice(); } }, 0.4);
+        .call(() => fx.pop(dial, 12, 0.5), null, 0.1)
+        .fromTo(tape, { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 0.7, ease: "power3.out", transformOrigin: "0 50%" }, 0.45)
+        .fromTo(tapeLbl, { scale: 0 }, { scale: 1, duration: 0.6, ease: "back.out(3)" }, 0.95);
+      if (touched) s.to(S, { g: growth(), duration: 1.2, ease: "elastic.out(1, 0.5)", onUpdate: () => { draw(); placeSlice(); placeTape(); } }, 0.4);
       else {
         // a quick demo: the party grows from a few guests to the real number, and the cake with it;
         // interrupted or not, the order ends up where it was
         const real = order.guests, o = { g: 4 };
-        demoRestore = () => { demoRestore = null; input.value = real; applyGuests(false); S.g = growth(); draw(); placeSlice(); };
+        demoRestore = () => { demoRestore = null; input.value = real; applyGuests(false); S.g = growth(); draw(); placeSlice(); placeTape(); };
         s.call(() => { input.value = 4; applyGuests(false); }, null, 0.3)
-          .to(o, { g: real, duration: 2, ease: "power2.inOut", onUpdate: () => { if (touched) return; input.value = Math.round(o.g); applyGuests(false); S.g = growth(); draw(); placeSlice(); } }, 0.5)
+          .to(o, { g: real, duration: 2, ease: "power2.inOut", onUpdate: () => { if (touched) return; input.value = Math.round(o.g); applyGuests(false); S.g = growth(); draw(); placeSlice(); placeTape(); } }, 0.5)
           .call(() => demoRestore && demoRestore());
       }
       return s;
     };
 
-    // 04 · the paper moves aside, the phone comes up, a flash — and the photo flies into the chat, which plays itself
+    // 04 · the cake moves aside, the phone comes up, a flash — and the photo flies into the chat, which plays itself
     const enter4 = () => {
       spec();
       chat.reset();
       return gsap.timeline()
-        .to(paper, { x: -72, scale: 0.88, duration: 0.6, ease: "power2.inOut" }, 0)
-        .to(pencil, { opacity: 0, duration: 0.3 }, 0)
+        .to(frame, { x: -72, scale: 0.88, duration: 0.6, ease: "power2.inOut" }, 0)
         .to(phone, { y: 0, opacity: 1, duration: 0.7, ease: "back.out(1.4)" }, 0.2)
         .to(flash, { opacity: 0.9, duration: 0.07, yoyo: true, repeat: 1 }, 0.95)
         .fromTo(shot, { x: 110, y: 230, scale: 0.4, rotation: -10, opacity: 0 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 1)
@@ -913,54 +791,36 @@
         .add(booking.play(), 0.9);
     };
 
-    // 06 · the drawing is painted and piped into the real cake, the cherry goes on top, and the box closes round it
-    const washIn = () => {
-      const t = T.brush, o = { p: 0 }, n = art.blobs.length;
-      const first = () => at(art.blobs[0].x, art.blobs[0].y);
-      return gsap.timeline()
-        .call(() => { brush.style.setProperty("--tint", art.tint); Object.assign(t, { x: REST.x + 40, y: REST.y - 120, a: -70 }); put(brush, t); })
-        .to(brush, { opacity: 1, duration: 0.2 })
-        .to(t, { x: () => first()[0], y: () => first()[1], a: -50, duration: 0.45, ease: "power2.inOut", onUpdate: () => put(brush, t) }, "<")
-        .to(o, {
-          p: 1, duration: 1.5, ease: "none",
-          onUpdate: () => {
-            S.wa = o.p;
-            const f = Math.min(n - 0.001, (o.p * n) / 0.7), i = Math.floor(f), u = f - i;
-            const b = art.blobs[i], nb = art.blobs[Math.min(n - 1, i + 1)];
-            const m = u < 0.7 ? 0 : (u - 0.7) / 0.3, sw = u * Math.PI * 4;
-            const [x, y] = at(b.x + (nb.x - b.x) * m + Math.cos(sw) * 18, b.y + (nb.y - b.y) * m + Math.sin(sw) * 12);
-            t.x = x; t.y = y; t.a = -50 + Math.sin(sw) * 8;
-            put(brush, t);
-            draw();
-          },
-        })
-        .call(() => { S.wa = 1; draw(); })
-        .to(t, { x: "+=120", y: "-=90", a: -20, duration: 0.45, ease: "power2.in", onUpdate: () => put(brush, t) })
-        .to(brush, { opacity: 0, duration: 0.2 }, "<0.25");
-    };
-    const realIn = () => {
-      const t = T.bag, o = { p: 0 };
+    // 06 · the piping bag pipes rosettes along the rim, a shine runs over the cake, the cherry goes on top,
+    // and the box closes round it — the cherry escaping to the plate first and riding on the lid after
+    const finishIn = () => {
+      placeRoses();
+      const pts = ROSES.map((f) => rimPoint(f, 2));
+      const roseEls = [...roses.children];
+      const o = { p: 0 };
       let last = 0;
-      return gsap.timeline()
-        .call(() => { const [x, y] = at(front(0), art.rim); Object.assign(t, { x, y: y - 90, a: 16 }); put(bag, t); })
+      const s = gsap.timeline()
+        .set(roseEls, { scale: 0, opacity: 0 })
+        .call(() => { Object.assign(T, { x: pts[0][0], y: pts[0][1] - 110, a: 14 }); putBag(); })
         .to(bag, { opacity: 1, duration: 0.2 })
-        .to(t, { y: "+=90", duration: 0.4, ease: "back.out(2)", onUpdate: () => put(bag, t) }, "<")
-        .to(o, {
-          p: 1, duration: 1.5, ease: "power1.inOut",
-          onUpdate: () => {
-            S.re = o.p;
-            const [x, y] = at(front(o.p), art.rim + (art.base - art.rim) * (0.5 - 0.5 * Math.cos(o.p * Math.PI * 6)));
-            t.x = x; t.y = y; t.a = 12 * Math.sin(o.p * Math.PI * 6);
-            put(bag, t);
-            draw();
-            const now = performance.now();
-            if (now - last > 55) { last = now; spark(x, y); }
-          },
-        })
-        .to([sheet, tape, head], { opacity: 0, duration: 0.6 }, "<0.9")
-        .call(() => { S.re = 1; draw(); fx.pop(paper, 26, 0.9); })
-        .to(t, { y: "-=150", x: "+=50", a: 32, duration: 0.5, ease: "power2.in", onUpdate: () => put(bag, t) })
-        .to(bag, { opacity: 0, duration: 0.2 }, "<0.3");
+        .to(T, { y: pts[0][1] - 4, duration: 0.45, ease: "back.out(2)", onUpdate: putBag }, "<");
+      pts.forEach(([x, y], k) => {
+        if (k) s.to(T, { x, y: y - 4, a: k % 2 ? -8 : 8, duration: 0.3, ease: "power1.inOut", onUpdate: putBag });
+        s.to(roseEls[k], { scale: 1, opacity: 1, duration: 0.6, ease: "elastic.out(1, 0.45)" }, k ? "<0.2" : "<0.1")
+          .call(() => fx.pop(roseEls[k], 6, 0.3), null, "<");
+      });
+      s.to(T, { y: "-=130", x: "+=40", a: 30, duration: 0.45, ease: "power2.in", onUpdate: putBag })
+        .to(bag, { opacity: 0, duration: 0.2 }, "<0.25")
+        .set(S, { shine: 0 })
+        .to(o, { p: 1, duration: 0.9, ease: "power1.inOut", onUpdate: () => {
+          S.shine = o.p;
+          draw();
+          const now = performance.now();
+          if (now - last > 70) { last = now; const [x, y] = at(art.bbox[0] - 120 + (art.bbox[2] - art.bbox[0] + 240) * o.p, art.rim + (art.base - art.rim) * Math.random()); spark(x, y); }
+        } }, "<")
+        .set(S, { shine: -1 })
+        .call(() => { draw(); fx.pop(frame, 20, 0.9); });
+      return s;
     };
     const hopUp = () => {
       const [x, y] = rimPoint(0.12, 4);
@@ -971,7 +831,7 @@
     };
     const boxUp = () => gsap.timeline()
       .fromTo(back, { opacity: 0, y: 120 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" })
-      .add(hopTo(118, 452, 130), "<")
+      .add(hopTo(92, 456, 130), "<")
       .fromTo(sides, { opacity: 0, y: 120 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, "<0.35")
       .fromTo(frontWall, { opacity: 0, y: 160 }, { opacity: 1, y: 0, duration: 0.65, ease: "back.out(1.4)" }, "<0.1")
       .fromTo(lid, { opacity: 0, y: -160, rotation: -8 }, { opacity: 1, y: 0, rotation: 0, duration: 0.6, ease: "bounce.out" }, ">-0.1")
@@ -987,13 +847,11 @@
       spec();
       return gsap.timeline()
         .to(ticket, { y: 140, opacity: 0, duration: 0.45, ease: "power2.in" }, 0)
-        .to(paper, { x: 0, scale: 1, duration: 0.7, ease: "power2.inOut" }, 0.1)
-        .to(pencil, { opacity: 1, duration: 0.3 }, 0.6)
-        .to(slice, { scaleY: 0, opacity: 0, duration: 0.5, ease: "power2.in" }, 0.2)
+        .to(frame, { x: 0, scale: 1, duration: 0.7, ease: "power2.inOut" }, 0.1)
+        .to([slice, tape], { scaleY: 0, opacity: 0, duration: 0.5, ease: "power2.in" }, 0.2)
         .to(S, { cut: 0, z: 1, duration: 0.9, ease: "power2.inOut", onUpdate: draw }, 0.3)
-        .add(washIn(), 1.1)
-        .add(realIn(), ">-0.1")
-        .add(hopUp(), ">-0.3")
+        .add(finishIn(), 1.1)
+        .add(hopUp(), ">-0.2")
         .add(boxUp(), ">-0.2");
     };
 
@@ -1019,7 +877,7 @@
       .to(frontWall, { rotationX: -100, opacity: 0, duration: 0.75, ease: "power2.in", transformOrigin: "50% 100%", transformPerspective: 900 }, 0.6)
       .to(sides, { opacity: 0, scaleX: 0, duration: 0.4 }, 0.8)
       .to(back, { rotationX: 95, opacity: 0, duration: 0.6, ease: "power2.in", transformOrigin: "50% 100%", transformPerspective: 900 }, 0.85)
-      .call(() => { fx.pop(paper, 44, 1.3); fx.rain(stage, 70); }, null, 1)
+      .call(() => { fx.pop(frame, 44, 1.3); fx.rain(stage, 70); }, null, 1)
       .add(partyIn(), 1);
 
     const ENTER = { 1: enter1, 2: enter2, 3: enter3, 4: enter4, 5: enter5, 6: enter6, 7: enter7 };
@@ -1034,42 +892,14 @@
       if (id !== seq) return;
       settle(n - 1);
       tl = ENTER[n]();
-      tl.call(() => settle(n, true));
+      // the first chapter keeps popping cakes on its own, so it is never pinned to a settled state
+      if (n !== 1) tl.call(() => settle(n, true));
     };
 
-    // ── the references: pick one and it is sketched (only while the line is down, in the first chapter) ──
-    const upload = (i) => {
-      if (refs[i] !== yours || yours.classList.contains("is-up")) return Promise.resolve();
-      if (!animate) { yours.classList.add("is-up"); return Promise.resolve(); }
-      yours.classList.add("is-loading");
-      return new Promise((res) => setTimeout(() => {
-        yours.classList.remove("is-loading");
-        yours.classList.add("is-up");
-        fx.hearts(yours, 2);
-        res();
-      }, 800));
-    };
-    const pick = async (i) => {
-      order.design = i;
-      refs.forEach((r, j) => r.setAttribute("aria-pressed", String(i === j)));
-      const id = ++seq;
-      await upload(i);
-      await load(i);
-      if (id !== seq) return;
-      spec();
-      if (cur === 1 && live) {
-        // the sheet is torn off and a fresh one sketched
-        if (tl) tl.kill();
-        tl = gsap.timeline()
-          .to(paper, { rotation: 8, y: 40, opacity: 0, duration: 0.35, ease: "power2.in", onComplete: () => { S.sk = 0; draw(); } })
-          .call(() => { settle(0, true); gsap.set(line, { y: 0, autoAlpha: 1 }); gsap.set(ghost, { opacity: 0 }); })
-          .fromTo(paper, { y: 60, opacity: 0, rotation: -5 }, { y: 0, opacity: 1, rotation: 0, duration: 0.7, ease: "back.out(1.6)" })
-          .add(sketchIn(), ">-0.2")
-          .add(hop(), ">-0.3")
-          .call(() => settle(1, true));
-      } else settle(cur, true);
-    };
-    refs.forEach((r, i) => r.addEventListener("click", () => pick(i)));
+    // ── the references: pick one off the line and that cake pops out (only while the line is down) ──
+    refs.forEach((r, i) => r.addEventListener("click", () => { if (cur !== 1) return; touchedAt = Date.now(); pop(i); }));
+    line.addEventListener("pointerenter", () => { hover = true; });
+    line.addEventListener("pointerleave", () => { hover = false; });
 
     // ── the chapter controls in the cards ──
     const chips = $$("[data-flavor]", sec), desc = $("[data-flavor-desc]", sec);
@@ -1138,7 +968,7 @@
     spec();
     fit();
     if (window.ResizeObserver) new ResizeObserver(fit).observe(stage);
-    const warm = () => prepare(0).then(() => designs.forEach((_, i) => i && setTimeout(() => prepare(i).catch(() => {}), 350 * i)), () => {});
+    const warm = () => prepare(0).then(() => designs.forEach((_, i) => i && setTimeout(() => prepare(i).catch(() => {}), 250 * i)), () => {});
     if (window.IntersectionObserver) {
       const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); warm(); } }, { rootMargin: "1200px 0px" });
       io.observe(stage);
@@ -1148,8 +978,8 @@
     return {
       go,
       // without the script's motion: the finished cake on its stand
-      async static() {
-        paper.classList.add("is-still");
+      static() {
+        frame.classList.add("is-still");
         still.src = designs[order.design].cut;
         still.style.opacity = "1";
       },
