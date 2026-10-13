@@ -397,6 +397,10 @@
   --on: 1;
   --d: 0;
   --ph: 0.1;
+  --hop: 0;
+  --sx: 1;
+  --sy: 1;
+  --rg: 1;
   position: relative;
   flex: 0 0 auto;
   display: flex;
@@ -422,23 +426,6 @@
   background: radial-gradient(closest-side, rgba(255, 250, 236, 0.8), rgba(255, 246, 225, 0.3) 55%, transparent);
   opacity: calc(var(--on) * var(--on) * var(--lamp, 1) * (1 - var(--il, 0)));
   pointer-events: none;
-}
-
-/* sprinkles scattered around the work, drifting at different depths as the row moves */
-.ex__sprinkles { position: absolute; z-index: 1; left: -16%; right: -16%; top: 0; height: calc(var(--cw) * 1.05); pointer-events: none; }
-.ex__sprinkles i {
-  position: absolute;
-  left: var(--x);
-  top: var(--y);
-  width: 15px;
-  height: 5px;
-  border-radius: 4px;
-  background: var(--c);
-  rotate: calc(var(--r) + var(--d) * 120deg);
-  opacity: calc(var(--on) * 0.9);
-  translate: calc(var(--d) * var(--z) * -36px) calc((1 - var(--on)) * var(--z) * 14px);
-  scale: calc(0.4 + var(--on) * 0.6);
-  transition: opacity 0.3s;
 }
 
 /* the cake itself, cut out of its photo; the one under the lamp lifts and takes full colour */
@@ -474,6 +461,9 @@
   height: 100%;
   animation: ex-float 5s ease-in-out infinite;
   animation-delay: calc(var(--ph) * -20s);
+  /* reaching the lamp the cake hops onto its plinth and lands with a squash (see lampMoments() in js/home.js) */
+  transform-origin: 50% 100%;
+  transform: translateY(calc(var(--hop, 0) * -1px)) scale(var(--sx, 1), var(--sy, 1));
 }
 @keyframes ex-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -5px; } }
 .ex__cake {
@@ -496,7 +486,7 @@
   .ex:hover .ex__cake { translate: 0 -10px; }
 }
 
-/* the plinth: a marble cylinder tinted with the cake's colour; name, number and price are engraved on the front */
+/* the plinth: a marble cylinder tinted with the cake's colour; the name is engraved on the front */
 .ex__plinth {
   --marble: color-mix(in srgb, var(--bg) 40%, #fffaf5);
   position: relative;
@@ -537,8 +527,7 @@
   opacity: 0.8;
   pointer-events: none;
 }
-/* the inscription on the plinth: the number in gold leaf that catches the lamp as the cake comes into the light,
-   a fine gold ornament, and the name cut into the marble */
+/* the inscription on the plinth: a fine gold ornament and the name cut into the marble */
 .ex__plate {
   display: grid;
   justify-items: center;
@@ -546,34 +535,13 @@
   padding: 0 0.8rem 0.5rem;
   text-align: center;
 }
-.ex__no {
-  position: relative;
-  display: inline-flex;
-  align-items: flex-start;
-  gap: 0.12em;
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 700;
-  font-size: clamp(2.2rem, calc(var(--cw) * 0.17), 3.6rem);
-  line-height: 0.9;
-  letter-spacing: -0.02em;
-  /* gold leaf: a glint slides across as the cake reaches the lamp */
-  background: linear-gradient(100deg, #7a5418 0%, #c9a052 18%, #f6dc96 30%, #b5872c 40%, #fff4cc 50%, #b5872c 60%, #e9c878 74%, #8a6420 100%);
-  background-size: 260% 100%;
-  background-position: calc(100% - var(--on) * 100%) 0;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9)) drop-shadow(0 -1px 0 rgba(90, 55, 10, 0.25)) saturate(calc(0.5 + var(--on) * 0.5));
-}
-.ex__no::before { content: "№"; margin-top: 0.38em; font-size: 0.32em; font-style: normal; letter-spacing: 0; }
 .ex__orn { display: flex; align-items: center; gap: 0.5rem; width: 64%; color: #c9a052; font-size: 0.55rem; line-height: 1; }
 .ex__orn::before, .ex__orn::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #c9a052); }
 .ex__orn::after { transform: scaleX(-1); }
 .ex__plate b {
   margin-top: 0.2rem;
   font-family: var(--font-display);
-  font-size: clamp(1.02rem, calc(var(--cw) * 0.066), 1.4rem);
+  font-size: clamp(1.1rem, calc(var(--cw) * 0.078), 1.6rem);
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: 0.01em;
@@ -742,3 +710,111 @@
 .ex__cake.is-photo { width: 84%; max-width: none; aspect-ratio: 1; object-fit: cover; border-radius: 50%; border: 6px solid #fffaf4; box-shadow: 0 0 0 1px rgba(201, 160, 82, 0.5); }
 .gl__ride img.is-photo { aspect-ratio: 1; object-fit: cover; border-radius: 50%; border: 4px solid #fffaf4; }
 .gl__dots img.is-photo { width: 36px; height: 36px; object-fit: cover; border-radius: 50%; border: 2px solid #fff; }
+
+/* ── each cake's own moment under the lamp (lampMoments() in js/home.js) ── */
+/* a ring of light runs out over the plinth top as the cake lands */
+.ex__ring {
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  bottom: calc(var(--cw) * -0.035);
+  width: 86%;
+  aspect-ratio: 4.4;
+  margin-left: -43%;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--ac) 55%, #fff);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--ac) 45%, transparent), inset 0 0 12px rgba(255, 250, 236, 0.9);
+  transform: scale(calc(0.3 + var(--rg) * 0.95));
+  opacity: calc((1 - var(--rg)) * 0.95);
+  pointer-events: none;
+}
+
+/* the tag on the lamp: a string from the rim of the shade and a paper tag swinging on it;
+   JS hangs it at the lamp (translate + the pendulum's rotate) and lowers the tag down the string */
+.gl__tag {
+  position: absolute;
+  z-index: 5; /* over the cakes and the weather */
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+.gl__tag-string {
+  position: absolute;
+  left: -0.75px;
+  top: 0;
+  width: 1.5px;
+  height: 0;
+  background: linear-gradient(var(--cherry-deep), color-mix(in srgb, var(--cherry) 70%, #fff));
+  border-radius: 1px;
+}
+/* a zero-width box that centres the tag under the string, so the tag can turn on it without being moved */
+.gl__tag-hang {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  display: flex;
+  justify-content: center;
+  transform-origin: 0 0;
+  perspective: 700px;
+  filter: drop-shadow(0 10px 12px rgba(61, 4, 5, 0.28)) drop-shadow(0 1px 1px rgba(61, 4, 5, 0.18));
+}
+.gl__tag-card {
+  position: relative;
+  flex: 0 0 auto;
+  display: block;
+  width: max-content;
+  max-width: min(11.5em, 62vw);
+  padding: 26px 1.1em 0.8em;
+  /* a gift tag: cut corners at the top, a punched hole the wall shows through */
+  clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%, 0 16px);
+  -webkit-mask: radial-gradient(circle 4.5px at 50% 11px, transparent 96%, #000 100%);
+  mask: radial-gradient(circle 4.5px at 50% 11px, transparent 96%, #000 100%);
+  background:
+    linear-gradient(90deg, transparent 6px, color-mix(in srgb, var(--ac) 30%, transparent) 6px 7px, transparent 7px calc(100% - 7px), color-mix(in srgb, var(--ac) 30%, transparent) calc(100% - 7px) calc(100% - 6px), transparent calc(100% - 6px)),
+    linear-gradient(170deg, #fffdf8, #fbf0e2 70%, color-mix(in srgb, var(--bg) 40%, #f6e5d2));
+  font-family: var(--font-hand);
+  font-weight: 500;
+  font-size: clamp(1.2rem, 1.55vw, 1.6rem);
+  line-height: 1.02;
+  color: var(--cherry-deep);
+  text-align: center;
+  text-wrap: balance;
+  backface-visibility: hidden;
+}
+/* the gold eyelet round the hole */
+.gl__tag-card::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 4.6px, #b8892e 4.8px, #f4d98e 6px, #a87a24 7px);
+}
+.gl__tag-text { display: block; }
+
+/* the weather each cake brings: it travels with the row, so what fell on a cake moves on with it */
+.gl__fx { position: absolute; z-index: 4; inset: 0; pointer-events: none; }
+.gl__p {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--s, 18px);
+  height: var(--s, 18px);
+  margin: calc(var(--s, 18px) * -0.5) 0 0 calc(var(--s, 18px) * -0.5);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.gl__p svg, .gl__p img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.gl__p.is-white { filter: drop-shadow(0 1px 2px color-mix(in srgb, var(--ac) 55%, rgba(61, 4, 5, 0.4))); }
+.gl__p--star { filter: drop-shadow(0 0 3px rgba(255, 214, 120, 0.95)) drop-shadow(0 0 8px rgba(255, 236, 180, 0.8)); }
+
+@media (max-width: 560px) {
+  .gl__tag-card { font-size: 1.1rem; padding: 24px 0.9em 0.65em; }
+}

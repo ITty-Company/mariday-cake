@@ -1,5 +1,6 @@
-/* Mariday — "Пошта від гостей": review store, postcard renderer and the postcard composer.
-   Home: postcards pegged on a clothesline that slides on by itself (#reviews). pages/reviews.html: the full mail wall.
+/* Mariday — the review store (seeds + this browser + Supabase), plus a postcard renderer and composer.
+   The home row (js/home-post.js) and the reviews page (js/editorial.js: wall + form) both read and write through
+   window.MaridayReviews, so a review written on the page shows up on the home row straight away.
    Reviews go to Supabase when MARIDAY.reviewsBackend is filled in, otherwise to this browser's storage. */
 (function () {
   const M = window.MARIDAY || {};
@@ -11,6 +12,8 @@
   const ROOT = location.pathname.includes("/pages/") ? "../" : "";
   const LOCAL_KEY = "mariday.reviews.v1";
   const LAST_KEY = "mariday.reviews.last";
+  // the review just written, so the next page to show reviews (the home row) can greet it
+  const FRESH_KEY = "mariday.reviews.fresh";
   const SPRINKLES = ["#6d0809", "#f5bcc8", "#e2849a", "#bcd6f3", "#fbe6b8", "#ffffff", "#9ed9b8"];
 
   const COLORS = {
@@ -62,6 +65,8 @@
     const occ = String(r.occasion || "");
     const colorKeys = Object.keys(COLORS);
     const stampKeys = Object.keys(STAMPS);
+    // a photo someone picked (a seed's own photo, a postcard stamp); without one a stamp is drawn by lot — `auto`
+    const chosen = PHOTOS.has(r.stamp) ? r.stamp : PHOTOS.has(r.img) || (r.seed && isUpload(r.img)) ? r.img : null;
     return {
       id: String(r.id || `s${h.toString(36)}`).slice(0, 64),
       name,
@@ -71,7 +76,8 @@
       rating: Math.min(5, Math.max(1, Math.round(+(r.rating ?? r.stars)) || 5)),
       occasion: OCC.has(occ) ? occ : OCC_BY_LABEL.get(occ.toLowerCase()) || "justbecause",
       color: COLORS[r.color] ? r.color : colorKeys[h % colorKeys.length],
-      stamp: PHOTOS.has(r.stamp) ? r.stamp : PHOTOS.has(r.img) || (r.seed && isUpload(r.img)) ? r.img : stampKeys[h % stampKeys.length],
+      stamp: chosen || stampKeys[h % stampKeys.length],
+      auto: r.auto === true || !chosen,
       date: date && !isNaN(date) ? date.toISOString() : "",
       sample: !!r.sample,
     };
@@ -115,6 +121,8 @@
   async function add(input) {
     const r = clean({ ...input, date: new Date().toISOString() });
     if (!r) throw new Error("invalid");
+    // one review every half a minute from a browser
+    try { if (Date.now() - (+localStorage.getItem(LAST_KEY) || 0) < 30000) throw new Error("wait"); } catch (e) { if (e.message === "wait") throw e; }
     if (remote) {
       const { name, text, city, rating, occasion, color, stamp } = r;
       const res = await fetch(endpoint, {
@@ -128,6 +136,10 @@
     r.id = "l" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     writeLocal([r, ...readLocal()]);
     mine.add(r.id);
+    try {
+      localStorage.setItem(LAST_KEY, String(Date.now()));
+      sessionStorage.setItem(FRESH_KEY, r.id);
+    } catch { /* storage unavailable */ }
     if (cache) cache = [r, ...cache];
     else await load(); // first load picks r up from storage
     document.dispatchEvent(new CustomEvent("mariday:review", { detail: r }));
@@ -664,7 +676,20 @@
     renderWall(false);
   }
 
-  window.MaridayReviews = { load, add, stats, card, composer };
+  // what a page needs to lay a review out its own way: the occasion's label, the cake photo, a readable date, "is it yours"
+  // (auto: the photo was drawn by lot, not picked — pages may prefer to show none)
+  const meta = (r) => ({ occasion: OCC.get(r.occasion) || "", photo: stampSrc(r.stamp), auto: !!r.auto, date: r.date ? fmtDate(r.date) : "", mine: mine.has(r.id) });
+
+  // the id of a review written in this tab that hasn't been greeted yet (read once)
+  const takeFresh = () => {
+    try {
+      const id = sessionStorage.getItem(FRESH_KEY);
+      sessionStorage.removeItem(FRESH_KEY);
+      return id;
+    } catch { return null; }
+  };
+
+  window.MaridayReviews = { load, add, stats, card, composer, meta, takeFresh, occasions: () => [...OCC] };
 
   function init() {
     initHome();

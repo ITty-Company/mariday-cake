@@ -54,19 +54,17 @@
   const ROOMS = [["#f6dbe0", "#c9506d"], ["#e5ddf3", "#7b5ea7"], ["#f6e6bf", "#a3701a"], ["#dbefed", "#2f8f83"], ["#efd3cd", "#8e2a22"], ["#f9d6e3", "#cf467f"]];
 
   // A cake in the catalog is an exhibit, as on the home page: its own room, a marble plinth with its number,
-  // the cake cut out of its photo (or a framed photo); on hover the lamp lights it and a snapshot of the real cake peeks out
+  // the cake cut out of its photo (or a framed photo); on hover the lamp lights it
   function cakeCard(c, i) {
     const fav = MaridayFavs.has(c.id);
     const cut = M().cutout ? M().cutout(c) : "";
     const [bg, ac] = c.bg ? [c.bg, c.accent || "#c9506d"] : ROOMS[i % ROOMS.length];
-    const no = pad(M().cakes.indexOf(c) + 1);
     return `
       <article class="p-card ex-card" data-id="${c.id}" style="--room:${bg};--accent:${ac}" data-tilt>
         <a class="ex-card__room" href="${productHref(c.id)}" aria-label="${esc(c.name)}">
           <span class="ex-card__lamp" aria-hidden="true"></span>
           <span class="ex-card__cake"><img class="${cut ? "" : "is-photo"}" src="${cut || c.image}" alt="${esc(c.name)}" loading="lazy" draggable="false"></span>
-          <span class="ex-card__plinth" aria-hidden="true"><span class="ex-card__no"><sup>№</sup>${no}</span></span>
-          ${cut ? `<span class="ex-card__snap" aria-hidden="true"><img src="${c.image}" alt="" loading="lazy"><i>наживо</i></span>` : ""}
+          <span class="ex-card__plinth" aria-hidden="true"></span>
           <span class="p-card__price ex-card__price"><small>від</small><b>€${c.price}</b></span>
         </a>
         <button type="button" class="p-fav${fav ? " is-on" : ""}" data-fav="${c.id}" aria-pressed="${fav}" aria-label="Додати «${esc(c.name)}» в обране">♥</button>
@@ -89,7 +87,8 @@
       btn.classList.remove("is-pop");
       void btn.offsetWidth;
       btn.classList.add("is-pop");
-      showToast(on ? "Додано в обране ♥" : "Прибрано з обраного");
+      // on pages with js/favs.js the cake itself pops up in the note; elsewhere the plain toast
+      window.MaridayFavNote ? MaridayFavNote.show(btn.dataset.fav, on, btn) : showToast(on ? "Додано в обране ♥" : "Прибрано з обраного");
     });
   }
 
@@ -181,13 +180,15 @@
     document.title = `${cake.name} — Mariday Cake`;
     qs("[data-crumb-name]") && (qs("[data-crumb-name]").textContent = cake.name);
 
-    const sizes = M().sizes;
+    // a cake may come in only some sizes and fillings (ticked in the admin panel); none ticked = all of them
+    const only = (all, ids) => { const l = Array.isArray(ids) ? all.filter((x) => ids.includes(x.id)) : []; return l.length ? l : all; };
+    const sizes = only(M().sizes, cake.sizes);
+    const flavors = only(M().flavors, cake.flavors);
     let size = sizes[0];
-    let flavor = M().flavors[0];
+    let flavor = flavors[0];
     let view = "stand";
     let text = "";
     const price = () => Math.round(cake.price * size.priceMult);
-    const no = pad(M().cakes.indexOf(cake) + 1);
     const cut = M().cutout ? M().cutout(cake) : "";
     // the name as on the home showcase: heavy glazed words, the last one piped across in cream
     const words = cake.name.trim().split(/\s+/);
@@ -195,11 +196,13 @@
     const piped = words.length > 1 ? words[words.length - 1] : "";
     root.style.setProperty("--room", cake.bg || "#f6dbe0");
     root.style.setProperty("--accent", cake.accent || "#c9506d");
+    // the whole page glows in the colour picked for this cake in the admin («Колір кімнати»); no colour = the site's mint
+    document.body.classList.toggle("is-roomlit", !!cake.bg);
+    if (cake.bg) document.body.style.setProperty("--room", cake.bg);
 
     root.innerHTML = `
       <div class="p-prod__stage pr-stage">
         <div class="pr-room" data-room>
-          <i class="pr-rail" aria-hidden="true"></i>
           <span class="pr-beam" aria-hidden="true"></span>
           <i class="pr-lamp" aria-hidden="true"></i>
           <svg class="p-prod__badge" viewBox="0 0 200 200" aria-hidden="true"><defs><path id="p-prod-c" d="M100,100 m-76,0 a76,76 0 1,1 152,0 a76,76 0 1,1 -152,0"/></defs><text><textPath href="#p-prod-c">handmade ✦ mariday ✦ alkmaar ✦ </textPath></text></svg>
@@ -208,40 +211,45 @@
             <span class="pr-plates" data-plates aria-hidden="true"></span>
             <span class="pr-guests" data-guests></span>
             <span class="pr-cake" data-cake><img class="${cut ? "" : "is-photo"}" src="${cut || cake.image}" alt="${esc(cake.name)}" draggable="false"></span>
-            <span class="pr-plinth" aria-hidden="true"><span class="pr-plinth__no"><sup>№</sup>${no}</span><span class="pr-plinth__orn">✦</span><b>${esc(cake.name)}</b></span>
+            <span class="pr-plinth" aria-hidden="true"><span class="pr-plinth__orn">✦</span><b>${esc(cake.name)}</b></span>
             <span class="pr-plaque" data-plaque hidden><span data-plaque-text></span></span>
           </figure>
 
           <figure class="pr-view pr-cutview" data-view="cut">
+            <span class="pr-cut__plate" aria-hidden="true"></span>
             <span class="pr-slice" data-slice></span>
+            <div class="pr-cut__parts"><p>що всередині</p><ol data-cut-parts></ol></div>
             <span class="pr-flv-photo"><img data-flavor-photo src="" alt=""></span>
-            <figcaption><b data-cut-name></b><span data-cut-layers></span></figcaption>
+            <figcaption><b data-cut-name></b><span class="pr-cut__meter" data-cut-meter></span></figcaption>
           </figure>
 
-          <figure class="pr-view pr-photo" data-view="photo"><img src="${cake.image}" alt="${esc(cake.name)}"></figure>
           <img class="p-prod__cherry" src="${CHERRY()}" alt="" data-depth="1.3">
         </div>
         <div class="p-prod__views pr-tabs" role="tablist" aria-label="Вигляд">
           <button type="button" role="tab" class="is-on" data-show="stand" aria-selected="true"><img src="${cut || cake.image}" alt="" class="${cut ? "is-cut" : ""}"><span>Вітрина</span></button>
           <button type="button" role="tab" data-show="cut" aria-selected="false"><span class="p-prod__views-cut" data-cut-thumb></span><span>Розріз</span></button>
-          <button type="button" role="tab" data-show="photo" aria-selected="false"><img src="${cake.image}" alt=""><span>Фото</span></button>
         </div>
       </div>
       <div class="p-prod__info">
         <ul class="p-tags">${(cake.tags || []).map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
         <h1 class="pr-title" aria-label="${esc(cake.name)}"><span class="pr-title__w" aria-hidden="true">${esc(heavy)}</span>${piped ? `<span class="pr-title__s" aria-hidden="true">${esc(piped)}</span>` : ""}</h1>
-        <p class="p-prod__desc">${esc(cake.desc)}</p>
+        <div class="pr-desc" data-desc><div class="pr-desc__text" data-desc-text>${String(cake.desc || "").trim().split(/\n\s*\n/).map((t) => `<p>${esc(t).replace(/\n/g, "<br>")}</p>`).join("")}</div><button type="button" class="pr-desc__more" data-desc-more hidden aria-expanded="false"><span>Читати далі</span></button></div>
         <div class="p-prod__price pr-price"><b data-price>${formatEUR(price())}</b><span data-per>≈ ${formatEUR(price() / 8)} / гість</span></div>
+        <div class="pr-quick" data-quick>
+          <button type="button" class="p-btn p-btn--big pr-buy" data-add><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16l-1.3 11.2a2 2 0 0 1-2 1.8H7.3a2 2 0 0 1-2-1.8z"/><path d="M8.5 8V6.5a3.5 3.5 0 0 1 7 0V8"/><path d="M12 11.5v5M9.5 14h5"/></svg><span>У кошик · <b data-buy-price>${formatEUR(price())}</b></span><i class="pr-buy__shine" aria-hidden="true"></i></button>
+        </div>
+        <p class="pr-quick__note"><span class="pr-quick__ok" aria-hidden="true">✓</span><span><b data-quick-meta>${esc(size.label)} · ${esc(flavor.name)}</b> — <a href="#pr-opts" data-to-opts>змінити</a></span><span class="pr-quick__trust">одне натискання — і торт у кошику</span></p>
 
-        <div class="p-opt">
+        <div class="p-opt" id="pr-opts">
           <p class="p-opt__label">Вага <span data-serves>${size.serves}</span></p>
           <div class="p-sizes">${sizes.map((s, i) => `<button type="button" class="p-size${s.id === size.id ? " is-on" : ""}" data-size="${s.id}" aria-pressed="${s.id === size.id}"><i style="--h:${12 + i * 5}px;--w:${18 + i * 4}px" aria-hidden="true"></i>${s.label}</button>`).join("")}</div>
         </div>
 
         <div class="p-opt">
           <p class="p-opt__label">Начинка <span data-flavor-name>${esc(flavor.name)}</span></p>
-          <div class="p-flv">${M().flavors.map((f) => `<button type="button" class="p-flv__btn${f.id === flavor.id ? " is-on" : ""}" data-flavor="${f.id}" aria-pressed="${f.id === flavor.id}" title="${esc(f.name)}">${stripesHTML(f.id)}<span>${esc(f.name)}</span></button>`).join("")}</div>
-          <p class="p-flv__desc" data-flavor-desc>${esc(flavor.desc)}</p>
+          ${flavors.length > 1 ? `<div class="p-flv">${flavors.map((f) => `<button type="button" class="p-flv__btn${f.id === flavor.id ? " is-on" : ""}" data-flavor="${f.id}" aria-pressed="${f.id === flavor.id}" title="${esc(f.name)}">${stripesHTML(f.id)}<span>${esc(f.name)}</span></button>`).join("")}</div>
+          <p class="p-flv__desc" data-flavor-desc>${esc(flavor.desc)}</p>`
+          : `<button type="button" class="pr-oneflv" data-see-cut>${stripesHTML(flavor.id, "pr-oneflv__s")}<span><small>начинка цього торта</small><b>${esc(flavor.name)}</b><span data-flavor-desc>${esc(flavor.desc)}</span><em>подивитися розріз →</em></span></button>`}
         </div>
 
         <label class="p-opt p-field">
@@ -250,7 +258,7 @@
         </label>
 
         <div class="p-prod__actions" data-actions>
-          <button type="button" class="p-btn p-btn--big" data-add><span>У кошик · <b data-price-btn>${formatEUR(price())}</b></span></button>
+          <button type="button" class="p-btn p-btn--big pr-buy" data-add><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16l-1.3 11.2a2 2 0 0 1-2 1.8H7.3a2 2 0 0 1-2-1.8z"/><path d="M8.5 8V6.5a3.5 3.5 0 0 1 7 0V8"/><path d="M12 11.5v5M9.5 14h5"/></svg><span>У кошик · <b data-price-btn>${formatEUR(price())}</b></span><i class="pr-buy__shine" aria-hidden="true"></i></button>
           <button type="button" class="p-fav p-fav--big${MaridayFavs.has(cake.id) ? " is-on" : ""}" data-fav="${cake.id}" aria-pressed="${MaridayFavs.has(cake.id)}" aria-label="В обране">♥</button>
         </div>
         <a class="p-link" href="constructor.html?flavor=${flavor.id}" data-ctor-link>Хочу свій дизайн → конструктор</a>
@@ -264,7 +272,7 @@
       <div class="pr-dock" data-dock aria-hidden="true">
         <img src="${cut || cake.image}" alt="" class="${cut ? "is-cut" : ""}">
         <span><b>${esc(cake.name)}</b><small data-dock-meta></small></span>
-        <button type="button" class="p-btn" data-add tabindex="-1"><span>У кошик · <b data-dock-price>${formatEUR(price())}</b></span></button>
+        <button type="button" class="p-btn pr-buy" data-add tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16l-1.3 11.2a2 2 0 0 1-2 1.8H7.3a2 2 0 0 1-2-1.8z"/><path d="M8.5 8V6.5a3.5 3.5 0 0 1 7 0V8"/><path d="M12 11.5v5M9.5 14h5"/></svg><span>У кошик · <b data-dock-price>${formatEUR(price())}</b></span><i class="pr-buy__shine" aria-hidden="true"></i></button>
       </div>`;
 
     const gs = !reduce && window.gsap ? window.gsap : null;
@@ -286,11 +294,15 @@
       });
       const col = bands.slice().reverse().join("");
       return `<span class="pr-slice__box" style="--tone:${m.tone}">
-        <span class="pr-slice__face pr-slice__front">${col}</span>
-        <span class="pr-slice__face pr-slice__side">${col}</span>
+        <span class="pr-slice__face pr-slice__front">${col}<b class="pr-slice__drip" aria-hidden="true"></b></span>
+        <span class="pr-slice__face pr-slice__side">${col}<b class="pr-slice__drip" aria-hidden="true"></b></span>
         <span class="pr-slice__face pr-slice__top"><img src="${CHERRY()}" alt=""></span>
       </span>`;
     };
+    // what is inside, from the recipe's first sentence: «Бісквіт, кремчиз, конфі та намазка. Настрій.»
+    const partsOf = (f) => String(f.desc || "").split(/\.\s/)[0].replace(/\.$/, "")
+      .split(/,\s*|\s+(?:та|і|й)\s+/).map((t) => t.trim()).filter(Boolean).slice(0, 6)
+      .map((t) => t[0].toUpperCase() + t.slice(1));
     // guests around the plinth: a plate for each of them (up to 30), as the weight says
     const guestsOf = (s) => { const n = String(s.serves).match(/\d+/g); return n ? Math.min(24, +n[n.length - 1]) : 8; };
     function paintPlates() {
@@ -304,8 +316,10 @@
       qs("[data-guests]", root).textContent = `${size.serves} ↓`;
     }
     function paintCake() {
-      const i = sizes.indexOf(size);
-      const k = size.id === "tier" ? 1.14 : 0.74 + (i / Math.max(1, sizes.length - 2)) * 0.3;
+      // scaled against every size the shop makes, so a 2 kg cake looks the same on every cake's page
+      const all = M().sizes;
+      const i = all.indexOf(size);
+      const k = size.id === "tier" ? 1.08 : 0.86 + (i / Math.max(1, all.length - 2)) * 0.18;
       qs("[data-cake]", root).style.setProperty("--k", k.toFixed(3));
     }
 
@@ -315,12 +329,19 @@
       qs("[data-flavor-photo]", root).alt = flavor.name;
       qs("[data-slice]", root).innerHTML = sliceHTML(flavor);
       qs("[data-cut-name]", root).textContent = flavor.name;
-      qs("[data-cut-layers]", root).textContent = flavor.desc.split(". ")[0];
+      qs("[data-cut-parts]", root).innerHTML = partsOf(flavor).map((t, i) => `<li style="--i:${i}">${esc(t)}</li>`).join("");
+      const dots = (n) => Array.from({ length: 5 }, (_, i) => `<i class="${i < n ? "is-on" : ""}"></i>`).join("");
+      qs("[data-cut-meter]", root).innerHTML = `<span>солодкість ${dots(m.sweet || 3)}</span><span>кислинка ${dots(m.sour || 3)}</span>`;
       qs("[data-cut-thumb]", root).innerHTML = stripesHTML(flavor.id);
       qsa("[data-view]", root).forEach((el) => el.classList.toggle("is-on", el.dataset.view === view));
       qsa("[data-show]", root).forEach((b) => { b.classList.toggle("is-on", b.dataset.show === view); b.setAttribute("aria-selected", String(b.dataset.show === view)); });
       // the slice assembles layer by layer, bottom first
-      if (gs && view === "cut") gs.from(qsa(".pr-slice__front i, .pr-slice__side i", root), { yPercent: -260, opacity: 0, duration: 0.5, ease: "back.out(2)", stagger: { each: 0.035, from: "end" } });
+      if (gs && view === "cut") {
+        gs.from(qs(".pr-slice__box", root), { xPercent: 40, rotate: 8, opacity: 0, duration: 0.8, ease: "back.out(1.4)" });
+        gs.from(qsa(".pr-slice__front i, .pr-slice__side i", root), { yPercent: -260, opacity: 0, duration: 0.5, ease: "back.out(2)", stagger: { each: 0.035, from: "end" }, delay: 0.2 });
+        gs.from(qsa("[data-cut-parts] li", root), { x: 24, opacity: 0, duration: 0.5, ease: "back.out(1.6)", stagger: 0.09, delay: 0.45 });
+        gs.from(qsa("[data-cut-meter] i.is-on", root), { scale: 0, duration: 0.4, ease: "back.out(3)", stagger: 0.05, delay: 0.7 });
+      }
     }
 
     function paint() {
@@ -328,7 +349,9 @@
       animPrice(p);
       qs("[data-price-btn]", root).textContent = formatEUR(p);
       qs("[data-dock-price]", root).textContent = formatEUR(p);
+      qs("[data-buy-price]", root).textContent = formatEUR(p);
       qs("[data-dock-meta]", root).textContent = `${size.label} · ${flavor.name}`;
+      qs("[data-quick-meta]", root).textContent = `${size.label} · ${flavor.name}`;
       const guests = parseInt(size.serves, 10) || 30;
       qs("[data-per]", root).textContent = `≈ ${formatEUR(p / guests)} / гість`;
       qs("[data-serves]", root).textContent = size.serves;
@@ -350,18 +373,38 @@
       if (s) { size = sizes.find((x) => x.id === s.dataset.size); showStand(); paint(); }
       if (f) { flavor = flavorById(f.dataset.flavor); view = "cut"; paint(); }
       if (v) { view = v.dataset.show; paintView(); }
-      if (e.target.closest("[data-add]")) {
-        addToCartAndNotify({
-          id: cake.id,
-          name: cake.name,
-          price: price(),
-          size: size.id,
-          flavor: flavor.id,
-          variant: text,
-          image: cake.image,
-          meta: `${size.label} · ${flavor.name}${text ? ` · напис «${text}»` : ""}`,
-        }, qs("[data-room]", root));
+      if (e.target.closest("[data-see-cut]")) { view = "cut"; paintView(); if (innerWidth <= 960) qs("[data-room]", root).scrollIntoView({ behavior: "smooth", block: "center" }); }
+      const more = e.target.closest("[data-desc-more]");
+      if (more) {
+        const open = qs("[data-desc]", root).classList.toggle("is-open");
+        more.setAttribute("aria-expanded", String(open));
+        qs("span", more).textContent = open ? "Згорнути" : "Читати далі";
+        if (!open) qs("[data-desc]", root).scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
+      const add = e.target.closest("[data-add]");
+      if (add) {
+        addToCartAndNotify(item(), qs("[data-room]", root));
+        // the button that was pressed says so for a moment
+        add.classList.remove("is-added");
+        void add.offsetWidth;
+        add.classList.add("is-added");
+        clearTimeout(add._t);
+        add._t = setTimeout(() => add.classList.remove("is-added"), 1600);
+      }
+      if (e.target.closest("[data-to-opts]")) {
+        e.preventDefault();
+        qs("#pr-opts", root).scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      }
+    });
+    const item = () => ({
+      id: cake.id,
+      name: cake.name,
+      price: price(),
+      size: size.id,
+      flavor: flavor.id,
+      variant: text,
+      image: cake.image,
+      meta: `${size.label} · ${flavor.name}${text ? ` · напис «${text}»` : ""}`,
     });
     // the inscription is written on a chocolate plaque leaning on the plinth, as you type
     const plaque = qs("[data-plaque]", root);
@@ -375,21 +418,46 @@
       plaque.classList.add("is-write");
     });
 
-    // the buy bar follows you down the page once the main button has scrolled away
+    // the cart bar rides along whenever neither «У кошик» (under the price, or after the options) is in view —
+    // so the cake is always one tap from the cart, whichever part of the page they are reading
     const dock = qs("[data-dock]", root);
-    new IntersectionObserver(([en]) => {
-      const on = !en.isIntersecting && en.boundingClientRect.top < 0;
+    const seen = new Map();
+    const io = new IntersectionObserver((es) => {
+      es.forEach((en) => seen.set(en.target, en.isIntersecting));
+      const on = seen.size === 2 && ![...seen.values()].some(Boolean);
       dock.classList.toggle("is-on", on);
       dock.setAttribute("aria-hidden", String(!on));
-      qs("button", dock).tabIndex = on ? 0 : -1;
-    }).observe(qs("[data-actions]", root));
+      qsa("button", dock).forEach((b) => (b.tabIndex = on ? 0 : -1));
+    });
+    io.observe(qs("[data-quick]", root));
+    io.observe(qs("[data-actions]", root));
 
     bindFavs(root);
     paint();
+    const descText = qs("[data-desc-text]", root);
+    const fold = () => {
+      const long = descText.scrollHeight > descText.clientHeight + 4 || qs("[data-desc]", root).classList.contains("is-open");
+      qs("[data-desc]", root).classList.toggle("is-long", long);
+      qs("[data-desc-more]", root).hidden = !long;
+    };
+    fold();
+    document.fonts && document.fonts.ready.then(fold);
+
+    // the light falls from under the header: the beam reaches up to the header's bottom edge wherever it is
+    const room = qs("[data-room]", root);
+    const bar = qs(".hdr__bar");
+    if (bar) {
+      let raf = 0;
+      const sky = () => { raf = 0; room.style.setProperty("--sky", `${Math.max(0, Math.round(room.getBoundingClientRect().top - bar.getBoundingClientRect().bottom))}px`); };
+      const ask = () => { raf ||= requestAnimationFrame(sky); };
+      sky();
+      addEventListener("scroll", ask, { passive: true });
+      addEventListener("resize", ask);
+      bar.closest(".hdr")?.addEventListener("transitionend", ask);
+    }
 
     // walking in: the lamp stutters on, the cake is set down on its plinth, the plates are laid
     if (gs) {
-      const room = qs("[data-room]", root);
       gs.timeline({ delay: 0.25 })
         .fromTo(room, { "--lamp": 0 }, { keyframes: [{ "--lamp": 0.9, duration: 0.06 }, { "--lamp": 0.1, duration: 0.1 }, { "--lamp": 1, duration: 0.08 }, { "--lamp": 0.5, duration: 0.05 }, { "--lamp": 1, duration: 0.2 }] })
         .from(qs("[data-cake] img", root), { yPercent: -60, opacity: 0, duration: 1, ease: "bounce.out" }, 0.2)

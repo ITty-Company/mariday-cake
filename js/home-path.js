@@ -137,7 +137,7 @@
     $$(".x-path__lm", sec).forEach((im, i) => {
       const d = +im.dataset.depth || 1;
       gsap.fromTo(im, { y: 160 * d }, { y: -160 * d, rotation: `+=${(i % 2 ? 1 : -1) * 14}`, ease: "none", scrollTrigger: { trigger: road.el, start: "top bottom", end: "bottom top", scrub: 0.8 } });
-      gsap.from(im, { scale: 0, opacity: 0, duration: 1, ease: "back.out(2)", scrollTrigger: { trigger: im, start: "top 92%", once: true } });
+      gsap.from(im, { scale: 0, opacity: 0, duration: 0.6, ease: "back.out(2)", scrollTrigger: { trigger: im, start: "top 98%", once: true } });
     });
 
     // the dioramas drift with the scroll, each layer at its own depth, and tilt with the pointer
@@ -155,10 +155,20 @@
     // every chapter's entrance timeline
     const cards = stations.map((st) => cardIn(st));
 
-    const enter = (i) => {
+    // a chapter opens as soon as it scrolls into view — its text and its scene don't wait for the cherry
+    // (on phones the scene sits under the text, so it starts when it shows up itself)
+    stations.forEach((st, i) => {
+      ScrollTrigger.create({
+        trigger: st, start: "top 88%",
+        onEnter: () => { st.classList.add("is-on"); cards[i].restart(); },
+        onLeaveBack: () => { st.classList.remove("is-on"); cards[i].pause(0); },
+      });
+      ScrollTrigger.create({ trigger: $(".x-path__vis", st), start: "top 92%", onEnter: () => scenes[i].enter(), onLeaveBack: () => scenes[i].leave() });
+    });
+
+    // the cherry rolls over a stop: the token lights up with ripples and the cherry hops
+    const arrive = (i) => {
       const st = stations[i];
-      cards[i].restart();
-      scenes[i].enter();
       const stop = $(".x-path__stop", st);
       const tok = $(".x-path__tok", st);
       gsap.fromTo(tok, { scale: 1.35 }, { scale: 1, duration: 0.8, ease: "elastic.out(1, 0.35)", clearProps: "scale" });
@@ -171,10 +181,6 @@
       fx.pop(tok, 14, 0.6);
       // the cherry hops as it rolls over the stop
       gsap.fromTo(road, { hop: 0 }, { hop: -24, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out", onUpdate: () => road.draw(road.cur) });
-    };
-    const leave = (i) => {
-      cards[i].pause(0);
-      scenes[i].leave();
     };
 
     // the finale: bunting drops, candles light one by one, the wish is written, confetti rains
@@ -205,10 +211,10 @@
       gsap.fromTo($("svg", top), { y: -46, scaleY: 1.15, scaleX: 0.9 }, { y: 0, scaleY: 1, scaleX: 1, duration: 0.9, ease: "bounce.out" });
       gsap.delayedCall(0.25, () => fx.pop(top, 44, 1.3));
       gsap.fromTo(cake, { scaleY: 1 }, { scaleY: 0.95, duration: 0.1, delay: 0.25, yoyo: true, repeat: 1, transformOrigin: "50% 100%" });
-      gsap.fromTo(string, { scaleY: 0, transformOrigin: "50% 0%" }, { scaleY: 1, duration: 0.9, delay: 0.3, ease: "elastic.out(1, 0.5)" });
-      gsap.fromTo(flags, { y: -40, opacity: 0, rotation: -50 }, { y: 0, opacity: 1, rotation: 0, duration: 1.1, delay: 0.5, stagger: 0.06, ease: "elastic.out(1, 0.45)" });
-      lights.forEach((c, k) => lightTimers.push(setTimeout(() => c.classList.remove("is-unlit"), 900 + k * 260)));
-      gsap.fromTo(wish, { clipPath: HIDDEN }, { clipPath: "inset(-80% -30% -80% -30%)", duration: 1.2, delay: 0.5, ease: "power2.inOut" });
+      gsap.fromTo(string, { scaleY: 0, transformOrigin: "50% 0%" }, { scaleY: 1, duration: 0.7, delay: 0.15, ease: "elastic.out(1, 0.5)" });
+      gsap.fromTo(flags, { y: -40, opacity: 0, rotation: -50 }, { y: 0, opacity: 1, rotation: 0, duration: 0.9, delay: 0.25, stagger: 0.04, ease: "elastic.out(1, 0.45)" });
+      lights.forEach((c, k) => lightTimers.push(setTimeout(() => c.classList.remove("is-unlit"), 450 + k * 150)));
+      gsap.fromTo(wish, { clipPath: HIDDEN }, { clipPath: "inset(-80% -30% -80% -30%)", duration: 0.7, delay: 0.2, ease: "power2.inOut" });
       gsap.delayedCall(0.6, () => fx.rain(cake, 120));
       gsap.delayedCall(1.1, () => { fx.hearts(cake, 9); fx.pop(cake, 36, 1.5); });
       gsap.delayedCall(2.2, () => fx.rain(cake, 50));
@@ -242,9 +248,8 @@
         gsap.fromTo(road, { hop: 0 }, { hop: -26, duration: 0.17, yoyo: true, repeat: 1, ease: "power2.out", onUpdate: () => road.draw(road.cur) });
       }
       if (r.stop !== reached) {
-        stations.forEach((s, i) => { s.classList.toggle("is-on", i <= r.stop); s.classList.toggle("is-here", i === r.stop); });
-        for (let k = reached + 1; k <= r.stop; k++) enter(k);
-        for (let k = reached; k > r.stop; k--) leave(k);
+        stations.forEach((s, i) => { s.classList.toggle("is-past", i <= r.stop); s.classList.toggle("is-here", i === r.stop); });
+        for (let k = reached + 1; k <= r.stop; k++) arrive(k);
         reached = r.stop;
       }
       if (r.end !== landed) {
@@ -262,7 +267,7 @@
   }
 
   // a chapter's text: the number rolls like an odometer, words jump in, the script word is written and underlined,
-  // the link tickets drop in. Built paused at its start, so the chapter waits empty until the cherry arrives.
+  // the link tickets drop in. Built paused at its start; it plays as the chapter scrolls into view.
   function cardIn(st) {
     const card = $(".x-path__card", st);
     const no = $(".x-path__no", card);
@@ -306,13 +311,13 @@
     const tags = $$(".x-path__tag", card);
     const note = $(".x-path__note", st);
     const tl = gsap.timeline({ paused: true, onStart: () => card.classList.add("is-anim"), onComplete: () => card.classList.remove("is-anim") });
-    tl.fromTo(cols, { yPercent: 0 }, { yPercent: (i, el) => -((10 + +el.dataset.d) / 20) * 100, duration: 1.4, stagger: 0.15, ease: "expo.out" }, 0)
-      .fromTo(words, { yPercent: 110, opacity: 0, rotation: 8 }, { yPercent: 0, opacity: 1, rotation: 0, duration: 0.7, stagger: 0.07, ease: "back.out(1.8)" }, 0.1)
-      .fromTo(em, { clipPath: "inset(-80% 130% -80% -30%)" }, { clipPath: "inset(-80% -30% -80% -30%)", duration: 0.9, ease: "power2.inOut" }, 0.3)
-      .fromTo($(".x-path__swash path", em), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" }, 1)
-      .fromTo(p, { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "expo.out" }, 0.45)
-      .fromTo(tags, { y: -60, opacity: 0, rotation: (i) => (i % 2 ? 1 : -1) * 28 }, { y: 0, opacity: 1, rotation: 0, duration: 1, stagger: 0.1, ease: "elastic.out(1, 0.55)", clearProps: "transform" }, 0.6);
-    if (note) tl.fromTo(note, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: "back.out(3)" }, 1.2);
+    tl.fromTo(cols, { yPercent: 0 }, { yPercent: (i, el) => -((10 + +el.dataset.d) / 20) * 100, duration: 0.9, stagger: 0.08, ease: "expo.out" }, 0)
+      .fromTo(words, { yPercent: 110, opacity: 0, rotation: 8 }, { yPercent: 0, opacity: 1, rotation: 0, duration: 0.5, stagger: 0.04, ease: "back.out(1.8)" }, 0.05)
+      .fromTo(em, { clipPath: "inset(-80% 130% -80% -30%)" }, { clipPath: "inset(-80% -30% -80% -30%)", duration: 0.55, ease: "power2.inOut" }, 0.15)
+      .fromTo($(".x-path__swash path", em), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.4, ease: "power2.inOut" }, 0.6)
+      .fromTo(p, { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "expo.out" }, 0.25)
+      .fromTo(tags, { y: -60, opacity: 0, rotation: (i) => (i % 2 ? 1 : -1) * 28 }, { y: 0, opacity: 1, rotation: 0, duration: 0.8, stagger: 0.06, ease: "elastic.out(1, 0.55)", clearProps: "transform" }, 0.35);
+    if (note) tl.fromTo(note, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(3)" }, 0.6);
     tl.progress(1).progress(0);
     return tl;
   }
@@ -625,42 +630,43 @@
       return gsap.timeline()
         .set(bag, { opacity: 1 })
         // flies in from the top right to the start of the word
-        .to(o, { f: 1, duration: 0.55, ease: "power2.out", onUpdate: () => {
+        .to(o, { f: 1, duration: 0.3, ease: "power2.out", onUpdate: () => {
           const a = nozzle(0), tr = title.getBoundingClientRect();
           place(tr.width + 60 + (a.x - tr.width - 60) * o.f, -120 + (a.y + 120) * o.f, 30 - 58 * o.f);
         } })
         // pipes the word, letter by letter
-        .to(o, { p: 1, duration: 1.5, ease: "power1.inOut", onUpdate: () => {
+        .to(o, { p: 1, duration: 0.75, ease: "power1.inOut", onUpdate: () => {
           const a = nozzle(o.p);
           place(a.x, a.y, -28 + Math.sin(o.p * Math.PI * 10) * 9);
           script.style.clipPath = `inset(-80% ${((1 - o.p) * 155 - 30).toFixed(1)}% -80% -30%)`;
         } })
         .call(() => { script.style.clipPath = "none"; fx.pop(bag, 16, 0.5); })
         // the dot of the question mark is a cherry — it pops up last
-        .fromTo(qdot, { scale: 0, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.8, ease: "elastic.out(1, 0.4)" }, "<")
+        .fromTo(qdot, { scale: 0, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.6, ease: "elastic.out(1, 0.4)" }, "<")
         // and is lifted away
-        .to(bag, { y: "-=140", x: "+=80", rotation: 25, opacity: 0, duration: 0.6, ease: "power2.in" });
+        .to(bag, { y: "-=140", x: "+=80", rotation: 25, opacity: 0, duration: 0.4, ease: "power2.in" });
     };
 
     return {
       intro() {
         dripsHidden = true;
         gsap.set(dripEls, { scaleY: 0 });
-        const tl = gsap.timeline({ scrollTrigger: { trigger: head, start: "top 75%", once: true } });
-        tl.from(floats, { scale: 0, opacity: 0, duration: 0.9, stagger: 0.05, ease: "back.out(2.4)" }, 0)
+        // starts as soon as the title peeks in and is all there in about a second
+        const tl = gsap.timeline({ scrollTrigger: { trigger: head, start: "top 95%", once: true } });
+        tl.from(floats, { scale: 0, opacity: 0, duration: 0.6, stagger: 0.03, ease: "back.out(2.4)" }, 0)
           // the letters drop in one by one and bounce on the cake
-          .from(letters, { yPercent: -280, rotation: () => gsap.utils.random(-45, 45), opacity: 0, duration: 1, stagger: 0.07, ease: "bounce.out" }, 0.15)
+          .from(letters, { yPercent: -220, rotation: () => gsap.utils.random(-45, 45), opacity: 0, duration: 0.65, stagger: 0.035, ease: "bounce.out" }, 0.05)
           // every other letter kicks up sprinkles as it lands
-          .call(() => letters.forEach((lt, i) => { if (i % 2) return; gsap.delayedCall(i * 0.07 + 0.72, () => fx.pop(lt, 7, 0.35)); }), null, 0.15)
+          .call(() => letters.forEach((lt, i) => { if (i % 2) return; gsap.delayedCall(i * 0.035 + 0.45, () => fx.pop(lt, 7, 0.35)); }), null, 0.05)
           // the glaze starts to drip
           .call(() => {
             dripsHidden = false;
-            gsap.fromTo(dripEls, { scaleY: 0 }, { scaleY: 1, duration: 1.4, stagger: { each: 0.04, from: "random" }, ease: "elastic.out(1, 0.55)" });
-          }, null, 1.05)
-          .add(writeScript(), 1.2)
-          .from(".x-path__sub, .x-path__cta", { y: 18, opacity: 0, duration: 0.9, stagger: 0.12, ease: "expo.out" }, 1.6)
-          .fromTo(".x-path__sub mark", { backgroundSize: "0% 0.42em" }, { backgroundSize: "100% 0.42em", duration: 0.8, ease: "power2.inOut" }, 2.1)
-          .from(".x-path__call", { scale: 0, opacity: 0, duration: 0.7, stagger: 0.2, ease: "back.out(2.5)" }, 2.6);
+            gsap.fromTo(dripEls, { scaleY: 0 }, { scaleY: 1, duration: 1, stagger: { each: 0.02, from: "random" }, ease: "elastic.out(1, 0.55)" });
+          }, null, 0.6)
+          .add(writeScript(), 0.4)
+          .from(".x-path__sub, .x-path__cta", { y: 18, opacity: 0, duration: 0.6, stagger: 0.08, ease: "expo.out" }, 0.35)
+          .fromTo(".x-path__sub mark", { backgroundSize: "0% 0.42em" }, { backgroundSize: "100% 0.42em", duration: 0.5, ease: "power2.inOut" }, 0.7)
+          .from(".x-path__call", { scale: 0, opacity: 0, duration: 0.5, stagger: 0.1, ease: "back.out(2.5)" }, 0.8);
       },
     };
   }
@@ -762,7 +768,7 @@
         const all = figs();
         all.forEach((f, i) => gsap.fromTo(f,
           { "--fx": `${gsap.utils.random(-320, 320)}px`, "--fy": "-360px", "--fr": `${gsap.utils.random(-120, 120)}deg`, opacity: 0 },
-          { "--fx": "0px", "--fy": "0px", "--fr": "0deg", opacity: 1, duration: 1.1, delay: 0.15 + i * 0.16, ease: "back.out(1.3)", onComplete: i === all.length - 1 ? () => { el.classList.remove("is-dealing"); fx.hearts(f, 5); popTo(el.lastElementChild); } : null }));
+          { "--fx": "0px", "--fy": "0px", "--fr": "0deg", opacity: 1, duration: 0.75, delay: i * 0.09, ease: "back.out(1.3)", onComplete: i === all.length - 1 ? () => { el.classList.remove("is-dealing"); fx.hearts(f, 5); popTo(el.lastElementChild); } : null }));
         clearInterval(timer);
         timer = setInterval(() => { if (st.classList.contains("is-here") && !hover) shuffle(); }, 2800);
       },
@@ -796,8 +802,8 @@
       desc.textContent = FLAVORS[k].desc;
     };
     const stack = () => gsap.timeline()
-      .fromTo([...layers].reverse(), { y: -150, opacity: 0, rotation: () => gsap.utils.random(-8, 8) }, { y: 0, opacity: 1, rotation: 0, duration: 0.6, stagger: 0.07, ease: "bounce.out" })
-      .fromTo(berry, { y: -200, opacity: 0, scaleY: 1.3 }, { y: 0, opacity: 1, scaleY: 1, duration: 0.7, ease: "bounce.out" }, ">-0.15")
+      .fromTo([...layers].reverse(), { y: -150, opacity: 0, rotation: () => gsap.utils.random(-8, 8) }, { y: 0, opacity: 1, rotation: 0, duration: 0.5, stagger: 0.05, ease: "bounce.out" })
+      .fromTo(berry, { y: -200, opacity: 0, scaleY: 1.3 }, { y: 0, opacity: 1, scaleY: 1, duration: 0.55, ease: "bounce.out" }, ">-0.15")
       .call(() => fx.pop(berry, 12, 0.5));
     const pick = (k, focus) => {
       chips.forEach((c, i) => { c.setAttribute("aria-checked", String(i === k)); c.tabIndex = i === k ? 0 : -1; });
@@ -837,14 +843,14 @@
         if (cut) cut.kill();
         closed();
         // the knife comes down through the whole cake, then the halves fall apart and the slice is stacked between
-        cut = gsap.timeline({ delay: 0.25 })
-          .fromTo(knife, { y: -120, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power3.in" })
+        cut = gsap.timeline({ delay: 0.05 })
+          .fromTo(knife, { y: -120, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "power3.in" })
           .call(() => fx.pop(knife, 10, 0.4))
-          .to(knife, { y: -160, opacity: 0, duration: 0.4, ease: "power2.in" }, "+=0.15")
-          .to(halfL, { xPercent: -40, rotation: -10, duration: 1, ease: "elastic.out(1, 0.6)" }, "-=0.2")
-          .to(halfR, { xPercent: 40, rotation: 10, duration: 1, ease: "elastic.out(1, 0.6)" }, "<");
-        swap = stack().delay(1.2);
-        gsap.fromTo(chips, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, delay: 0.9, stagger: 0.06, ease: "back.out(2.5)", clearProps: "transform" });
+          .to(knife, { y: -160, opacity: 0, duration: 0.3, ease: "power2.in" }, "+=0.05")
+          .to(halfL, { xPercent: -40, rotation: -10, duration: 0.8, ease: "elastic.out(1, 0.6)" }, "-=0.2")
+          .to(halfR, { xPercent: 40, rotation: 10, duration: 0.8, ease: "elastic.out(1, 0.6)" }, "<");
+        swap = stack().delay(0.55);
+        gsap.fromTo(chips, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, delay: 0.4, stagger: 0.04, ease: "back.out(2.5)", clearProps: "transform" });
       },
       leave() {
         if (swap) swap.kill();
@@ -909,7 +915,7 @@
         const o = { g: 4 };
         input.value = 4;
         set();
-        demo = gsap.to(o, { g: 14, duration: 1.8, delay: 0.5, ease: "power2.inOut", onUpdate: () => { if (touched) return demo.kill(); input.value = Math.round(o.g); set(); } });
+        demo = gsap.to(o, { g: 14, duration: 1.2, delay: 0.1, ease: "power2.inOut", onUpdate: () => { if (touched) return demo.kill(); input.value = Math.round(o.g); set(); } });
       },
       leave() { if (demo) demo.kill(); },
     };
@@ -950,7 +956,7 @@
       const o = { n: 0 };
       return gsap.to(o, {
         n: text.length,
-        duration: text.length * 0.032,
+        duration: text.length * 0.02,
         ease: "none",
         onStart: () => field.classList.remove("is-ph"),
         onUpdate: () => { field.textContent = text.slice(0, Math.round(o.n)); },
@@ -967,19 +973,19 @@
         reset();
         // where the photo lands: on the picture bubble, which is laid out but still invisible
         const dx = log.offsetLeft + pic.offsetLeft - shot.offsetLeft, dy = log.offsetTop + pic.offsetTop - shot.offsetTop;
-        tl = gsap.timeline({ delay: 0.5 })
+        tl = gsap.timeline({ delay: 0.1 })
           .add(type(m1))
-          .add(send(m1), "+=0.15")
-          .to(flash, { opacity: 0.9, duration: 0.07, yoyo: true, repeat: 1 }, "+=0.25")
-          .fromTo(shot, { x: -170, y: 50, scale: 0.5, rotation: -14, opacity: 0 }, { x: -130, y: 36, opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, "<")
-          .to(shot, { x: dx, y: dy, scale: 0.72, rotation: 6, duration: 0.55, ease: "power2.inOut" }, "+=0.2")
+          .add(send(m1), "+=0.1")
+          .to(flash, { opacity: 0.9, duration: 0.07, yoyo: true, repeat: 1 }, "+=0.15")
+          .fromTo(shot, { x: -170, y: 50, scale: 0.5, rotation: -14, opacity: 0 }, { x: -130, y: 36, opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, "<")
+          .to(shot, { x: dx, y: dy, scale: 0.72, rotation: 6, duration: 0.4, ease: "power2.inOut" }, "+=0.1")
           .set(shot, { opacity: 0 })
           .add(send(pic), "<")
-          .add(type(m2), "+=0.3")
-          .add(send(m2), "+=0.15")
-          .call(() => { field.textContent = PH; field.classList.add("is-ph"); el.classList.add("is-read"); status.textContent = "друкує…"; }, null, "+=0.4")
+          .add(type(m2), "+=0.15")
+          .add(send(m2), "+=0.1")
+          .call(() => { field.textContent = PH; field.classList.add("is-ph"); el.classList.add("is-read"); status.textContent = "друкує…"; }, null, "+=0.25")
           .to(typing, { autoAlpha: 1, duration: 0.2 })
-          .to(typing, { autoAlpha: 0, duration: 0.15 }, "+=1.2")
+          .to(typing, { autoAlpha: 0, duration: 0.15 }, "+=0.7")
           .fromTo(reply, { autoAlpha: 0, y: 20, scale: 0.8, transformOrigin: "0% 100%" }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(2)" }, "<")
           .call(() => { status.textContent = "онлайн"; })
           .fromTo(react, { autoAlpha: 0, scale: 0 }, { autoAlpha: 1, scale: 1, duration: 0.6, ease: "elastic.out(1, 0.4)" }, "+=0.3")
@@ -1012,16 +1018,16 @@
     return {
       enter() {
         reset();
-        tl = gsap.timeline({ delay: 0.4 });
+        tl = gsap.timeline({ delay: 0.1 });
         const now = Date.now();
         // ten flips, quick at first and slowing down onto the date
         for (let k = 1; k <= 10; k++) {
-          const dur = 0.05 + (k / 10) ** 3 * 0.32;
+          const dur = 0.03 + (k / 10) ** 3 * 0.15;
           tl.to(day, { rotationX: 90, duration: dur, ease: "power1.in", transformPerspective: 300 })
             .call(() => show(new Date(now + k * 864e5)))
             .fromTo(day, { rotationX: -90 }, { rotationX: 0, duration: dur, ease: "power1.out", transformPerspective: 300 });
         }
-        tl.to(ring, { strokeDashoffset: 0, duration: 0.8, ease: "power2.inOut" }, "+=0.05")
+        tl.to(ring, { strokeDashoffset: 0, duration: 0.5, ease: "power2.inOut" }, "+=0.05")
           .fromTo(seal, { opacity: 0, scale: 3.2, rotation: -60 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.32, ease: "power4.in" }, "+=0.1")
           .call(() => fx.wax(seal))
           .fromTo(ticket, { x: -8, y: 4 }, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" })
@@ -1049,8 +1055,8 @@
       enter() {
         if (tl) tl.kill();
         open(false);
-        tl = gsap.timeline({ delay: 0.4 })
-          .to(btn, { keyframes: [{ rotation: 7 }, { rotation: -6 }, { rotation: 5 }, { rotation: -3 }, { rotation: 0 }], duration: 0.7, ease: "power1.inOut", transformOrigin: "50% 100%" })
+        tl = gsap.timeline({ delay: 0.1 })
+          .to(btn, { keyframes: [{ rotation: 7 }, { rotation: -6 }, { rotation: 5 }, { rotation: -3 }, { rotation: 0 }], duration: 0.5, ease: "power1.inOut", transformOrigin: "50% 100%" })
           .to(btn, { scaleY: 0.92, scaleX: 1.05, duration: 0.12, transformOrigin: "50% 100%" })
           .to(btn, { scaleY: 1, scaleX: 1, duration: 0.5, ease: "elastic.out(1, 0.4)" })
           .call(() => open(true), null, "<");

@@ -9,224 +9,350 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236d0809'/%3E%3Cpath d='M14 44h36v6H14z' fill='%23dbefed'/%3E%3Cpath d='M20 28h24v16H20z' fill='%23f5bcc8'/%3E%3Cpath d='M25 18h14v10H25z' fill='%23dbefed'/%3E%3Ccircle cx='32' cy='13' r='5' fill='%23f5bcc8'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="../css/main.css?v=13">
-  <link rel="stylesheet" href="../css/pages.css?v=12">
-  <link rel="stylesheet" href="../css/editorial.css?v=1">
-  <link rel="stylesheet" href="../css/editorial-pages.css?v=1">
+  <link rel="stylesheet" href="../css/main.css?v=23">
+  <link rel="stylesheet" href="../css/pages.css?v=13">
   <link rel="stylesheet" href="../css/glaze.css?v=1">
+  <link rel="stylesheet" href="../css/weddings.css?v=1">
 </head>
-<body data-page="weddings" class="inner inner--default">
+<body data-page="weddings" class="inner inner--default wd">
   <div class="grain" aria-hidden="true"></div>
   <a class="p-skip" href="#main">До вмісту</a>
   <div id="site-header"></div>
   <main id="main">
-    <header class="ed-hero ed-hero--pink">
-      <div class="p-wrap ed-hero__grid">
-        <div class="ed-hero__copy">
+
+    <!-- ① The invitation: a sealed envelope opens and one of our wedding cakes rises out of it.
+         The wax seal on the pocket sends that cake back and brings out the next one. -->
+    <header class="wd-hero">
+      <div class="wd-petals" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="p-wrap wd-hero__grid">
+        <div class="wd-hero__copy">
           <nav class="p-crumbs" aria-label="Хлібні крихти"><a href="../index.html">Головна</a><i>/</i><a href="cakes.html">Торти</a><i>/</i><span>Весілля</span></nav>
-          <p class="p-eyebrow">( Wedding cakes · Alkmaar → NL )</p>
-          <h1 class="ed-hero__title"><span data-chars>Весільні</span><em class="p-script">торти мрії</em></h1>
-          <p class="p-lede" data-up>Торт — єдиний гість, якого фотографують частіше за наречену. Ми проведемо вас від першої дегустації до моменту, коли ви разом зробите перший розріз, — спокійно, красиво й дуже смачно.</p>
-          <div class="ed-hero__actions" data-up>
+          <h1 class="p-title wd-title"><span class="p-title__word" data-chars>Весільні</span><em class="p-script">торти мрії</em></h1>
+          <p class="wd-hero__lede">Торт — єдиний гість, якого фотографують частіше за наречену. Ведемо вас від дегустації до першого розрізу — спокійно, красиво й дуже смачно.</p>
+          <div class="wd-hero__actions">
             <a class="p-btn p-btn--big" href="#calc"><span>Скільки ярусів?</span></a>
-            <a class="p-link" href="#journey">Як ми працюємо →</a>
+            <a class="p-link" href="#shliakh">Як ми працюємо →</a>
           </div>
-          <ul class="ed-facts" data-up>
-            <li><b>1–2 міс.</b><span>ідеально бронювати<br>заздалегідь</span></li>
-            <li><b>9</b><span>смаків для<br>дегустації</span></li>
-            <li><b>1–5</b><span>ярусів —<br>під ваших гостей</span></li>
+          <ul class="wd-rsvp" aria-label="Коротко">
+            <li><b>1–2 міс.</b><span>бронюйте заздалегідь</span></li>
+            <li><b>9 смаків</b><span>на дегустації</span></li>
+            <li><b>1–5 ярусів</b><span>під ваших гостей</span></li>
           </ul>
         </div>
-        <div class="ed-art wd-art" aria-hidden="true">
-          <span class="ed-art__disc ed-art__disc--ring" style="--x:4%;--y:3%;--w:92%"></span>
-          <figure class="ed-art__frame ed-art__frame--arch" style="--x:22%;--y:2%;--w:56%"><img src="../img/cakes/roses.jpg" alt=""></figure>
-          <figure class="ed-art__photo" style="--x:0%;--y:52%;--w:34%;--r:-8deg;--ar:1"><span class="ed-tape"></span><img src="../img/cakes/lilac.jpg" alt=""><figcaption>ліловий сад</figcaption></figure>
-          <figure class="ed-art__photo" style="--x:68%;--y:58%;--w:32%;--r:7deg;--ar:1"><span class="ed-tape ed-tape--pink"></span><img src="../img/cakes/berries.jpg" alt=""><figcaption>ягідна корона</figcaption></figure>
-          <div class="ed-badge ed-badge--pink" style="--x:70%;--y:4%;--w:128px">
-            <svg viewBox="0 0 200 200"><path id="bd-wd" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0" fill="none"/><text><textPath href="#bd-wd" textLength="462" lengthAdjust="spacing">Just married ✦ Mariday ✦ Wedding cakes ✦</textPath></text></svg>
-            <b>♥</b>
+
+        <div class="wd-inv" data-wd-inv>
+          <svg class="wd-rings" viewBox="0 0 120 80" aria-hidden="true"><defs><linearGradient id="wd-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2c4"/><stop offset=".45" stop-color="#e2b45a"/><stop offset="1" stop-color="#9c6a1c"/></linearGradient></defs><circle cx="44" cy="44" r="26" fill="none" stroke="url(#wd-gold)" stroke-width="7"/><circle cx="76" cy="40" r="26" fill="none" stroke="url(#wd-gold)" stroke-width="7"/><path d="M68 14l4-9 4 9-4 5z" fill="#eaf6ff" stroke="#b9d6e8" stroke-width="1.2"/></svg>
+          <div class="wd-env">
+            <div class="wd-env__back"></div>
+            <div class="wd-env__card" aria-hidden="true"><small>save the date</small><em>дегустація · ескіз · торт</em><b>♥</b></div>
+            <div class="wd-env__slot"><div class="wd-env__cake" data-wd-hero-cake></div></div>
+            <div class="wd-env__pocket">
+              <a class="wd-env__addr" href="cakes.html" data-wd-hero-link><span class="wd-env__to">для вас —</span><b data-wd-hero-name>&nbsp;</b><span class="wd-env__price" data-wd-hero-price></span></a>
+            </div>
+            <div class="wd-env__flap"><span></span></div>
+            <button class="wd-seal" type="button" data-wd-seal aria-label="Показати інший весільний торт"><span>M</span></button>
           </div>
-          <span class="ed-sticker ed-sticker--hand" style="--x:30%;--y:86%;--r:-4deg;--c:#fff">так! 💍 назавжди</span>
+          <p class="wd-hand wd-inv__note" aria-hidden="true">тисни печатку — інший торт ↺</p>
         </div>
       </div>
     </header>
 
-    <div class="p-ribbon p-ribbon--pink" data-marquee aria-hidden="true"><div class="p-ribbon__track"><span>Дегустація</span><b>♥</b><span>Ескіз</span><b>♥</b><span>Живі квіти</span><b>♥</b><span>Яруси</span><b>♥</b><span>Доставка й збірка</span><b>♥</b><span>Candy bar</span><b>♥</b></div></div>
+    <div class="wd-satin" aria-hidden="true">
+      <div class="p-ribbon wd-satin__band" data-marquee><div class="p-ribbon__track"><span>Дегустація</span><b>♥</b><span>Ескіз</span><b>♥</b><span>Живі квіти</span><b>♥</b><span>Яруси</span><b>♥</b><span>Доставка й збірка</span><b>♥</b><span>Candy bar</span><b>♥</b></div></div>
+      <svg class="wd-satin__bow" viewBox="0 0 160 90"><path d="M80 45C58 18 22 4 12 20s14 44 68 25z" fill="#f7c9d3" stroke="#c9506d" stroke-width="3"/><path d="M80 45c22-27 58-41 68-25s-14 44-68 25z" fill="#f7c9d3" stroke="#c9506d" stroke-width="3"/><path d="M74 48L52 86l14-4 6 8 10-38zM86 48l22 38-14-4-6 8-10-38z" fill="#f2b3c1" stroke="#c9506d" stroke-width="3" stroke-linejoin="round"/><rect x="70" y="35" width="20" height="20" rx="7" fill="#fbd8df" stroke="#c9506d" stroke-width="3"/></svg>
+    </div>
 
-    <section class="p-wrap ed-sec">
-      <article class="ed-split">
-        <figure class="ed-split__media" data-up>
-          <div class="ed-split__img ed-split__img--arch"><img src="../img/cakes/piping.jpg" alt="Кремові рюші на торті" loading="lazy"></div>
-          <figure class="ed-split__inset"><img src="../img/cakes/strawslice.jpg" alt="" loading="lazy"><figcaption>смак важливіший за все</figcaption></figure>
-        </figure>
-        <div class="ed-split__copy">
-          <p class="ed-head__n">( 01 ) Наш підхід</p>
-          <h2 class="p-h2" data-rise>Торт, який <span class="p-light">про вас двох</span></h2>
-          <div class="ed-prose" data-up>
-            <p class="ed-drop">Ми не продаємо весільні торти «з каталогу». Кожен починається з розмови: як ви познайомилися, яка палітра весілля, що любите їсти в неділю зранку. З цього народжуються смак, форма й деталі, які гості запам'ятають.</p>
-            <p>Весільний торт — це ще й логістика: він має пережити дорогу, спеку, фотосесію й годину на столі. Тому ми <strong>самі привозимо й збираємо яруси на місці</strong>, погоджуємо все з вашим декоратором і флористом і лишаємося на зв'язку в день весілля.</p>
+    <!-- ② About the two of you: each of you ticks what you love, and the tiers of a real wedding cake
+         get their fillings — the top one for you, the bottom one for your other half, the middle one shared. -->
+    <section class="wd-sec wd-two" id="pro-vas">
+      <span class="wd-lace wd-lace--top" aria-hidden="true"></span>
+      <div class="p-wrap">
+        <h2 class="wd-h2"><span class="wd-h2__w" data-wd-split>Про вас</span><em class="wd-h2__s">двох</em></h2>
+        <p class="wd-lede">Ми не продаємо весільні торти «з каталогу». Кожен починається з розмови — і з того, що ви любите їсти в неділю зранку. Позначте смаки, а торт сам розкладе їх по ярусах.</p>
+
+        <div class="wd-two__grid" data-wd-two>
+          <fieldset class="wd-taste wd-taste--a">
+            <legend><span class="wd-taste__who">Ви</span><span class="wd-hand">що любите ви?</span></legend>
+            <div class="wd-taste__chips" data-side="a"></div>
+          </fieldset>
+
+          <div class="wd-two__stage">
+            <div class="wd-two__cake" data-wd-two-cake></div>
+            <ol class="wd-two__notes" aria-live="polite">
+              <li class="wd-tier wd-tier--top"><small>верхній ярус · ваш</small><b data-tier="top">&nbsp;</b></li>
+              <li class="wd-tier wd-tier--mid"><small>середній · спільний</small><b data-tier="mid">&nbsp;</b></li>
+              <li class="wd-tier wd-tier--low"><small>нижній · половинки</small><b data-tier="low">&nbsp;</b></li>
+            </ol>
           </div>
-          <ul class="ed-ticks" data-up>
-            <li>Окрема начинка для кожного ярусу</li>
-            <li>Ескіз і погодження до старту виробництва</li>
-            <li>Живі квіти в палітрі вашого букета</li>
-          </ul>
+
+          <fieldset class="wd-taste wd-taste--b">
+            <legend><span class="wd-taste__who">Половинка</span><span class="wd-hand">а ваша половинка?</span></legend>
+            <div class="wd-taste__chips" data-side="b"></div>
+          </fieldset>
         </div>
-      </article>
+
+        <ul class="wd-ticks">
+          <li>Окрема начинка для кожного ярусу</li>
+          <li>Ескіз і погодження до старту</li>
+          <li>Живі квіти в палітрі вашого букета</li>
+          <li>Самі привозимо й збираємо на місці</li>
+        </ul>
+      </div>
+      <span class="wd-lace wd-lace--bottom" aria-hidden="true"></span>
     </section>
 
-    <section class="ed-dark" id="journey">
+    <!-- ③ The way of the cake: the closer the wedding, the more of the cake there is — it builds up from the bottom tier
+         while the steps scroll past, and every step has its own little scene. -->
+    <section class="wd-sec wd-way" id="shliakh">
       <div class="p-wrap">
-        <div class="ed-head">
-          <div>
-            <p class="ed-head__n">( 02 ) Шлях торта</p>
-            <h2 class="p-h2" data-rise>Від дегустації <span class="p-light">до першого шматочка</span></h2>
+        <h2 class="wd-h2"><span class="wd-h2__w" data-wd-split>Шлях торта</span><em class="wd-h2__s">до першого шматочка</em></h2>
+        <p class="wd-lede">Ви завжди знаєте, що відбувається з вашим тортом і що від вас потрібно. А торт тим часом росте — ярус за ярусом.</p>
+
+        <div class="wd-way__grid" data-wd-way>
+          <div class="wd-way__stage">
+            <div class="wd-way__room">
+              <p class="wd-way__when" aria-hidden="true"><span data-wd-when>за 2 місяці</span></p>
+              <div class="wd-way__cake" data-wd-way-cake></div>
+              <div class="wd-way__stand" aria-hidden="true"><i></i></div>
+              <div class="wd-way__ribbon" aria-hidden="true"><i data-wd-way-bar></i><b data-wd-way-heart>♥</b></div>
+            </div>
           </div>
-          <p class="ed-head__side" data-up>Шість кроків, які ми проходимо з кожною парою. Ви завжди знаєте, що відбувається з вашим тортом і що від вас потрібно.</p>
-        </div>
-        <div class="ed-steps" data-ed-steps>
-          <div class="ed-steps__media">
-            <img src="../img/cakes/pastel.jpg" alt="" loading="lazy">
-            <img src="../img/cakes/slice.jpg" alt="" loading="lazy">
-            <img src="../img/cakes/lilac.jpg" alt="" loading="lazy">
-            <img src="../img/cakes/piping.jpg" alt="" loading="lazy">
-            <img src="../img/cakes/berries.jpg" alt="" loading="lazy">
-            <img src="../img/cakes/roses.jpg" alt="" loading="lazy">
-            <span class="ed-steps__count">01 / 06</span>
-          </div>
-          <ol class="ed-steps__list">
-            <li class="ed-step"><span class="ed-step__n">01</span><small>за 1–2 місяці</small><h3>Знайомство</h3><p>Пишете нам дату, кількість гостей, локацію й кілька фото, які надихають. Перевіряємо, чи вільна дата, і бронюємо її за вами після передоплати.</p><img class="ed-step__img" src="../img/cakes/pastel.jpg" alt="" loading="lazy"></li>
-            <li class="ed-step"><span class="ed-step__n">02</span><small>за 4–6 тижнів</small><h3>Дегустація</h3><p>Дегустаційний сет із 9 міні-трайфлів — усі начинки кондитерської. Куштуєте вдома, у спокої, з тими, чия думка важлива. Обираєте 1–3 смаки для ярусів.</p><img class="ed-step__img" src="../img/cakes/slice.jpg" alt="" loading="lazy"></li>
-            <li class="ed-step"><span class="ed-step__n">03</span><small>за 3–4 тижні</small><h3>Ескіз і кошторис</h3><p>Малюємо торт: форма, кількість ярусів, декор, квіти. Надсилаємо ескіз з точною ціною — ніяких сюрпризів у день весілля.</p><img class="ed-step__img" src="../img/cakes/lilac.jpg" alt="" loading="lazy"></li>
-            <li class="ed-step"><span class="ed-step__n">04</span><small>за 2 тижні</small><h3>Узгодження з командою</h3><p>Зв'язуємося з вашим координатором, декоратором і флористом: час приїзду, де стоятиме торт, яка стійка, які квіти. Ви не будете «зв'язковим».</p><img class="ed-step__img" src="../img/cakes/piping.jpg" alt="" loading="lazy"></li>
-            <li class="ed-step"><span class="ed-step__n">05</span><small>за 1–2 дні</small><h3>Виробництво</h3><p>Печемо бісквіти, варимо конфі, збираємо яруси й ставимо опори. Торт відпочиває в холоді, щоб у дорозі він був ідеально стабільним.</p><img class="ed-step__img" src="../img/cakes/berries.jpg" alt="" loading="lazy"></li>
-            <li class="ed-step"><span class="ed-step__n">06</span><small>у день весілля</small><h3>Доставка й збірка</h3><p>Привозимо, збираємо на місці, додаємо живі квіти, фотографуємо результат — і передаємо торт координатору. А ви просто насолоджуєтеся днем.</p><img class="ed-step__img" src="../img/cakes/roses.jpg" alt="" loading="lazy"></li>
+
+          <ol class="wd-way__list">
+            <li class="wd-step" data-when="за 2 місяці">
+              <small class="wd-step__when">за 1–2 місяці</small>
+              <h3>Знайомство</h3>
+              <p>Пишете дату, кількість гостей, локацію й кілька фото, які надихають. Перевіряємо, чи вільна дата, і бронюємо її за вами після передоплати.</p>
+              <div class="wd-scene wd-chat" aria-hidden="true">
+                <p class="wd-chat__me">Привіт! Весілля 14 червня, 70 гостей 💍</p>
+                <p class="wd-chat__us">Вітаємо! Дата вільна — бронюємо ♥</p>
+              </div>
+            </li>
+            <li class="wd-step" data-when="за місяць">
+              <small class="wd-step__when">за 4–6 тижнів</small>
+              <h3>Дегустація</h3>
+              <p>Сет із 9 міні-трайфлів — усі начинки кондитерської. Куштуєте вдома, у спокої, з тими, чия думка важлива. Обираєте 1–3 смаки для ярусів.</p>
+              <div class="wd-scene wd-cups" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><span class="wd-cups__spoon"></span></div>
+            </li>
+            <li class="wd-step" data-when="за 3 тижні">
+              <small class="wd-step__when">за 3–4 тижні</small>
+              <h3>Ескіз і кошторис</h3>
+              <p>Малюємо торт: форма, яруси, декор, квіти. Надсилаємо ескіз з точною ціною — ніяких сюрпризів у день весілля.</p>
+              <div class="wd-scene wd-bill" aria-hidden="true">
+                <p><span>яруси</span><i></i><span>3</span></p>
+                <p><span>живі квіти</span><i></i><span>так</span></p>
+                <p><span>доставка й збірка</span><i></i><span>так</span></p>
+                <p class="wd-bill__sum"><span>сюрпризи</span><i></i><span>0</span></p>
+                <b class="wd-bill__stamp">погоджено</b>
+              </div>
+            </li>
+            <li class="wd-step" data-when="за 2 тижні">
+              <small class="wd-step__when">за 2 тижні</small>
+              <h3>Узгодження з командою</h3>
+              <p>Самі зв'язуємося з координатором, декоратором і флористом: час приїзду, стійка, квіти. Ви не будете «зв'язковим».</p>
+              <div class="wd-scene wd-team" aria-hidden="true">
+                <svg viewBox="0 0 300 120" preserveAspectRatio="none"><path d="M60 30 150 60M240 30 150 60M60 95 150 60M240 95 150 60"/></svg>
+                <span style="--x:20%;--y:25%">📋<small>координатор</small></span>
+                <span style="--x:80%;--y:25%">🎀<small>декоратор</small></span>
+                <span style="--x:20%;--y:79%">💐<small>флорист</small></span>
+                <span style="--x:80%;--y:79%">🍒<small>Mariday</small></span>
+                <b style="--x:50%;--y:50%">♥</b>
+              </div>
+            </li>
+            <li class="wd-step" data-when="за 2 дні">
+              <small class="wd-step__when">за 1–2 дні</small>
+              <h3>Виробництво</h3>
+              <p>Печемо бісквіти, варимо конфі, збираємо яруси й ставимо опори. Торт відпочиває в холоді, щоб у дорозі був ідеально стабільним.</p>
+              <div class="wd-scene wd-cold" aria-hidden="true">
+                <span class="wd-cold__layers"><i></i><i></i><i></i><i></i><i></i></span>
+                <span class="wd-cold__temp"><b>+4°</b><small>відпочиває</small></span>
+                <i class="wd-cold__flake">❄</i><i class="wd-cold__flake">❄</i><i class="wd-cold__flake">❄</i>
+              </div>
+            </li>
+            <li class="wd-step" data-when="сьогодні ♥">
+              <small class="wd-step__when">у день весілля</small>
+              <h3>Доставка й збірка</h3>
+              <p>Привозимо, збираємо на місці, додаємо живі квіти, фотографуємо результат — і передаємо торт координатору. А ви просто святкуєте.</p>
+              <div class="wd-scene wd-van" aria-hidden="true">
+                <span class="wd-van__road"></span>
+                <span class="wd-van__car"><span class="wd-van__body"><small>обережно, торт!</small></span><i></i><i></i><span class="wd-van__cans"><b></b><b></b><b></b></span></span>
+              </div>
+            </li>
           </ol>
         </div>
       </div>
     </section>
 
-    <section class="p-wrap ed-sec">
-      <div class="ed-head">
-        <div>
-          <p class="ed-head__n">( 03 ) Стилі</p>
-          <h2 class="p-h2" data-rise>Який торт <span class="p-light">ваш?</span></h2>
+    <!-- ④ Which cake is yours: our wedding cakes on white columns; toss the bouquet and it lands on one of them —
+         or simply pick one. Its style opens on a card below. -->
+    <section class="wd-sec wd-toss">
+      <span class="wd-lace wd-lace--top" aria-hidden="true"></span>
+      <div class="p-wrap">
+        <h2 class="wd-h2"><span class="wd-h2__w" data-wd-split>Який торт</span><em class="wd-h2__s">ваш?</em></h2>
+        <p class="wd-lede">Стилі можна змішувати — головне, щоб торт був схожий на ваше весілля. Не можете обрати? Киньте букет.</p>
+
+        <div class="wd-toss__hall" data-wd-toss>
+          <button class="wd-bouquet" type="button" data-wd-bouquet aria-label="Кинути букет — він обере торт">
+            <svg viewBox="0 0 120 150" aria-hidden="true">
+              <path d="M48 92 60 146l12-54z" fill="#7fa36b"/><path d="M52 96l8 40 8-40" fill="none" stroke="#5c7f4b" stroke-width="2"/>
+              <path d="M42 108c10 6 26 6 36 0l-4 12c-8 4-20 4-28 0z" fill="#fff4f6" stroke="#c9506d" stroke-width="2.5"/>
+              <path d="M56 116c-10 10-18 18-30 18 8-6 12-12 16-20zM64 116c10 10 18 18 30 18-8-6-12-12-16-20z" fill="#f7c9d3" stroke="#c9506d" stroke-width="2"/>
+              <circle cx="30" cy="66" r="12" fill="#9cc58a"/><circle cx="90" cy="66" r="12" fill="#9cc58a"/>
+              <circle cx="38" cy="54" r="17" fill="#fff8f0" stroke="#efd9c8" stroke-width="2"/><circle cx="60" cy="44" r="19" fill="#f5bcc8" stroke="#e59aab" stroke-width="2"/><circle cx="82" cy="54" r="17" fill="#fff8f0" stroke="#efd9c8" stroke-width="2"/>
+              <circle cx="46" cy="76" r="17" fill="#f7c9d3" stroke="#e59aab" stroke-width="2"/><circle cx="74" cy="76" r="17" fill="#fff8f0" stroke="#efd9c8" stroke-width="2"/><circle cx="60" cy="66" r="14" fill="#e98fa4" stroke="#c9506d" stroke-width="2"/>
+              <path d="M60 58c-5 3-5 13 0 16 5-3 5-13 0-16zM34 50c4-4 10-4 12 2M78 50c4-4 10-4 12 2M40 72c4-4 10-4 12 2M68 72c4-4 10-4 12 2M54 38c4-4 10-4 12 2" fill="none" stroke="#c9506d" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+            </svg>
+            <span class="wd-hand">киньте букет!</span>
+          </button>
+          <div class="wd-toss__row" data-wd-toss-row></div>
+          <div class="wd-toss__card" data-wd-toss-card aria-live="polite" hidden></div>
         </div>
-        <p class="ed-head__side" data-up>Шість напрямів, з яких зазвичай починаємо розмову. Їх можна змішувати: naked з квітами, мінімалізм з золотом — головне, щоб торт був схожий на ваше весілля.</p>
       </div>
-      <div class="ed-cards wd-styles" style="--n:3">
-        <article class="ed-card ed-card--photo ed-card--tall" data-up><img src="../img/cakes/roses.jpg" alt="" loading="lazy"><div><small>класика</small><h3>Квітковий каскад</h3><p>Ніжний крем і живі троянди чи півонії, що «стікають» ярусами. Найромантичніший вибір.</p></div></article>
-        <article class="ed-card ed-card--photo" data-up><img src="../img/cakes/lilac.jpg" alt="" loading="lazy"><div><small>природно</small><h3>Semi-naked</h3><p>Тонкий шар крему, ягоди й зелень. Для весіль у саду, на фермі, біля води.</p></div></article>
-        <article class="ed-card ed-card--photo" data-up><img src="../img/cakes/berries.jpg" alt="" loading="lazy"><div><small>літо</small><h3>Ягідна корона</h3><p>Свіжі полуниця, лохина й малина зверху й між ярусами. Яскраво й дуже апетитно.</p></div></article>
-        <article class="ed-card ed-card--photo" data-up><img src="../img/cakes/fraisier.jpg" alt="" loading="lazy"><div><small>сучасно</small><h3>Мінімалізм і текстура</h3><p>Один колір, рельєф крему, мінімум декору. Торт як скульптура.</p></div></article>
-        <article class="ed-card ed-card--photo" data-up><img src="../img/cakes/gold.jpg" alt="" loading="lazy"><div><small>гламур</small><h3>Золото й макарони</h3><p>Поталь, дріп, макарони в палітрі весілля. Для вечірніх і зимових свят.</p></div></article>
-        <article class="ed-card ed-card--photo ed-card--wide" data-up><img src="../img/cakes/macarons.jpg" alt="" loading="lazy"><div><small>для великих весіль</small><h3>Торт + candy bar</h3><p>Невеликий церемоніальний торт для розрізання й солодкий стіл, щоб вистачило всім. Зручно для 80+ гостей.</p></div></article>
-      </div>
+      <span class="wd-lace wd-lace--bottom" aria-hidden="true"></span>
     </section>
 
-    <section class="p-wrap ed-sec" id="calc">
-      <div class="ed-head">
-        <div>
-          <p class="ed-head__n">( 04 ) Калькулятор</p>
-          <h2 class="p-h2" data-rise>Скільки <span class="p-light">ярусів?</span></h2>
-        </div>
-        <p class="ed-head__side" data-up>Рахуємо за кондитерською нормою: 150–200 г на гостя. Якщо буде candy bar, торта можна взяти менше. Ціна — база без декору, фінал — після ескізу.</p>
-      </div>
-      <div class="ed-calc" data-ed-calc>
-        <div class="ed-calc__ctrl">
-          <label><span>Кількість гостей</span><output data-guests-out>60</output><input class="ed-range" type="range" min="10" max="200" value="60" aria-label="Кількість гостей"></label>
-          <div>
-            <p class="p-eyebrow light" style="margin-bottom:.6rem">Формат</p>
-            <div class="ed-calc__seg" role="group" aria-label="Формат">
-              <button type="button" data-grams="120" aria-pressed="false">+ candy bar · 120 г</button>
-              <button type="button" data-grams="150" aria-pressed="false">Після вечері · 150 г</button>
-              <button type="button" data-grams="175" aria-pressed="true">Класика · 175 г</button>
-              <button type="button" data-grams="200" aria-pressed="false">Головний десерт · 200 г</button>
+    <!-- ⑤ How many tiers: every guest is a seat in the hall, tiers drop onto the stand as the guest list grows,
+         and each seat is coloured by the tier that feeds it. -->
+    <section class="wd-sec wd-calc" id="calc">
+      <div class="p-wrap">
+        <h2 class="wd-h2"><span class="wd-h2__w" data-wd-split>Скільки</span><em class="wd-h2__s">ярусів?</em></h2>
+        <p class="wd-lede">Рахуємо за кондитерською нормою: 150–200 г на гостя. Якщо буде candy bar, торта можна взяти менше. Ціна — база без декору, фінал — після ескізу.</p>
+
+        <div class="wd-calc__grid" data-wd-calc>
+          <div class="wd-calc__ctrl">
+            <label class="wd-guests">
+              <span class="wd-guests__n"><output data-wd-guests>60</output><span>гостей</span></span>
+              <input class="wd-ring" type="range" min="10" max="200" step="1" value="60" aria-label="Кількість гостей">
+            </label>
+            <div class="wd-calc__quick" role="group" aria-label="Швидкий вибір">
+              <button type="button" data-guests="20">камерне</button>
+              <button type="button" data-guests="60">класичне</button>
+              <button type="button" data-guests="120">велике</button>
+            </div>
+            <p class="wd-calc__label">Яким буде торт на святі?</p>
+            <div class="wd-calc__fmt" role="group" aria-label="Формат">
+              <button type="button" data-grams="120" aria-pressed="false"><b>+ candy bar</b><small>120 г на гостя</small></button>
+              <button type="button" data-grams="150" aria-pressed="false"><b>після вечері</b><small>150 г</small></button>
+              <button type="button" data-grams="175" aria-pressed="true"><b>класика</b><small>175 г</small></button>
+              <button type="button" data-grams="200" aria-pressed="false"><b>головний десерт</b><small>200 г</small></button>
             </div>
           </div>
-          <p class="ed-calc__hint" data-hint></p>
-        </div>
-        <div class="ed-calc__out" aria-live="polite">
-          <div class="ed-calc__cake" aria-hidden="true"></div>
-          <div class="ed-calc__res" data-res></div>
-          <a class="p-btn" href="contacts.html" style="background:var(--pink);color:var(--cherry)"><span>Забронювати дату →</span></a>
-        </div>
-      </div>
-      <div class="ed-tablewrap ed-mt" data-up>
-        <table class="wd-table">
-          <thead><tr><th>Гостей</th><th>Вага торта</th><th>Ярусів</th><th>Порада</th></tr></thead>
-          <tbody>
-            <tr><td>до 20</td><td>3–4 кг</td><td>1–2</td><td>камерне весілля або торт + бенто для пари</td></tr>
-            <tr><td>30–40</td><td>5–8 кг</td><td>2</td><td>два яруси — дві начинки</td></tr>
-            <tr><td>50–70</td><td>8–12 кг</td><td>3</td><td>класичний весільний торт</td></tr>
-            <tr><td>80–100</td><td>12–20 кг</td><td>3–4</td><td>або 2–3 яруси + candy bar</td></tr>
-            <tr><td>120+</td><td>від 20 кг</td><td>4–5</td><td>церемоніальний торт + солодкий стіл</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
 
-    <section class="ed-blush">
-      <div class="p-wrap">
-        <div class="ed-head">
-          <div>
-            <p class="ed-head__n">( 05 ) Солодке навколо</p>
-            <h2 class="p-h2" data-rise>Що ще <span class="p-light">замовляють пари</span></h2>
+          <div class="wd-calc__hall">
+            <div class="wd-seats" data-wd-seats aria-hidden="true"></div>
+            <div class="wd-calc__cake" aria-hidden="true">
+              <div class="wd-tiers" data-wd-tiers></div>
+              <div class="wd-tiers__stand"><i></i></div>
+            </div>
+            <div class="wd-calc__res" data-wd-res aria-live="polite"></div>
+            <p class="wd-hand wd-calc__hint" data-wd-hint></p>
+            <a class="p-btn wd-calc__go" href="#date"><span>Обрати дату →</span></a>
           </div>
-          <p class="ed-head__side" data-up>Весілля — це не лише один вечір. Ось маленькі солодкі моменти, які роблять його ще теплішим.</p>
-        </div>
-        <div class="ed-cards" style="--n:4">
-          <a class="ed-card" href="desserts.html#candybar" style="--r:-1.5deg" data-up><span class="ed-card__ico">🍬</span><small>для гостей</small><h3>Candy bar</h3><p>Солодкий стіл у палітрі весілля — від 10 до 60 гостей.</p></a>
-          <a class="ed-card" href="desserts.html" style="--c:#fbe6b8;--r:1deg" data-up><span class="ed-card__ico">🥄</span><small>за місяць</small><h3>Дегустаційний сет</h3><p>9 міні-трайфлів, щоб обрати смаки ярусів удвох.</p></a>
-          <a class="ed-card" href="bento.html" style="--c:#e9c6f0;--r:-1deg" data-up><span class="ed-card__ico">🍰</span><small>напередодні</small><h3>Бенто на дівич-вечір</h3><p>Маленькі торти з жартівливими написами для подруг.</p></a>
-          <a class="ed-card ed-card--dark" href="desserts.html" style="--r:1.5deg" data-up><span class="ed-card__ico">💝</span><small>компліменти</small><h3>Капкейки для гостей</h3><p>Солодкий подарунок у коробочці з вашими ініціалами.</p></a>
         </div>
       </div>
     </section>
 
-    <section class="p-wrap ed-sec">
-      <div class="wd-letter">
-        <div class="ed-note" style="--r:-1.5deg" data-up>
-          <span class="ed-tape"></span>
-          <p>«Найкращий комплімент для мене — коли через рік пара пише: "Ми досі згадуємо той торт". Ми робимо не десерт, а частину вашої історії.</p>
-          <p>Пишіть — я з радістю послухаю вашу ♥»</p>
-          <p class="wd-letter__sign">— <a href="https://www.instagram.com/mari.hockey/" target="_blank" rel="noopener">@mari.hockey</a>, засновниця Mariday</p>
+    <!-- ⑥ Sweet things around the wedding: a gilded étagère, each plate is one of the extras couples order. -->
+    <section class="wd-sec wd-sweet">
+      <span class="wd-lace wd-lace--top" aria-hidden="true"></span>
+      <div class="p-wrap">
+        <h2 class="wd-h2"><span class="wd-h2__w" data-wd-split>Солодке</span><em class="wd-h2__s">навколо</em></h2>
+        <p class="wd-lede">Весілля — це не лише один вечір. Ось маленькі солодкі моменти, які роблять його ще теплішим.</p>
+
+        <div class="wd-sweet__grid" data-wd-sweet>
+          <a class="wd-tag" href="bento.html" data-plate="0" style="--r:-3deg"><small>напередодні</small><b>Бенто на дівич-вечір</b><span>Маленькі торти з жартівливими написами для подруг.</span></a>
+          <a class="wd-tag" href="desserts.html" data-plate="1" style="--r:2deg"><small>за місяць</small><b>Дегустаційний сет</b><span>9 міні-трайфлів, щоб обрати смаки ярусів удвох.</span></a>
+
+          <div class="wd-etagere" aria-hidden="true">
+            <span class="wd-etagere__handle"></span>
+            <div class="wd-plate" data-plate="0"><img src="../img/cutouts/candy-mac.webp" alt=""><img src="../img/cutouts/candy-mac.webp" alt=""></div>
+            <div class="wd-plate" data-plate="1"><img src="../img/cutouts/candy-cup.webp" alt=""><img src="../img/cutouts/cherrycup.webp" alt=""><img src="../img/cutouts/candy-mac.webp" alt=""></div>
+            <div class="wd-plate" data-plate="2"><img src="../img/cutouts/cherrycup.webp" alt=""><img src="../img/cutouts/candy-cake.webp" alt=""><img src="../img/cutouts/candy-cup.webp" alt=""></div>
+            <span class="wd-etagere__foot"></span>
+          </div>
+
+          <a class="wd-tag" href="desserts.html#candybar" data-plate="2" style="--r:2.5deg"><small>для гостей</small><b>Candy bar</b><span>Солодкий стіл у палітрі весілля — від 10 до 60 гостей.</span></a>
+          <a class="wd-tag wd-tag--dark" href="desserts.html" data-plate="1" style="--r:-2deg"><small>компліменти</small><b>Капкейки для гостей</b><span>Солодкий подарунок у коробочці з вашими ініціалами.</span></a>
         </div>
-        <figure class="wd-letter__img" data-up><img src="../img/cakes/pink.jpg" alt="" loading="lazy"><img src="../img/cakes/cherries.png" alt="" class="wd-letter__cherry"></figure>
       </div>
+      <span class="wd-lace wd-lace--bottom" aria-hidden="true"></span>
     </section>
 
-    <section class="p-wrap ed-sec">
-      <div class="ed-head">
-        <div>
-          <p class="ed-head__n">( 06 ) Питання пар</p>
-          <h2 class="p-h2" data-rise>Весільні <span class="p-light">FAQ</span></h2>
+    <!-- ⑦ The guest book: one of our cakes pressed on the left page, Mari's note written on the right one. -->
+    <section class="wd-sec wd-bookwrap">
+      <div class="p-wrap">
+        <div class="wd-book" data-wd-book>
+          <div class="wd-book__page wd-book__page--l">
+            <div class="wd-book__cake" data-wd-book-cake></div>
+            <svg class="wd-book__flower" viewBox="0 0 80 120" aria-hidden="true"><path d="M40 118C38 90 42 60 40 40" stroke="#7fa36b" stroke-width="3" fill="none"/><path d="M40 84c-14-4-20-14-18-22 10 2 16 10 18 22zM40 70c12-6 18-16 16-24-10 4-15 12-16 24z" fill="#9cc58a"/><g fill="#f5bcc8" stroke="#c9506d" stroke-width="1.5"><ellipse cx="40" cy="22" rx="9" ry="14"/><ellipse cx="40" cy="22" rx="9" ry="14" transform="rotate(72 40 34)"/><ellipse cx="40" cy="22" rx="9" ry="14" transform="rotate(144 40 34)"/><ellipse cx="40" cy="22" rx="9" ry="14" transform="rotate(216 40 34)"/><ellipse cx="40" cy="22" rx="9" ry="14" transform="rotate(288 40 34)"/></g><circle cx="40" cy="34" r="6" fill="#fbe6b8" stroke="#c9506d" stroke-width="1.5"/></svg>
+            <span class="wd-book__mark" aria-hidden="true"></span>
+          </div>
+          <div class="wd-book__page wd-book__page--r">
+            <p class="wd-book__head">Книга побажань</p>
+            <blockquote class="wd-book__text" data-wd-ink>
+              <p>«Найкращий комплімент для мене — коли через рік пара пише: “Ми досі згадуємо той торт”. Ми робимо не десерт, а частину вашої історії.</p>
+              <p>Пишіть — я з радістю послухаю вашу ♥»</p>
+            </blockquote>
+            <p class="wd-book__sign"><span class="wd-book__name">Марі</span><a href="https://www.instagram.com/mari.hockey/" target="_blank" rel="noopener">@mari.hockey</a>, засновниця Mariday</p>
+            <span class="wd-book__seal" aria-hidden="true">♥</span>
+          </div>
         </div>
       </div>
-      <div class="ed-acc" data-single data-up>
-        <details><summary><small>01</small><h3>Чи можна різні смаки в різних ярусах?</h3><i aria-hidden="true">+</i></summary><div class="ed-acc__body"><p>Так, і ми це радимо: гості з різними смаками будуть щасливі. Найчастіше обирають одну ягідну начинку, одну шоколадну й одну горіхову.</p></div></details>
-        <details><summary><small>02</small><h3>Що буде, якщо в день весілля спекотно?</h3><i aria-hidden="true">+</i></summary><div class="ed-acc__body"><p>Ми підбираємо стабільні креми для літа, привозимо торт якомога ближче до подачі й просимо локацію поставити його в тіні та подалі від вікон. Квіти додаємо в останній момент.</p></div></details>
-        <details><summary><small>03</small><h3>Чи можна торт з фальш-ярусом?</h3><i aria-hidden="true">+</i></summary><div class="ed-acc__body"><p>Так, декоративний ярус робить торт вищим без зайвих кілограмів — корисно, коли гостей небагато, а хочеться ефектний торт на фото.</p></div></details>
-        <details><summary><small>04</small><h3>Хто розрізає торт на порції?</h3><i aria-hidden="true">+</i></summary><div class="ed-acc__body"><p>Зазвичай персонал локації. Ми залишаємо схему нарізки й пояснюємо, де опори. Якщо потрібно, підкажемо, як подати торт красиво.</p></div></details>
-        <details><summary><small>05</small><h3>Чи можна зберегти верхній ярус на річницю?</h3><i aria-hidden="true">+</i></summary><div class="ed-acc__body"><p>Можна заморозити без декору до місяця, але скажемо чесно: найсмачніше — замовити свіжий мініторт на першу річницю. Ми із задоволенням його спечемо 😉</p></div></details>
+    </section>
+
+    <!-- ⑧ Questions couples ask: little notes tied with a satin bow — the bow comes undone and the note opens. -->
+    <section class="wd-sec wd-faq">
+      <span class="wd-lace wd-lace--top" aria-hidden="true"></span>
+      <div class="p-wrap">
+        <h2 class="wd-h2"><span class="wd-h2__w" data-wd-split>Питання</span><em class="wd-h2__s">пар</em></h2>
+        <div class="wd-notes" data-wd-notes>
+          <div class="wd-note" style="--r:-1deg">
+            <button type="button" aria-expanded="false"><span class="wd-note__bow" aria-hidden="true"></span><span class="wd-note__q">Чи можна різні смаки в різних ярусах?</span></button>
+            <div class="wd-note__a"><div><p>Так, і ми це радимо: гості з різними смаками будуть щасливі. Найчастіше обирають одну ягідну начинку, одну шоколадну й одну горіхову.</p></div></div>
+          </div>
+          <div class="wd-note" style="--r:1deg">
+            <button type="button" aria-expanded="false"><span class="wd-note__bow" aria-hidden="true"></span><span class="wd-note__q">Що буде, якщо в день весілля спекотно?</span></button>
+            <div class="wd-note__a"><div><p>Ми підбираємо стабільні креми для літа, привозимо торт якомога ближче до подачі й просимо локацію поставити його в тіні та подалі від вікон. Квіти додаємо в останній момент.</p></div></div>
+          </div>
+          <div class="wd-note" style="--r:-.6deg">
+            <button type="button" aria-expanded="false"><span class="wd-note__bow" aria-hidden="true"></span><span class="wd-note__q">Чи можна торт з фальш-ярусом?</span></button>
+            <div class="wd-note__a"><div><p>Так, декоративний ярус робить торт вищим без зайвих кілограмів — корисно, коли гостей небагато, а хочеться ефектний торт на фото.</p></div></div>
+          </div>
+          <div class="wd-note" style="--r:.8deg">
+            <button type="button" aria-expanded="false"><span class="wd-note__bow" aria-hidden="true"></span><span class="wd-note__q">Хто розрізає торт на порції?</span></button>
+            <div class="wd-note__a"><div><p>Зазвичай персонал локації. Ми залишаємо схему нарізки й пояснюємо, де опори. Якщо потрібно, підкажемо, як подати торт красиво.</p></div></div>
+          </div>
+          <div class="wd-note" style="--r:-1.2deg">
+            <button type="button" aria-expanded="false"><span class="wd-note__bow" aria-hidden="true"></span><span class="wd-note__q">Чи можна зберегти верхній ярус на річницю?</span></button>
+            <div class="wd-note__a"><div><p>Можна заморозити без декору до місяця, але скажемо чесно: найсмачніше — замовити свіжий мініторт на першу річницю. Ми із задоволенням його спечемо 😉</p></div></div>
+          </div>
+        </div>
+
+        <nav class="wd-album" aria-label="Інші сторінки">
+          <a href="journal-wedding.html" style="--r:-3deg"><img src="../img/cakes/vanilla.jpg" alt="" loading="lazy"><small>журнал · 8 хв</small><b>Чек-лист весільного торта</b></a>
+          <a href="reviews.html" style="--r:2deg"><img src="../img/cakes/lilac.jpg" alt="" loading="lazy"><small>що кажуть пари</small><b>Відгуки</b></a>
+          <a href="flavors.html" style="--r:-1.5deg"><img src="../img/cakes/forest.jpg" alt="" loading="lazy"><small>9 начинок</small><b>Карта смаків</b></a>
+        </nav>
       </div>
     </section>
 
-    <section class="p-wrap ed-sec">
-      <nav class="ed-cross" aria-label="Інші сторінки">
-        <a href="journal-wedding.html" data-up><img src="../img/cakes/vanilla.jpg" alt="" loading="lazy"><small>журнал · 8 хв</small><b>Чек-лист весільного торта</b><i aria-hidden="true">↗</i></a>
-        <a href="reviews.html" data-up><img src="../img/cakes/lilac.jpg" alt="" loading="lazy"><small>що кажуть пари</small><b>Відгуки</b><i aria-hidden="true">↗</i></a>
-        <a href="flavors.html" data-up><img src="../img/cakes/forest.jpg" alt="" loading="lazy"><small>9 начинок</small><b>Карта смаків</b><i aria-hidden="true">↗</i></a>
-      </nav>
-    </section>
-
-    <section class="p-cta" data-sprinkles>
+    <!-- ⑨ Save the date: pick the day on the calendar — it gets circled with a heart, and the message is ready to send. -->
+    <section class="p-cta wd-date" id="date" data-sprinkles>
       <div class="p-cta__inner">
-        <p class="p-eyebrow light" data-up>( Ваша черга )</p>
-        <h2 class="p-cta__title" data-rise>Забронюємо <em>вашу дату?</em></h2>
-        <a class="p-magnet" href="contacts.html"><span>Написати нам</span></a>
+        <h2 class="wd-h2 wd-h2--light"><span class="wd-h2__w" data-wd-split>Ваша дата</span><em class="wd-h2__s">save the date</em></h2>
+        <div class="wd-cal" data-wd-cal>
+          <div class="wd-cal__top">
+            <button type="button" data-cal="-1" aria-label="Попередній місяць">‹</button>
+            <b data-cal-month></b>
+            <button type="button" data-cal="1" aria-label="Наступний місяць">›</button>
+          </div>
+          <div class="wd-cal__dow" aria-hidden="true"><span>пн</span><span>вт</span><span>ср</span><span>чт</span><span>пт</span><span>сб</span><span>нд</span></div>
+          <div class="wd-cal__days" data-cal-days role="grid" aria-label="Дні місяця"></div>
+          <p class="wd-cal__pick" data-cal-pick aria-live="polite">Оберіть день — обведу його сердечком</p>
+        </div>
+        <a class="p-magnet" href="contacts.html" data-cal-go><span>Написати нам</span></a>
         <nav class="p-cta__links" aria-label="Швидкі посилання"><a href="desserts.html#candybar">Candy bar</a><a href="delivery.html">Доставка</a><a href="faq.html">FAQ</a></nav>
-        <p class="p-cta__hint">Клікніть будь-де — буде посипка ✦</p>
+        <p class="p-cta__hint">Клікніть будь-де — буде конфеті ✦</p>
       </div>
     </section>
   </main>
@@ -234,12 +360,11 @@
   <script src="../js/vendor/gsap.min.js"></script>
   <script src="../js/vendor/ScrollTrigger.min.js"></script>
   <script src="../js/vendor/lenis.min.js"></script>
-  <script src="../js/data.js?v=15"></script>
-  <script src="../js/content.js?v=1"></script>
+  <script src="../js/data.js?v=16"></script>
+  <script src="../js/content.js?v=3"></script>
   <script src="../js/cart.js?v=12"></script>
-  <script src="../js/layout.js?v=14"></script>
-  <script src="../js/app.js?v=14"></script>
-  <script src="../js/pages.js?v=13"></script>
-  <script src="../js/editorial.js?v=2"></script>
+  <script src="../js/layout.js?v=24"></script>
+  <script src="../js/pages.js?v=14"></script>
+  <script src="../js/weddings.js?v=1"></script>
 </body>
 </html>

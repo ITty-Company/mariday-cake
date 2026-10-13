@@ -9,136 +9,411 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236d0809'/%3E%3Cpath d='M14 44h36v6H14z' fill='%23dbefed'/%3E%3Cpath d='M20 28h24v16H20z' fill='%23f5bcc8'/%3E%3Cpath d='M25 18h14v10H25z' fill='%23dbefed'/%3E%3Ccircle cx='32' cy='13' r='5' fill='%23f5bcc8'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="../css/main.css?v=13">
-  <link rel="stylesheet" href="../css/pages.css?v=12">
+  <link rel="stylesheet" href="../css/main.css?v=23">
+  <link rel="stylesheet" href="../css/pages.css?v=13">
   <link rel="stylesheet" href="../css/editorial.css?v=1">
-  <link rel="stylesheet" href="../css/editorial-pages.css?v=1">
+  <link rel="stylesheet" href="../css/editorial-pages.css?v=2">
   <link rel="stylesheet" href="../css/glaze.css?v=1">
+  <link rel="stylesheet" href="../css/candybar.css?v=2">
 </head>
-<body data-page="journal" class="inner inner--default">
+<body data-page="journal" class="inner inner--default cb">
   <div class="grain" aria-hidden="true"></div>
   <a class="p-skip" href="#main">До вмісту</a>
   <div id="site-header"></div>
-  <main id="main">
-    <header class="ar-hero">
-      <div class="p-wrap ar-hero__in">
+  <main id="main" class="cb-main">
+
+    <!-- ═══ Свято вже накрите: довгий солодкий стіл зі справжніх десертів, кожен можна надкусити ═══ -->
+    <header class="cb-hero">
+      <div class="p-wrap cb-hero__in">
         <nav class="p-crumbs" aria-label="Хлібні крихти"><a href="../index.html">Головна</a><i>/</i><a href="journal.html">Журнал</a><i>/</i><span>Candy bar</span></nav>
-        <div class="ed-meta" data-up><b>Свята</b><span>7 хв читання</span><span>Mariday Journal · №04</span></div>
-        <h1 class="ar-title" data-rise>Candy bar: солодкий стіл, <span class="p-light">який з'їдять</span></h1>
-        <p class="ar-lead" data-up>Гарний candy bar фотографують. Ідеальний — фотографують, а потім з'їдають до останньої крихти. Ділимося тим, що навчилися, збираючи солодкі столи для днів народження, хрестин і весіль.</p>
+        <div class="ed-meta" data-up><b>Свята</b><span>7 хв читання</span><span>Mariday Journal</span></div>
+        <div class="cb-hero__top">
+          <h1 class="p-title cb-title"><span data-chars>Candy bar</span><em class="p-script">стіл, який з'їдять</em></h1>
+          <div class="cb-hero__copy">
+            <p class="ar-lead" data-up>Гарний candy bar фотографують. Ідеальний — фотографують, а потім з'їдають до останньої крихти.</p>
+          </div>
+        </div>
       </div>
-      <figure class="ed-cover" data-scale-in><img src="../img/cakes/macarons.jpg" alt="Пастельні макарони"></figure>
+
+      <div class="cb-spread" data-cb-spread>
+        <div class="cb-balloons" aria-hidden="true">
+          <i style="--c:#f5bcc8;--x:4%;--y:6%;--s:1.1;--d:-1s"></i><i style="--c:#fbe6b8;--x:9%;--y:22%;--s:.8;--d:-3s"></i><i style="--c:#fff;--x:1%;--y:34%;--s:.7;--d:-2s"></i>
+          <i style="--c:#e2849a;--x:91%;--y:2%;--s:1.15;--d:-4s"></i><i style="--c:#dbefed;--x:96%;--y:20%;--s:.85;--d:-1.5s"></i><i style="--c:#fbe6b8;--x:88%;--y:30%;--s:.7;--d:-2.5s"></i>
+        </div>
+        <p class="cb-hint" aria-live="polite"><span data-cb-say>Клацніть на десерт — і надкусіть</span><svg viewBox="0 0 80 50" aria-hidden="true"><path d="M4 6c22 0 46 6 58 30m0 0-12-4m12 4 2-12"/></svg></p>
+
+        <div class="cb-tier cb-tier--lo cb-tier--fl" style="--x:9%">
+          <div class="cb-tier__top">
+            <button class="cb-eat" type="button" aria-label="Надкусити брауні" style="--w:9.5vw"><img src="../img/cutouts/ds-brownie.webp" alt=""></button>
+          </div>
+          <i class="cb-tier__stand" aria-hidden="true"></i>
+        </div>
+        <div class="cb-tier cb-tier--mid" style="--x:27%">
+          <div class="cb-tier__top">
+            <button class="cb-eat" type="button" aria-label="Надкусити капкейк з полуницею" style="--w:7.4vw"><img src="../img/cutouts/ds-cupcake.webp" alt=""></button>
+            <button class="cb-eat" type="button" aria-label="Надкусити капкейк з кремом-райдугою" style="--w:7.4vw"><img src="../img/cutouts/candy-cup.webp" alt=""></button>
+          </div>
+          <i class="cb-tier__stand" aria-hidden="true"></i>
+        </div>
+        <div class="cb-tier cb-tier--hi" style="--x:50%">
+          <div class="cb-tier__top">
+            <button class="cb-eat cb-eat--star" type="button" aria-label="Надкусити торт" style="--w:15vw" data-cb-star><img src="../img/cutouts/candy-cake.webp" alt=""></button>
+          </div>
+          <i class="cb-tier__stand" aria-hidden="true"></i>
+        </div>
+        <div class="cb-tier cb-tier--mid" style="--x:73%">
+          <div class="cb-tier__top">
+            <button class="cb-eat" type="button" aria-label="Надкусити вишневий капкейк" style="--w:7.4vw"><img src="../img/cutouts/cherrycup.webp" alt=""></button>
+            <button class="cb-eat" type="button" aria-label="Надкусити червоний оксамит" style="--w:7.4vw"><img src="../img/cutouts/ds-redvelvet.webp" alt=""></button>
+          </div>
+          <i class="cb-tier__stand" aria-hidden="true"></i>
+        </div>
+        <div class="cb-tier cb-tier--lo cb-tier--fr" style="--x:91%">
+          <div class="cb-tier__top">
+            <button class="cb-eat" type="button" aria-label="Надкусити шоколадний капкейк" style="--w:8vw"><img src="../img/cutouts/ds-choccup.webp" alt=""></button>
+          </div>
+          <i class="cb-tier__stand" aria-hidden="true"></i>
+        </div>
+
+        <div class="cb-front">
+          <div class="cb-plate" style="--x:17%">
+            <button class="cb-eat" type="button" aria-label="Надкусити макарон" style="--w:6vw"><img src="../img/cutouts/candy-mac.webp" alt=""></button>
+            <button class="cb-eat" type="button" aria-label="Надкусити макарон" style="--w:6vw"><img src="../img/cutouts/candy-mac.webp" alt=""></button>
+            <button class="cb-eat" type="button" aria-label="Надкусити макарон" style="--w:6vw"><img src="../img/cutouts/candy-mac.webp" alt=""></button>
+          </div>
+          <div class="cb-plate cb-plate--ph" style="--x:38%">
+            <button class="cb-eat" type="button" aria-label="Надкусити печиво з посипкою" style="--w:6.4vw"><img src="../img/cutouts/ds-cookie.webp" alt=""></button>
+            <button class="cb-eat" type="button" aria-label="Надкусити пончик" style="--w:6.4vw"><img src="../img/cutouts/ds-donut3.webp" alt=""></button>
+          </div>
+          <div class="cb-plate cb-plate--ph" style="--x:62%">
+            <button class="cb-eat" type="button" aria-label="Надкусити капкейк з посипкою" style="--w:6vw"><img src="../img/cutouts/ds-mint.webp" alt=""></button>
+            <button class="cb-eat" type="button" aria-label="Надкусити ванільні капкейки" style="--w:7vw"><img src="../img/cutouts/ds-vanilla.webp" alt=""></button>
+          </div>
+          <div class="cb-plate" style="--x:83%">
+            <button class="cb-eat" type="button" aria-label="Надкусити орео-капкейк" style="--w:6.4vw"><img src="../img/cutouts/ds-blackoreo.webp" alt=""></button>
+            <button class="cb-eat" type="button" aria-label="Надкусити пончик" style="--w:6.4vw"><img src="../img/cutouts/ds-donut1.webp" alt=""></button>
+          </div>
+        </div>
+        <div class="cb-cloth" aria-hidden="true"></div>
+        <div class="cb-empty" data-cb-empty hidden>
+          <b>Порожньо — отже, ідеально ♡</b>
+          <button class="cb-btn" type="button" data-cb-refill>Накрити знову</button>
+        </div>
+      </div>
+
+      <div class="p-wrap">
+        <p class="cb-hero__note" data-up>Candy bar — це не «багато солодкого на столі». Це маленька вітрина кондитерської під ваше свято: в одній палітрі, з продуманою висотою і десертами, які зручно їсти однією рукою. Ділимося тим, що навчилися, збираючи солодкі столи для днів народження, хрестин і весіль.</p>
+      </div>
+
+      <div class="cb-tape" data-marquee="0.8" aria-hidden="true"><div class="cb-tape__track"><span>Макарони</span><i>✦</i><span>Капкейки</span><i>✦</i><span>Трайфли</span><i>✦</i><span>Брауні</span><i>✦</i><span>Тарталетки</span><i>✦</i><span>Трюфелі</span><i>✦</i><span>Печиво з посипкою</span><i>✦</i></div></div>
     </header>
 
-    <div class="p-wrap ed-article">
-      <nav class="ed-toc" data-ed-toc aria-label="Зміст статті">
-        <p>Зміст</p>
-        <a href="#c1">Скільки десертів</a>
-        <a href="#c2">Асортимент</a>
-        <a href="#c3">Палітра</a>
-        <a href="#c4">Висоти й композиція</a>
-        <a href="#c5">Місце й час</a>
-        <a href="#c6">Чек-лист</a>
-      </nav>
+    <!-- намисто з цукерок: зміст статті, що їде поруч -->
+    <nav class="cb-beads" data-ed-toc aria-label="Зміст статті">
+      <p>Зміст</p>
+      <a href="#c1" style="--c:#f5bcc8"><i></i><span>Скільки десертів</span></a>
+      <a href="#c2" style="--c:#fbe6b8"><i></i><span>Асортимент</span></a>
+      <a href="#c3" style="--c:#c8e5e2"><i></i><span>Палітра</span></a>
+      <a href="#c4" style="--c:#e2849a"><i></i><span>Висоти й композиція</span></a>
+      <a href="#c5" style="--c:#bcd6f3"><i></i><span>Місце й час</span></a>
+      <a href="#c6" style="--c:#f2d29b"><i></i><span>Чек-лист</span></a>
+    </nav>
 
-      <article class="ed-body">
-        <p class="ed-lead">Candy bar — це не «багато солодкого на столі». Це маленька вітрина кондитерської, зібрана під ваше свято: в одній палітрі, з продуманою висотою і десертами, які зручно їсти однією рукою.</p>
-
-        <h2 id="c1">Скільки десертів на гостя</h2>
-        <p>Найчастіше питання — і найчастіша помилка. Ось наші орієнтири:</p>
-        <div class="ed-tablewrap">
-          <table>
-            <thead><tr><th>Ситуація</th><th>На гостя</th><th>Коментар</th></tr></thead>
-            <tbody>
-              <tr><td>Candy bar + торт</td><td>2–3 десерти</td><td>торт — головний, бар — доповнення</td></tr>
-              <tr><td>Candy bar замість торта</td><td>4–5 десертів</td><td>додайте торт-акцент для фото</td></tr>
-              <tr><td>Дитяче свято</td><td>2–3 десерти</td><td>плюс порції для батьків</td></tr>
-              <tr><td>Вечірнє весілля</td><td>3–4 десерти</td><td>бар працює до кінця вечора</td></tr>
-              <tr><td>Офіс / презентація</td><td>2–3 десерти</td><td>лише порційні, без ложок</td></tr>
-            </tbody>
-          </table>
+    <!-- ═══ Скільки на гостя: каса друкує чек, тап по рядку — і десерти падають на тарілку одного гостя ═══ -->
+    <section class="cb-ch cb-count" aria-labelledby="c1">
+      <div class="p-wrap cb-count__grid">
+        <div class="cb-ch__head">
+          <p class="cb-kicker" data-up>Математика</p>
+          <h2 id="c1" class="p-h2 cb-h2" data-rise>Скільки десертів <span class="p-light">на гостя</span></h2>
+          <p data-up>Найчастіше питання — і найчастіша помилка. Оберіть своє свято в чеку — і подивіться, що ляже на тарілку одного гостя.</p>
+          <div class="cb-guest" data-cb-guest>
+            <span class="cb-guest__say" data-cb-guest-say>одному гостю — <b>2–3</b></span>
+            <div class="cb-guest__row" data-cb-guest-row></div>
+            <i class="cb-guest__plate" aria-hidden="true"></i>
+          </div>
+          <p class="cb-count__packs" data-up>Готові пакети <a href="desserts.html#candybar">S, M і L</a> розраховані саме за цими нормами — на 10–15, 20–30 і 40–60 гостей.</p>
         </div>
-        <p>Готові пакети <a href="desserts.html#candybar">S, M і L</a> розраховані саме за цими нормами — на 10–15, 20–30 і 40–60 гостей.</p>
 
-        <h2 id="c2">Асортимент: правило трьох текстур</h2>
-        <p>Найсмачніші бари поєднують три різні «відчуття», щоб гостям хотілося спробувати все:</p>
-        <ul>
-          <li><strong>Ніжне й кремове</strong> — капкейки, трайфли в стаканчиках, мусові десерти.</li>
-          <li><strong>Хрустке</strong> — макарони, печиво з посипкою, тарталетки.</li>
-          <li><strong>Щільне й шоколадне</strong> — брауні, трюфелі, шоколадні капкейки.</li>
-        </ul>
-        <p>4–5 видів десертів — ідеальна кількість. Менше — стіл виглядає бідно, більше — гості губляться й беруть «усього потроху», а половина лишається.</p>
-        <div class="ed-callout" style="--c:#fbe6b8"><i>✋</i><div><b>Правило однієї руки</b><p>У другій руці гостя — келих чи телефон. Тому все на барі має їстися без ножа й тарілки: один-два укуси, без крихт на сукні.</p></div></div>
-
-        <h2 id="c3">Палітра: менше кольорів — більше «вау»</h2>
-        <p>Найефектніші солодкі столи — майже монохромні: 2–3 основні кольори й один акцент. Наприклад:</p>
-        <ul>
-          <li><strong>Пудра + вишня</strong> — ніжно, по-весільному.</li>
-          <li><strong>М'ята + білий</strong> — свіжо, для хрестин і літніх свят.</li>
-          <li><strong>Шампань + золото</strong> — ювілеї й новорічні вечірки.</li>
-        </ul>
-        <p>Колір беріть з декору свята: запрошення, квіти, сукня, повітряні кульки. Надішліть нам фото — ми підберемо відтінки крему, капсул і макаронів. А пограти з палітрами можна просто зараз — у <a href="desserts.html">симуляторі на сторінці десертів</a>.</p>
-
-        <h2 id="c4">Висоти й композиція</h2>
-        <p>Плоский стіл, де все стоїть на одному рівні, виглядає як шведський стіл у готелі. Солодкий бар має «дихати» висотами:</p>
-        <ol class="ar-steps">
-          <li><strong>Центр — найвищий.</strong> Торт-акцент або вежа з макаронів на високій стійці.</li>
-          <li><strong>Середній рівень</strong> — капкейки на дво-триярусних стійках по боках.</li>
-          <li><strong>Передній план</strong> — низькі тарілки з печивом, трайфли в рядах.</li>
-          <li><strong>Фон</strong> — квіти, гірлянда, неонова вивіска чи ініціали.</li>
-        </ol>
-        <p>Розставляйте десерти групами по 3, 5 чи 7 штук — непарні числа виглядають природніше. І лишайте трохи «повітря» між групами.</p>
-
-        <h2 id="c5">Місце й час</h2>
-        <ul>
-          <li><strong>Тінь і прохолода.</strong> Жодного прямого сонця, батарей, ламп і кавомашини поруч. Крем і шоколад цього не люблять.</li>
-          <li><strong>Доступ з одного боку.</strong> Стіл під стіною або з фоном — гарніше на фото й зручніше гостям.</li>
-          <li><strong>Таблички.</strong> Підписи смаків і алергенів (горіхи!) рятують від однакових питань.</li>
-          <li><strong>Час.</strong> Виставляйте бар за 15–30 хвилин до подачі, а не на початку свята. Влітку — частинами.</li>
-          <li><strong>Коробочки «з собою».</strong> Гості з радістю заберуть залишки додому — і це найкращий комплімент.</li>
-        </ul>
-        <blockquote class="ed-pull">Найкращий candy bar — порожній о 23:00. Найгірший — повний, але «надто гарний, щоб чіпати».<cite>— з досвіду студії</cite></blockquote>
-
-        <h2 id="c6">Чек-лист candy bar</h2>
-        <p>Відмічайте пункти — сайт запам'ятає ваш прогрес у цьому браузері.</p>
-        <div class="ar-progress" data-check-bar><span>Готовність</span><i></i><b>0 / 10</b></div>
-        <ul class="ar-check" data-ed-check="candybar">
-          <li><label><input type="checkbox"><span>Порахувати гостей, включно з дітьми й командою свята</span></label></li>
-          <li><label><input type="checkbox"><span>Вирішити: бар замість торта чи разом з ним</span></label></li>
-          <li><label><input type="checkbox"><span>Обрати палітру — 2–3 кольори й один акцент</span></label></li>
-          <li><label><input type="checkbox"><span>Обрати 4–5 видів десертів трьох текстур</span></label></li>
-          <li><label><input type="checkbox"><span>Уточнити алергії гостей</span></label></li>
-          <li><label><input type="checkbox"><span>Домовитися про стіл, скатертину й стійки на локації</span></label></li>
-          <li><label><input type="checkbox"><span>Замовити таблички з назвами й вашим написом</span></label></li>
-          <li><label><input type="checkbox"><span>Забронювати дату в Mariday (за 1–3 тижні)</span></label></li>
-          <li><label><input type="checkbox"><span>Підготувати коробочки «з собою» для гостей</span></label></li>
-          <li><label><input type="checkbox"><span>Сфотографувати бар до приходу гостей 📸</span></label></li>
-        </ul>
-
-        <div class="ar-author"><img src="../img/cakes/cherries.png" alt=""><div><b>Команда Mariday</b><span>Хочете, щоб усе це зробили за вас? Candy bar під ключ — наша улюблена робота.</span></div></div>
-      </article>
-
-      <aside class="ed-aside">
-        <div class="ed-callout" style="--c:#f5bcc8"><i>🍬</i><div><b>Під ключ</b><p>Пакети S · M · L від €120.</p><p><a class="p-link" href="desserts.html#candybar">Обрати →</a></p></div></div>
-        <div class="ed-callout" style="--c:#fff"><i>🎨</i><div><b>Палітра</b><p>Спробуйте 6 палітр на нашому симуляторі столу.</p></div></div>
-      </aside>
-    </div>
-
-    <section class="p-wrap ed-sec">
-      <div class="ed-head">
-        <div>
-          <p class="ed-head__n">Читайте також</p>
-          <h2 class="p-h2" data-rise>Ще з <span class="p-light">журналу</span></h2>
+        <div class="cb-till" data-cb-till>
+          <div class="cb-till__slot">
+            <div class="cb-receipt" data-cb-paper>
+              <div class="cb-receipt__top"><b>Mariday · candy bar</b><small>чек на одного гостя</small></div>
+              <div class="cb-receipt__rows" role="group" aria-label="Оберіть свято">
+                <button type="button" class="cb-line" data-n="2" data-opt="1" aria-pressed="true"><span><b>Candy bar + торт</b><small>торт — головний, бар — доповнення</small></span><em>2–3</em></button>
+                <button type="button" class="cb-line" data-n="4" data-opt="1" aria-pressed="false"><span><b>Candy bar замість торта</b><small>додайте торт-акцент для фото</small></span><em>4–5</em></button>
+                <button type="button" class="cb-line" data-n="2" data-opt="1" data-kids aria-pressed="false"><span><b>Дитяче свято</b><small>плюс порції для батьків</small></span><em>2–3</em></button>
+                <button type="button" class="cb-line" data-n="3" data-opt="1" aria-pressed="false"><span><b>Вечірнє весілля</b><small>бар працює до кінця вечора</small></span><em>3–4</em></button>
+                <button type="button" class="cb-line" data-n="2" data-opt="1" data-office aria-pressed="false"><span><b>Офіс / презентація</b><small>лише порційні, без ложок</small></span><em>2–3</em></button>
+              </div>
+              <div class="cb-receipt__sum"><span>Пакети S · M · L</span><b>10–15 · 20–30 · 40–60 гостей</b></div>
+              <div class="cb-receipt__bar" aria-hidden="true"></div>
+              <p class="cb-receipt__thanks">дякуємо, що смакуєте ♥</p>
+            </div>
+          </div>
+          <div class="cb-till__body" aria-hidden="true">
+            <div class="cb-till__screen"><small>на гостя</small><b data-cb-disp>2–3</b></div>
+            <div class="cb-till__keys"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="cb-till__drawer"><span>Mariday</span></div>
+          </div>
         </div>
       </div>
-      <nav class="ed-cross" aria-label="Інші статті">
-        <a href="journal-bento.html" data-up><img src="../img/cakes/mint.jpg" alt="" loading="lazy"><small>4 хв</small><b>30 ідей для напису на бенто</b><i aria-hidden="true">↗</i></a>
-        <a href="journal-storage.html" data-up><img src="../img/cakes/strawslice.jpg" alt="" loading="lazy"><small>6 хв</small><b>Як зберігати й подавати торт</b><i aria-hidden="true">↗</i></a>
-        <a href="desserts.html" data-up><img src="../img/cakes/cupcakes.jpg" alt="" loading="lazy"><small>15 десертів</small><b>Меню десертів</b><i aria-hidden="true">↗</i></a>
-      </nav>
     </section>
 
-    <section class="p-cta" data-sprinkles>
+    <!-- ═══ Три текстури: під скляними клошами — крем, хрум і шоколад; лоток на п'ять видів ═══ -->
+    <section class="cb-ch cb-tex" aria-labelledby="c2">
+      <div class="p-wrap cb-tex__head">
+        <p class="cb-kicker" data-up>Асортимент</p>
+        <h2 id="c2" class="p-h2 cb-h2" data-rise>Правило трьох <span class="p-light">текстур</span></h2>
+        <p data-up>Найсмачніші бари поєднують три різні «відчуття», щоб гостям хотілося спробувати все. Підніміть клош — і скуштуйте.</p>
+      </div>
+      <div class="cb-tex__bands" data-cb-cloches>
+        <article class="cb-band cb-band--cream">
+          <div class="cb-dome">
+            <button class="cb-eat" type="button" aria-label="Скуштувати ніжне й кремове" data-say="м-м-м…"><img src="../img/cutouts/candy-cup.webp" alt=""></button>
+            <i class="cb-dome__glass" aria-hidden="true"></i>
+            <i class="cb-dome__tray" aria-hidden="true"></i>
+          </div>
+          <div class="cb-band__label">
+            <small>ложкою не треба</small>
+            <h3>Ніжне й кремове</h3>
+            <p>Капкейки, трайфли в стаканчиках, мусові десерти.</p>
+          </div>
+        </article>
+        <article class="cb-band cb-band--crunch">
+          <div class="cb-dome">
+            <button class="cb-eat" type="button" aria-label="Скуштувати хрустке" data-say="хрум!"><img src="../img/cutouts/candy-mac.webp" alt=""></button>
+            <i class="cb-dome__glass" aria-hidden="true"></i>
+            <i class="cb-dome__tray" aria-hidden="true"></i>
+          </div>
+          <div class="cb-band__label">
+            <small>хрум</small>
+            <h3>Хрустке</h3>
+            <p>Макарони, печиво з посипкою, тарталетки.</p>
+          </div>
+        </article>
+        <article class="cb-band cb-band--choc">
+          <div class="cb-dome">
+            <button class="cb-eat" type="button" aria-label="Скуштувати щільне й шоколадне" data-say="ох…"><img src="../img/cutouts/ds-brownie.webp" alt=""></button>
+            <i class="cb-dome__glass" aria-hidden="true"></i>
+            <i class="cb-dome__tray" aria-hidden="true"></i>
+          </div>
+          <div class="cb-band__label">
+            <small>для серйозних</small>
+            <h3>Щільне й шоколадне</h3>
+            <p>Брауні, трюфелі, шоколадні капкейки.</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="p-wrap cb-tex__foot">
+        <div class="cb-kinds" data-cb-kinds>
+          <p class="cb-big"><b>4–5</b> видів десертів — ідеальна кількість. Менше — стіл виглядає бідно, більше — гості губляться й беруть «усього потроху», а половина лишається.</p>
+          <div class="cb-tray">
+            <div class="cb-tray__slots" data-cb-tray></div>
+            <i class="cb-tray__board" aria-hidden="true"></i>
+          </div>
+          <div class="cb-kinds__ctl">
+            <button class="cb-round" type="button" data-cb-kind="-1" aria-label="Прибрати один вид">−</button>
+            <output data-cb-kinds-out aria-live="polite">саме те ♡</output>
+            <button class="cb-round" type="button" data-cb-kind="1" aria-label="Додати ще один вид">+</button>
+          </div>
+        </div>
+        <aside class="cb-hand" data-pop>
+          <div class="cb-hand__pic" aria-hidden="true">
+            <span class="cb-hand__glass"></span>
+            <img src="../img/cutouts/candy-mac.webp" alt="">
+          </div>
+          <b>Правило однієї руки</b>
+          <p>У другій руці гостя — келих чи телефон. Тому все на барі має їстися без ножа й тарілки: один-два укуси, без крихт на сукні.</p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ═══ Палітра: котушки стрічок і ваше фото; вежа зі справжніх макаронів перефарбовується ═══ -->
+    <section class="cb-ch cb-pal" data-pal="powder" data-cb-pal aria-labelledby="c3">
+      <div class="p-wrap cb-pal__grid">
+        <div class="cb-ch__head">
+          <p class="cb-kicker" data-up>Палітра</p>
+          <h2 id="c3" class="p-h2 cb-h2" data-rise>Менше кольорів — <span class="p-light">більше «вау»</span></h2>
+          <p data-up>Найефектніші солодкі столи — майже монохромні: 2–3 основні кольори й один акцент. Колір беріть з декору свята: запрошення, квіти, сукня, повітряні кульки.</p>
+          <div class="cb-spools" role="group" aria-label="Палітри">
+            <button class="cb-spool" type="button" data-pal-set="powder" aria-pressed="true" style="--a:#f5bcc8;--b:#fdf0f2;--c:#6d0809"><i aria-hidden="true"></i><b>Пудра + вишня</b><small>ніжно, по-весільному</small></button>
+            <button class="cb-spool" type="button" data-pal-set="mint" aria-pressed="false" style="--a:#bfe3de;--b:#ffffff;--c:#2f6f68"><i aria-hidden="true"></i><b>М'ята + білий</b><small>хрестини й літо</small></button>
+            <button class="cb-spool" type="button" data-pal-set="gold" aria-pressed="false" style="--a:#f2d29b;--b:#fbf1dc;--c:#a87b24"><i aria-hidden="true"></i><b>Шампань + золото</b><small>ювілеї й Новий рік</small></button>
+            <button class="cb-spool" type="button" data-pal-set="lilac" aria-pressed="false" style="--a:#d9c8f0;--b:#f6f0fd;--c:#5b3c8c"><i aria-hidden="true"></i><b>Лаванда + слива</b><small>вечірні свята</small></button>
+            <label class="cb-spool cb-spool--photo" data-cb-photo>
+              <input type="file" accept="image/*" data-cb-file>
+              <i aria-hidden="true"></i><b>З вашого фото</b><small>запрошення, сукня, квіти</small>
+            </label>
+          </div>
+          <p class="cb-pal__more" data-up>Палітру з фото рахує ваш браузер — сам знімок нікуди не відправляється. Сподобалось? Надішліть його нам — підберемо відтінки крему, капсул і макаронів. А зібрати набір десертів у кольорі можна в <a href="desserts.html">меню десертів</a>.</p>
+        </div>
+
+        <div class="cb-tower" aria-hidden="true" data-cb-tower>
+          <div class="cb-tower__balloons"><i></i><i></i><i></i><i></i><i></i></div>
+          <figure class="cb-tower__photo" data-cb-pic hidden><img alt=""><figcaption>ваше фото</figcaption></figure>
+          <div class="cb-tower__cone" data-cb-cone></div>
+          <i class="cb-tower__bow"></i>
+          <i class="cb-tower__stand"></i>
+          <div class="cb-tower__chips" data-cb-chips><i></i><i></i><i></i></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Висоти: прокрутка перетворює плаский «шведський стіл» на бар, що дихає висотами ═══ -->
+    <section class="cb-ch cb-stage" aria-labelledby="c4" data-cb-stage>
+      <div class="cb-stage__track">
+      <div class="cb-stage__pin">
+        <div class="cb-bunting" aria-hidden="true"></div>
+        <div class="p-wrap cb-stage__grid">
+          <div class="cb-ch__head">
+            <p class="cb-kicker" data-up>Композиція</p>
+            <h2 id="c4" class="p-h2 light cb-h2" data-rise>Висоти й <span class="p-light">композиція</span></h2>
+            <p data-up>Плоский стіл, де все стоїть на одному рівні, виглядає як шведський стіл у готелі. Прокручуйте — і він задихає висотами:</p>
+            <ol class="cb-steps">
+              <li data-step="1"><strong>Центр — найвищий.</strong> Торт-акцент або вежа з макаронів на високій стійці.</li>
+              <li data-step="2"><strong>Середній рівень</strong> — капкейки на дво-триярусних стійках по боках.</li>
+              <li data-step="3"><strong>Передній план</strong> — низькі тарілки з печивом, трайфли в рядах.</li>
+              <li data-step="4"><strong>Фон</strong> — квіти, гірлянда, неонова вивіска чи ініціали.</li>
+            </ol>
+          </div>
+          <div class="cb-build" aria-hidden="true">
+            <span class="cb-build__meh">нудно…</span>
+            <div class="cb-build__back">
+              <span class="cb-build__neon">Mariday</span>
+              <i class="cb-build__garland"></i>
+            </div>
+            <div class="cb-post cb-post--c"><div class="cb-post__top"><img data-cb-star2 src="../img/cutouts/candy-cake.webp" alt=""></div><i class="cb-post__stem"></i></div>
+            <div class="cb-post cb-post--l"><div class="cb-post__top"><img src="../img/cutouts/ds-cupcake.webp" alt=""><img src="../img/cutouts/candy-cup.webp" alt=""></div><i class="cb-post__stem"></i></div>
+            <div class="cb-post cb-post--r"><div class="cb-post__top"><img src="../img/cutouts/cherrycup.webp" alt=""><img src="../img/cutouts/ds-redvelvet.webp" alt=""></div><i class="cb-post__stem"></i></div>
+            <div class="cb-post cb-post--fl"><div class="cb-post__top"><img src="../img/cutouts/candy-mac.webp" alt=""><img src="../img/cutouts/candy-mac.webp" alt=""><img src="../img/cutouts/candy-mac.webp" alt=""></div><i class="cb-post__stem"></i></div>
+            <div class="cb-post cb-post--fr"><div class="cb-post__top"><img src="../img/cutouts/ds-cookie.webp" alt=""><img src="../img/cutouts/ds-donut3.webp" alt=""><img src="../img/cutouts/ds-cookie.webp" alt=""></div><i class="cb-post__stem"></i></div>
+            <i class="cb-build__cloth"></i>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div class="p-wrap cb-odd" data-cb-odd>
+        <div class="cb-odd__tray">
+          <div class="cb-odd__row" data-cb-odd-row></div>
+          <i class="cb-odd__board" aria-hidden="true"></i>
+        </div>
+        <div class="cb-odd__copy">
+          <p>Розставляйте десерти групами по 3, 5 чи 7 штук — непарні числа виглядають природніше. І лишайте трохи «повітря» між групами.</p>
+          <div class="cb-odd__ctl">
+            <button class="cb-round" type="button" data-cb-odd-step="-1" aria-label="Прибрати макарон">−</button>
+            <output data-cb-odd-out aria-live="polite">3 — живо ✓</output>
+            <button class="cb-round" type="button" data-cb-odd-step="1" aria-label="Додати макарон">+</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Вечір: прокрутка крутить годинник з 17:00 до 23:00, небо темнішає, стіл пустіє, вмикається неон ═══ -->
+    <section class="cb-ch cb-night" aria-labelledby="c5" data-cb-night>
+      <div class="cb-night__pin">
+        <div class="cb-sky" aria-hidden="true"><i class="cb-sky__dusk"></i><i class="cb-sky__night"></i><i class="cb-sky__stars"></i><i class="cb-sky__sun"></i><i class="cb-sky__moon"></i></div>
+        <div class="p-wrap cb-night__grid">
+          <div class="cb-ch__head">
+            <p class="cb-kicker" data-up>Логістика</p>
+            <h2 id="c5" class="p-h2 light cb-h2" data-rise>Місце <span class="p-light">й час</span></h2>
+            <div class="cb-time">
+              <svg class="cb-clock" viewBox="0 0 200 200" aria-hidden="true">
+                <circle cx="100" cy="100" r="92" class="cb-clock__face"/>
+                <g class="cb-clock__ticks"><path d="M100 14v14M100 172v14M14 100h14M172 100h14"/><path d="M143 25.5l-5 8.7M175 57l-8.7 5M175 143l-8.7-5M143 174.5l-5-8.7M57 174.5l5-8.7M25 143l8.7-5M25 57l8.7 5M57 25.5l5 8.7"/></g>
+                <line class="cb-clock__h" x1="100" y1="100" x2="100" y2="52"/>
+                <line class="cb-clock__m" x1="100" y1="100" x2="100" y2="30"/>
+                <circle cx="100" cy="100" r="5" class="cb-clock__pin"/>
+              </svg>
+              <b class="cb-time__d" data-cb-clock>17:00</b>
+            </div>
+          </div>
+          <ul class="cb-tips" data-cb-tips>
+            <li data-at="0"><time>17:00</time><i aria-hidden="true">☂</i><div><strong>Тінь і прохолода.</strong> Жодного прямого сонця, батарей, ламп і кавомашини поруч. Крем і шоколад цього не люблять.</div></li>
+            <li data-at="0.09"><time>17:30</time><i aria-hidden="true">⇥</i><div><strong>Доступ з одного боку.</strong> Стіл під стіною або з фоном — гарніше на фото й зручніше гостям.</div></li>
+            <li data-at="0.18"><time>18:00</time><i aria-hidden="true">✎</i><div><strong>Таблички.</strong> Підписи смаків і алергенів (горіхи!) рятують від однакових питань.</div></li>
+            <li data-at="0.27"><time>18:30</time><i aria-hidden="true">◷</i><div><strong>Час.</strong> Виставляйте бар за 15–30 хвилин до подачі, а не на початку свята. Влітку — частинами.</div></li>
+            <li data-at="0.8"><time>22:30</time><i aria-hidden="true">♡</i><div><strong>Коробочки «з собою».</strong> Гості з радістю заберуть залишки додому — і це найкращий комплімент.</div></li>
+          </ul>
+        </div>
+        <div class="cb-eve" aria-hidden="true">
+          <div class="cb-eve__row" data-cb-eve>
+            <img src="../img/cutouts/candy-mac.webp" alt=""><img src="../img/cutouts/ds-cupcake.webp" alt=""><img src="../img/cutouts/ds-brownie.webp" alt=""><img src="../img/cutouts/candy-cup.webp" alt=""><img src="../img/cutouts/ds-cookie.webp" alt=""><img src="../img/cutouts/cherrycup.webp" alt=""><img src="../img/cutouts/ds-choccup.webp" alt=""><img src="../img/cutouts/candy-mac.webp" alt=""><img src="../img/cutouts/ds-mint.webp" alt="">
+          </div>
+          <div class="cb-eve__boxes"><i></i><i></i><i></i><i></i><i></i></div>
+          <i class="cb-eve__cloth"></i>
+        </div>
+        <div class="p-wrap cb-neon-wrap">
+          <blockquote class="cb-neon">
+            <p><span>Найкращий candy bar — порожній о 23:00.</span> <span>Найгірший — повний, але «надто гарний, щоб чіпати».</span></p>
+            <cite>— з досвіду студії</cite>
+          </blockquote>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Чек-лист: кожна позначка ставить десерт на ярусну стійку ═══ -->
+    <section class="cb-ch cb-gingham" aria-labelledby="c6" data-sprinkles>
+      <div class="p-wrap cb-gingham__grid">
+        <div class="cb-note">
+          <p class="cb-kicker">Перед святом</p>
+          <h2 id="c6" class="p-h2 cb-h2" data-rise>Чек-лист <span class="p-light">candy bar</span></h2>
+          <p class="cb-note__sub">Кожна позначка — ще один десерт на стійці. Сайт запам'ятає прогрес у цьому браузері.</p>
+          <div class="ar-progress" data-check-bar><span>Готовність</span><i></i><b>0 / 10</b></div>
+          <ul class="ar-check" data-ed-check="candybar">
+            <li><label><input type="checkbox"><span>Порахувати гостей, включно з дітьми й командою свята</span></label></li>
+            <li><label><input type="checkbox"><span>Вирішити: бар замість торта чи разом з ним</span></label></li>
+            <li><label><input type="checkbox"><span>Обрати палітру — 2–3 кольори й один акцент</span></label></li>
+            <li><label><input type="checkbox"><span>Обрати 4–5 видів десертів трьох текстур</span></label></li>
+            <li><label><input type="checkbox"><span>Уточнити алергії гостей</span></label></li>
+            <li><label><input type="checkbox"><span>Домовитися про стіл, скатертину й стійки на локації</span></label></li>
+            <li><label><input type="checkbox"><span>Замовити таблички з назвами й вашим написом</span></label></li>
+            <li><label><input type="checkbox"><span>Забронювати дату в Mariday (за 1–3 тижні)</span></label></li>
+            <li><label><input type="checkbox"><span>Підготувати коробочки «з собою» для гостей</span></label></li>
+            <li><label><input type="checkbox"><span>Сфотографувати бар до приходу гостей 📸</span></label></li>
+          </ul>
+          <span class="cb-stamp" aria-hidden="true">Готово!<small>смачного свята</small></span>
+        </div>
+        <div class="cb-side">
+          <div class="cb-etagere" data-cb-etagere aria-hidden="true">
+            <span class="cb-etagere__say" data-cb-et-say>поки порожньо…</span>
+            <div class="cb-etagere__tier cb-etagere__tier--3"><div class="cb-etagere__row"></div><i></i></div>
+            <div class="cb-etagere__tier cb-etagere__tier--2"><div class="cb-etagere__row"></div><i></i></div>
+            <div class="cb-etagere__tier cb-etagere__tier--1"><div class="cb-etagere__row"></div><i></i></div>
+            <i class="cb-etagere__rod"></i>
+          </div>
+          <a class="cb-tag" href="desserts.html#candybar" data-pop>
+            <small>Під ключ</small>
+            <b>Пакети S · M · L</b>
+            <span>від <strong data-cb-from>€120</strong></span>
+            <em>Обрати →</em>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Ще з журналу: листівки на мотузці ═══ -->
+    <section class="cb-ch cb-more">
+      <div class="p-wrap">
+        <div class="ed-head">
+          <div>
+            <p class="ed-head__n">Читайте також</p>
+            <h2 class="p-h2" data-rise>Ще з <span class="p-light">журналу</span></h2>
+          </div>
+        </div>
+        <nav class="ed-cross cb-line-up" aria-label="Інші статті">
+          <a href="journal-bento.html" data-up><img src="../img/cakes/mint.jpg" alt="" loading="lazy"><small>4 хв</small><b>30 ідей для напису на бенто</b><i aria-hidden="true">↗</i></a>
+          <a href="journal-storage.html" data-up><img src="../img/cakes/strawslice.jpg" alt="" loading="lazy"><small>6 хв</small><b>Як зберігати й подавати торт</b><i aria-hidden="true">↗</i></a>
+          <a href="desserts.html" data-up><img src="../img/cakes/cupcakes.jpg" alt="" loading="lazy"><small>15 десертів</small><b>Меню десертів</b><i aria-hidden="true">↗</i></a>
+        </nav>
+      </div>
+    </section>
+
+    <section class="p-cta cb-cta" data-sprinkles>
+      <img class="cb-cta__f cb-cta__f--l" src="../img/cutouts/candy-mac.webp" alt="" aria-hidden="true">
+      <img class="cb-cta__f cb-cta__f--r" src="../img/cutouts/candy-cup.webp" alt="" aria-hidden="true">
+      <img class="cb-cta__f cb-cta__f--t" src="../img/cutouts/ds-cupcake.webp" alt="" aria-hidden="true">
       <div class="p-cta__inner">
         <p class="p-eyebrow light" data-up>( Готові? )</p>
         <h2 class="p-cta__title" data-rise>Зберемо <em>ваш candy bar</em></h2>
@@ -148,16 +423,18 @@
       </div>
     </section>
   </main>
+
   <div id="site-footer"></div>
   <script src="../js/vendor/gsap.min.js"></script>
   <script src="../js/vendor/ScrollTrigger.min.js"></script>
   <script src="../js/vendor/lenis.min.js"></script>
-  <script src="../js/data.js?v=15"></script>
-  <script src="../js/content.js?v=1"></script>
+  <script src="../js/data.js?v=16"></script>
+  <script src="../js/content.js?v=3"></script>
   <script src="../js/cart.js?v=12"></script>
-  <script src="../js/layout.js?v=14"></script>
-  <script src="../js/app.js?v=14"></script>
-  <script src="../js/pages.js?v=13"></script>
+  <script src="../js/layout.js?v=24"></script>
+  <script src="../js/app.js?v=18"></script>
+  <script src="../js/pages.js?v=14"></script>
   <script src="../js/editorial.js?v=2"></script>
+  <script src="../js/candybar.js?v=2"></script>
 </body>
 </html>

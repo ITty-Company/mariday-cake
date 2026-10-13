@@ -1,7 +1,8 @@
 /* Mariday — live content. The defaults live in js/data.js; whatever the admin panel (/admin) saves to Supabase
    is laid on top of them here, before any page script draws anything:
-   · collections (cakes, desserts, flavours, FAQ, contacts…) from the `content` table replace the defaults key by key;
-   · texts and photos edited right on a page (?edit=1) come from `page_edits` and are put back into the HTML.
+   · collections (cakes, desserts, flavours, reviews…) from the `content` table replace the defaults key by key;
+   · texts and photos once edited right on a page come from `page_edits` and are put back into the HTML.
+   The contacts, the FAQ and «З чого ціна» always come from data.js: the admin panel is shared by the team and they are not theirs to change.
    Page scripts start through MARIDAY.onReady(fn) instead of DOMContentLoaded, so they always see the final data. */
 (function () {
   const M = (window.MARIDAY = window.MARIDAY || {});
@@ -13,7 +14,7 @@
   // Everything the admin can edit as data. Keys missing from Supabase keep their defaults from data.js
   M.contentKeys = [
     "cakes", "desserts", "dessertCats", "flavors", "flavorMeta", "moods", "sizes", "categories",
-    "bentoDecor", "bentoBase", "priceFactors", "faq", "faqMore", "faqCats", "reviews", "reviewOccasions", "contacts",
+    "bentoDecor", "bentoBase", "reviews", "reviewOccasions",
   ];
   const clone = (v) => JSON.parse(JSON.stringify(v));
   M.defaults = {};
@@ -23,23 +24,36 @@
   const inPages = /\/(pages|admin)\//.test(location.pathname);
   M.root = inPages ? "../" : "";
   const isUrl = (s) => /^(https?:|data:|blob:|\/)/.test(String(s || ""));
-  M.img = (name) => (isUrl(name) ? name : `${M.root}img/cakes/${name}.jpg`);
+  // a photo uploaded in the admin panel is a big original (cut-outs are 1.7 MB PNGs): the site asks Supabase for a copy
+  // sized for the screen instead — a phone decoding the originals runs out of memory and stalls. The admin keeps the originals
+  const STORE = cfg.supabaseUrl ? `${cfg.supabaseUrl}/storage/v1/object/public/` : "";
+  const FIT = Math.min(screen.width, screen.height) <= 520 ? 900 : 1400;
+  const sized = (url) => (STORE && !location.pathname.includes("/admin/") && url.startsWith(STORE) && /\.(png|jpe?g|webp)$/i.test(url)
+    ? `${url.replace("/object/public/", "/render/image/public/")}?width=${FIT}&resize=contain&quality=80`
+    : url);
+  M.img = (name) => (isUrl(name) ? sized(name) : `${M.root}img/cakes/${name}.jpg`);
+  // if the resizing ever fails, the original is still there
+  if (STORE) document.addEventListener("error", (e) => {
+    const t = e.target;
+    if (t && t.tagName === "IMG" && t.src.includes("/storage/v1/render/image/public/")) t.src = t.src.replace("/render/image/public/", "/object/public/").replace(/\?.*$/, "");
+  }, true);
   // the showcase on the home page needs a cake without its background: an uploaded cut-out, or one of the originals
-  const CUTOUTS = ["berries", "drip", "forest", "gold", "lilac", "pink", "piping", "roses"];
+  const CUTOUTS = ["berries", "drip", "forest", "gold", "lilac", "pink", "piping", "roses", "fraisier", "slice", "strawslice", "tiramisu", "meringue"];
   M.cutout = (c) => (c.cutout ? M.img(c.cutout) : CUTOUTS.includes(c.img) ? `${M.root}img/cutouts/gl-${c.img}.webp` : "");
 
   // the page this is, as the key its edits are stored under: "index", "pages/product"…
   const file = location.pathname.split("/").pop().replace(/\.html$/, "") || "index";
   M.pageKey = location.pathname.includes("/admin/") ? "admin" : inPages ? `pages/${file}` : file;
 
-  // ── the admin's session (written by the admin panel); with ?edit=1 it turns the page into an editor
+  // ── the admin's session (written by the admin panel)
   M.session = (() => {
     try {
       const s = JSON.parse(localStorage.getItem("mariday-admin") || "null");
       return s && s.access_token && s.expires_at * 1000 > Date.now() ? s : null;
     } catch (e) { return null; }
   })();
-  M.editing = !!(M.session && new URLSearchParams(location.search).has("edit"));
+  // editing a page right on the site (?edit=1) is switched off: the pages are not changed from the shared admin panel
+  M.editing = false;
 
   // ── applying content
   function applyContent(rows) {

@@ -289,8 +289,8 @@ MARIDAY.contacts = {
 // Admin panel (/admin) and live content: the Supabase project that stores what you edit there.
 // Порожньо = сайт показує дані з цього файлу. Як підключити — README, розділ «Адмін-панель».
 MARIDAY.backend = {
-  supabaseUrl: "",
-  supabaseKey: "", // anon public key
+  supabaseUrl: "https://qoxxlorshotqncxqpoex.supabase.co",
+  supabaseKey: "sb_publishable_zJCYWaOcoyTgtBHkBeQZgA_9u-9Aph-", // anon public key
   bucket: "media",
 };
 
@@ -311,6 +311,9 @@ MARIDAY.reviewOccasions = [
   { id: "anniversary", label: "Річниця" },
   { id: "corporate", label: "Корпоратив" },
   { id: "desserts", label: "Candy bar" },
+  { id: "christening", label: "Хрестини" },
+  { id: "gender", label: "Гендер-паті" },
+  { id: "babyshower", label: "Бебі-шауер" },
   { id: "justbecause", label: "Просто так" },
 ];
 
@@ -472,4 +475,11 @@ MARIDAY.reviews = [
   { name: "Аліна Ш.", city: "Alkmaar", occasion: "Бенто", product: "Два бенто на гендер-паті", stars: 5, img: "pastel", text: "Дві коробочки, а всередині — рожевий крем 💗 Ефект був неймовірний, усі кричали. Дякую за ідею й таємницю!", sample: true },
   { name: "Roos P.", city: "Schagen", occasion: "Candy bar", product: "Донати й печиво", stars: 5, img: "donuts", text: "Donuts in de kleuren van ons feest — de kinderen waren dol op ze. Mooi verpakt en heel vriendelijk contact.", sample: true },
   { name: "Валерія Т.", city: "Amsterdam", occasion: "Весілля", product: "Candy bar + торт", stars: 5, img: "vanilla", text: "Замовляли повний солодкий стіл на камерне весілля. Mariday підлаштували все під наш декор, навіть таблички підписали від руки.", sample: true },
+  { name: "Оксана та Ігор", city: "Alkmaar", occasion: "Хрестини", product: "Ніжний ванільний, 2 яруси", stars: 5, img: "pastel", text: "Торт на хрестини сина — білий, з тоненьким іменем і датою. Батюшка навіть спитав, де замовляли 😊 Смак ніжний, діти доїли все до крихти.", sample: true },
+  { name: "Fleur & Joost", city: "Haarlem", occasion: "Гендер-паті", product: "Торт-сюрприз", stars: 5, img: "strawslice", text: "We cut it together and it was blue inside! Nobody knew — not even our moms. Best moment of the whole day, thank you Mariday ♥", sample: true },
+  { name: "Анастасія М.", city: "Heerhugowaard", occasion: "Бебі-шауер", product: "Бенто для гостей ×10", stars: 5, img: "mint", text: "Десять маленьких бенто з написами для кожної гості — це було так мило! Пастель, бантики, і всі забрали коробочки додому на пам'ять.", sample: true },
+  { name: "Роман К.", city: "Zaandam", occasion: "Річниця", product: "Червоний оксамит", stars: 5, img: "redvelvet", text: "Десять років разом — замовив копію нашого весільного торта в мініатюрі. Дружина розплакалась. Дякую, що відтворили до дрібниць!", sample: true },
+  { name: "Sophie van D.", city: "Bergen", occasion: "Просто так", product: "Бенто «бо можна»", stars: 5, img: "pinkmac", text: "Just because Friday cake 🍒 Small, cute and seriously delicious. My office is now jealous.", sample: true },
+  { name: "Ірина Л.", city: "Castricum", occasion: "Хрестини", product: "Candy bar S", stars: 5, img: "meringue", text: "Пудрові безе, капкейки й міні-тарти на хрестини доньки. Усе свіже, акуратне й не приторне — бабусі просили контакт кондитера.", sample: true },
+  { name: "Макс Д.", city: "Hoorn", occasion: "Просто так", product: "Тірамісу-торт", stars: 4, img: "tiramisu", text: "Взяв без приводу, просто захотілось. Крем — як у Римі, тільки трохи більше какао хотілося б. Повернусь обов'язково.", sample: true },
 ];

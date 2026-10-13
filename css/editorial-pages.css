@@ -399,6 +399,22 @@
 .rv-rate__stars label:hover { transform: scale(1.2) rotate(-8deg); }
 .rv-rate__stars input:focus-visible + label { outline: 2.5px solid var(--cherry); outline-offset: 2px; border-radius: 6px; }
 .rv-form__ok { font-size: 0.88rem; }
+.rv-form[hidden], .rv-done[hidden] { display: none; }
+.rv-form__err { margin: -0.3rem 0 0; font-size: 0.86rem; font-weight: 600; color: #c0142a; }
+.rv-form__err:empty { display: none; }
+/* after sending: thanks, and the review as it now stands on the wall */
+.rv-done { display: grid; justify-items: start; gap: 1.2rem; padding: clamp(1.6rem, 3.4vw, 2.8rem); border-radius: 36px; background: #fff; box-shadow: var(--shadow-1); }
+.rv-done__big { margin: 0; font-family: var(--font-display); font-style: italic; font-size: clamp(2.2rem, 4vw, 3.2rem); line-height: 1; color: var(--cherry); }
+.rv-done__big em { font-style: normal; color: var(--pink-deep); }
+.rv-done__text { margin: 0; max-width: 36ch; line-height: 1.6; color: var(--muted); }
+.rv-done__card { width: min(100%, 30rem); padding-top: 0.6rem; }
+.rv-done__card .ed-quote { margin: 0; rotate: -1.5deg; }
+/* a review just written (or written in this browser) wears a little tag; the new one also glows and drops in */
+.rv-grid .ed-quote, .rv-done__card .ed-quote { position: relative; }
+.ed-quote__new { position: absolute; z-index: 1; right: 18px; top: -12px; padding: 0.3em 0.8em; border-radius: 999px; background: var(--cherry); color: #fff; font: 500 1.05rem/1 var(--font-hand); rotate: 4deg; box-shadow: 0 6px 14px -6px rgba(61, 4, 5, 0.5); }
+.ed-quote.is-fresh { box-shadow: inset 0 0 0 2px var(--cherry), 0 0 0 6px rgba(245, 188, 200, 0.55); animation: rv-fresh 1.1s cubic-bezier(0.34, 1.6, 0.5, 1) both; }
+@keyframes rv-fresh { from { transform: translateY(-36px) rotate(-5deg) scale(0.9); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ed-quote.is-fresh { animation: none; } }
 @media (max-width: 960px) {
   .rv-praise { grid-template-columns: 1fr 1fr; }
   .rv-praise li { padding: 1.4rem 0 0; border-left: 0 !important; padding-left: 0 !important; }

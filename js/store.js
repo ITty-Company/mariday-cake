@@ -6,6 +6,7 @@
   const cfg = M.backend || {};
   const live = !!(cfg.supabaseUrl && cfg.supabaseKey);
   const bucket = cfg.bucket || "media";
+  const reviewsTable = (M.reviewsBackend && M.reviewsBackend.table) || "reviews";
   const SESSION = "mariday-admin";
   const DEMO = "mariday-demo";
 
@@ -56,6 +57,10 @@
     return r.status === 204 ? null : r.json().catch(() => null);
   }
 
+  const touched = (rows, what = "відгуки") => {
+    if (!Array.isArray(rows) || !rows.length) throw new Error(`Немає прав змінювати ${what} — виконайте ще раз supabase/setup.sql у SQL Editor (README).`);
+  };
+
   // ── trial mode: everything in one bundle in this browser
   const demo = () => readJSON(DEMO, { content: [], edits: {} });
   const saveDemo = (d) => {
@@ -86,8 +91,9 @@
     get email() { return session && (session.demo ? "пробний режим" : session.email); },
 
     async login(email, password) {
-      if (!live) throw new Error("Supabase ще не підключено");
-      saveSession(await auth("token?grant_type=password", { email, password }));
+      if (!live) throw new Error("Вхід ще не налаштовано — підключіть Supabase (README, розділ «Адмін-панель»).");
+      try { saveSession(await auth("token?grant_type=password", { email, password })); }
+      catch (e) { throw /invalid login credentials/i.test(e.message) ? new Error("Невірний email або пароль") : e; }
     },
     startDemo() { saveSession({ demo: true, access_token: "demo", expires_at: 4102444800, email: "" }); },
     async logout() {
@@ -152,6 +158,60 @@
         saveDemo(d);
       }
       localStorage.removeItem("mariday-content-v1");
+    },
+
+    // reviews guests wrote on the site: null when there is no Supabase to read them from
+    async guestReviews() {
+      if (!(live && !session.demo)) return null;
+      return (await api(`/rest/v1/${reviewsTable}?select=id,created_at,name,text,city,rating,occasion,approved&order=created_at.desc&limit=500`)) || [];
+    },
+    // without the admin policies the database changes nothing and says nothing — so ask for the rows back
+    async updateGuestReview(id, patch) {
+      touched(await api(`/rest/v1/${reviewsTable}?id=eq.${encodeURIComponent(id)}`, { method: "PATCH", headers: { Prefer: "return=representation" }, body: JSON.stringify(patch) }));
+    },
+    async deleteGuestReview(id) {
+      touched(await api(`/rest/v1/${reviewsTable}?id=eq.${encodeURIComponent(id)}`, { method: "DELETE", headers: { Prefer: "return=representation" } }));
+    },
+
+    // orders guests sent from the cart (with photos in the `ideas` bucket): null when there is no Supabase
+    async orders() {
+      if (!(live && !session.demo)) return null;
+      return (await api("/rest/v1/orders?select=*&order=id.desc&limit=300")) || [];
+    },
+    async newOrders() {
+      if (!(live && !session.demo)) return [];
+      return (await api("/rest/v1/orders?select=id,number,name,total&status=eq.new&order=id.desc&limit=100")) || [];
+    },
+    async updateOrder(id, patch) {
+      touched(await api(`/rest/v1/orders?id=eq.${encodeURIComponent(id)}`, { method: "PATCH", headers: { Prefer: "return=representation" }, body: JSON.stringify(patch) }), "заявки");
+    },
+    async deleteOrder(o) {
+      touched(await api(`/rest/v1/orders?id=eq.${encodeURIComponent(o.id)}`, { method: "DELETE", headers: { Prefer: "return=representation" } }), "заявки");
+      const paths = (o.photos || []).map((u) => u.split("/object/public/ideas/")[1]).filter(Boolean);
+      if (paths.length) await api("/storage/v1/object/ideas", { method: "DELETE", body: JSON.stringify({ prefixes: paths }) }).catch(() => {});
+    },
+    // Telegram: the bot token and the chat live in the database; the database itself sends each new order
+    async telegram() {
+      const rows = await api("/rest/v1/telegram?select=bot_token,chat_id&id=eq.1");
+      return (rows && rows[0]) || { bot_token: "", chat_id: "" };
+    },
+    async saveTelegram(v) {
+      await api("/rest/v1/telegram?on_conflict=id", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify([{ id: 1, ...v, updated_at: new Date().toISOString() }]) });
+    },
+    // sends a test message and waits for Telegram's answer: { ok } or { error }
+    async telegramTest() {
+      const req = await api("/rest/v1/rpc/telegram_test", { method: "POST", body: "{}" });
+      if (req == null) return { error: "Спершу збережіть токен і чат" };
+      for (let i = 0; i < 8; i++) {
+        await new Promise((r) => setTimeout(r, 900));
+        const res = await api("/rest/v1/rpc/telegram_result", { method: "POST", body: JSON.stringify({ req }) });
+        if (!res) continue;
+        let body = {};
+        try { body = JSON.parse(res.body || "{}"); } catch (e) { /* not json */ }
+        if (body.ok) return { ok: true };
+        return { error: body.description || res.error || `Telegram відповів ${res.status}` };
+      }
+      return { error: "Telegram не відповів — спробуйте ще раз за хвилину" };
     },
 
     // files: returns the URL to put in the data

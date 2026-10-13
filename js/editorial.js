@@ -514,36 +514,53 @@
     });
   }
 
-  /* ───────── Reviews wall from data ───────── */
+  /* ───────── Reviews wall ───────── */
+  // Reads the shared review store (js/reviews.js: seeds + reviews written in this browser + the server), so a review
+  // left in the form below appears here — and on the home row — at once. Falls back to MARIDAY.reviews without it.
+  const H = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  const reviewWalls = [];
+  async function reviewList() {
+    const R = window.MaridayReviews;
+    if (!R) return (M().reviews || []).map((r) => ({ ...r, photo: r.img && M().img ? M().img(r.img) : "" }));
+    return (await R.load()).map((r) => {
+      const m = R.meta(r);
+      return { id: r.id, name: r.name, city: r.city, product: r.product, stars: r.rating, occasion: m.occasion, photo: m.auto ? "" : m.photo, text: r.text, sample: r.sample, mine: m.mine };
+    });
+  }
+  const TINTS = ["#ffffff", "#f5bcc8", "#fbe6b8", "#ffffff", "#bcd6f3", "#e9c6f0"];
+  function reviewCard(r, i, fresh) {
+    const dark = i % 7 === 3;
+    const init = r.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+    const meta = [r.city, r.product].filter(Boolean).join(" · ");
+    return `<article class="ed-quote${dark ? " ed-quote--dark" : ""}${fresh ? " is-fresh" : ""}"${dark ? "" : ` style="--c:${TINTS[i % TINTS.length]}"`} data-id="${H(r.id)}" data-up>
+      ${fresh ? '<span class="ed-quote__new">новий ♥</span>' : r.mine ? '<span class="ed-quote__new">ваш ♥</span>' : ""}
+      <div class="ed-quote__stars" aria-label="Оцінка ${+r.stars} з 5">${"★".repeat(r.stars)}${"☆".repeat(5 - r.stars)}</div>
+      ${r.photo ? `<img src="${H(r.photo)}" alt="" loading="lazy">` : ""}
+      <blockquote>${H(r.text)}</blockquote>
+      <footer><span class="ed-quote__ava" aria-hidden="true">${H(init)}</span><span><b>${H(r.name)}</b>${meta ? `<small>${H(meta)}</small>` : ""}</span>${r.occasion ? `<span class="ed-quote__tag">${H(r.occasion)}</span>` : ""}</footer>
+    </article>`;
+  }
   function reviews() {
-    $$("[data-ed-reviews]").forEach((box) => {
-      const list = M().reviews || [];
+    $$("[data-ed-reviews]").forEach(async (box) => {
       const grid = $("[data-grid]", box);
       const more = $("[data-more]", box);
       const note = $("[data-sample-note]", box);
       const chips = $("[data-chips]", box);
       const size = +box.dataset.edReviews || 9;
-      const TINTS = ["#ffffff", "#f5bcc8", "#fbe6b8", "#ffffff", "#bcd6f3", "#e9c6f0"];
-      const cats = [["all", "Усі"], ...[...new Set(list.map((r) => r.occasion))].map((o) => [o, o])];
+      let list = await reviewList();
       let cat = "all";
       let shown = size;
-      if (note) note.hidden = !list.some((r) => r.sample);
-      if (chips) {
-        chips.innerHTML = cats.map(([id, label], i) => `<button type="button" class="p-sticker${i ? "" : " is-on"}" data-rcat="${esc(id)}" aria-pressed="${!i}" style="--r:${[-2, 1.5, -1, 2, -1.5][i % 5]}deg">${esc(label)}<sup>${id === "all" ? list.length : list.filter((r) => r.occasion === id).length}</sup></button>`).join("");
-      }
-      const card = (r, i) => {
-        const dark = i % 7 === 3;
-        const init = r.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
-        return `<article class="ed-quote${dark ? " ed-quote--dark" : ""}"${dark ? "" : ` style="--c:${TINTS[i % TINTS.length]}"`} data-up>
-          <div class="ed-quote__stars" aria-label="Оцінка ${r.stars} з 5">${"★".repeat(r.stars)}${"☆".repeat(5 - r.stars)}</div>
-          ${r.img ? `<img src="${M().img ? M().img(r.img) : r.img}" alt="" loading="lazy">` : ""}
-          <blockquote>${esc(r.text)}</blockquote>
-          <footer><span class="ed-quote__ava" aria-hidden="true">${esc(init)}</span><span><b>${esc(r.name)}</b><small>${esc(r.city)} · ${esc(r.product)}</small></span><span class="ed-quote__tag">${esc(r.occasion)}</span></footer>
-        </article>`;
+      let freshId = null;
+      const paintChips = () => {
+        if (!chips) return;
+        const cats = [["all", "Усі"], ...[...new Set(list.map((r) => r.occasion).filter(Boolean))].map((o) => [o, o])];
+        if (!cats.some(([id]) => id === cat)) cat = "all";
+        chips.innerHTML = cats.map(([id, label], i) => `<button type="button" class="p-sticker${id === cat ? " is-on" : ""}" data-rcat="${H(id)}" aria-pressed="${id === cat}" style="--r:${[-2, 1.5, -1, 2, -1.5][i % 5]}deg">${H(label)}<sup>${id === "all" ? list.length : list.filter((r) => r.occasion === id).length}</sup></button>`).join("");
       };
       const paint = (animate) => {
+        if (note) note.hidden = !list.some((r) => r.sample);
         const items = list.filter((r) => cat === "all" || r.occasion === cat);
-        grid.innerHTML = items.slice(0, shown).map(card).join("");
+        grid.innerHTML = items.slice(0, shown).map((r, i) => reviewCard(r, i, r.id === freshId)).join("");
         if (more) more.hidden = shown >= items.length;
         if (animate) {
           $$("[data-up]", grid).forEach((el) => el.removeAttribute("data-up"));
@@ -556,11 +573,22 @@
         if (c) {
           cat = c.dataset.rcat;
           shown = size;
-          $$("[data-rcat]", box).forEach((x) => { x.classList.toggle("is-on", x === c); x.setAttribute("aria-pressed", x === c); });
+          paintChips();
           paint(true);
         }
       });
       more?.addEventListener("click", () => { shown += size; paint(true); });
+      // a new review (from the form on this page) goes to the top of the wall, marked "new"
+      document.addEventListener("mariday:review", async (e) => {
+        list = await reviewList();
+        freshId = e.detail?.id || null;
+        cat = "all";
+        shown = Math.max(shown, size);
+        paintChips();
+        paint(true);
+      });
+      reviewWalls.push(box);
+      paintChips();
       paint(false);
     });
   }
@@ -648,29 +676,65 @@
     });
   }
 
-  /* ───────── Leave a review → WhatsApp / email ───────── */
+  /* ───────── Leave a review: published at once (wall above + home row); a photo can go by WhatsApp ───────── */
   function reviewForm() {
     $$("[data-rv-form]").forEach((box) => {
       const form = $("form", box);
+      const R = window.MaridayReviews;
       const wa = $("[data-rv-wa]", box);
-      const mail = $("[data-rv-mail]", box);
+      const err = $("[data-rv-err]", box);
+      const send = $("[data-rv-send]", box);
+      const done = $("[data-rv-done]", box);
+      const sel = form.elements.occasion;
+      // the occasions come from the store, so the form and the walls always agree
+      if (R && sel) sel.innerHTML = R.occasions().map(([id, label]) => `<option value="${H(id)}">${H(label)}</option>`).join("");
       const paint = () => {
         const f = new FormData(form);
         const stars = +f.get("stars") || 5;
-        const t = [
-          `Відгук для Mariday ${"★".repeat(stars)}${"☆".repeat(5 - stars)}`,
-          `Привід: ${f.get("occasion")}`,
-          f.get("text") ? `\n${f.get("text").trim()}` : "",
-          `\n— ${(f.get("name") || "").trim() || "гість"}${f.get("city") ? ", " + f.get("city").trim() : ""}`,
-          f.get("publish") ? "\n(можна опублікувати)" : "\n(тільки для команди)",
-        ].filter(Boolean).join("\n");
-        wa.href = `https://wa.me/${C().whatsapp}?text=${encodeURIComponent(t)}`;
-        mail.href = `mailto:${C().email}?subject=${encodeURIComponent("Відгук про Mariday")}&body=${encodeURIComponent(t)}`;
+        const occ = sel?.selectedOptions[0]?.textContent || "";
+        const t = [`Відгук для Mariday ${"★".repeat(stars)}${"☆".repeat(5 - stars)}`, occ && `Привід: ${occ}`, f.get("text") ? `\n${f.get("text").trim()}` : "", `\n— ${(f.get("name") || "").trim() || "гість"}${f.get("city") ? ", " + f.get("city").trim() : ""}`, "\n📸 фото торта додаю нижче"].filter(Boolean).join("\n");
+        if (wa) wa.href = `https://wa.me/${C().whatsapp}?text=${encodeURIComponent(t)}`;
       };
-      form.addEventListener("input", paint);
+      form.addEventListener("input", () => { paint(); if (err) err.textContent = ""; });
       form.addEventListener("change", paint);
-      form.addEventListener("submit", (e) => e.preventDefault());
       paint();
+
+      let busy = false;
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (busy || !R) return;
+        const f = new FormData(form);
+        const name = String(f.get("name") || "").trim();
+        const text = String(f.get("text") || "").trim();
+        if (text.length < 10) { err.textContent = "Напишіть хоча б кілька слів — від 10 символів."; return form.elements.text.focus(); }
+        if (name.length < 2) { err.textContent = "Як вас звати? Ім'я буде під відгуком."; return form.elements.name.focus(); }
+        busy = true;
+        send.disabled = true;
+        $("span", send).textContent = "Публікуємо…";
+        try {
+          const colors = ["pink", "butter", "sky", "mint", "cherry"];
+          const r = await R.add({ name, text, city: f.get("city"), rating: f.get("stars"), occasion: f.get("occasion"), color: colors[Math.floor(Math.random() * colors.length)] });
+          // the thank-you shows the review as it now stands on the wall
+          const m = R.meta(r);
+          $("[data-rv-preview]", done).innerHTML = reviewCard({ id: r.id, name: r.name, city: r.city, product: r.product, stars: r.rating, occasion: m.occasion, photo: m.auto ? "" : m.photo, text: r.text }, 0, true);
+          form.hidden = true;
+          done.hidden = false;
+          window.MaridayMotion?.stagger?.([...done.children]);
+          form.reset();
+          paint();
+        } catch (x) {
+          err.textContent = x.message === "wait" ? "Відгук щойно пішов — зачекайте пів хвилини перед наступним." : "Не вдалося опублікувати. Перевірте з'єднання й спробуйте ще раз.";
+        } finally {
+          busy = false;
+          send.disabled = false;
+          $("span", send).textContent = "Опублікувати відгук";
+        }
+      });
+      $("[data-rv-again]", box)?.addEventListener("click", () => {
+        done.hidden = true;
+        form.hidden = false;
+        form.elements.text.focus();
+      });
     });
   }
 

@@ -9,92 +9,166 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236d0809'/%3E%3Cpath d='M14 44h36v6H14z' fill='%23dbefed'/%3E%3Cpath d='M20 28h24v16H20z' fill='%23f5bcc8'/%3E%3Cpath d='M25 18h14v10H25z' fill='%23dbefed'/%3E%3Ccircle cx='32' cy='13' r='5' fill='%23f5bcc8'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="../css/main.css?v=10">
-  <link rel="stylesheet" href="../css/pages.css?v=13">
+  <link rel="stylesheet" href="../css/main.css?v=23">
+  <link rel="stylesheet" href="../css/pages.css?v=14">
   <link rel="stylesheet" href="../css/glaze.css?v=1">
-  <link rel="stylesheet" href="../css/showcase.css?v=1">
+  <link rel="stylesheet" href="../css/catalog.css?v=10">
+  <link rel="stylesheet" href="../css/favs.css?v=1">
 </head>
-<body data-page="cakes" class="inner inner--default">
+<body data-page="cakes" class="inner inner--default kt">
   <div class="grain" aria-hidden="true"></div>
   <a class="p-skip" href="#main">До вмісту</a>
   <div id="site-header"></div>
   <main id="main">
-    <header class="p-hero ">
-      <img class="p-hero__cherry p-hero__cherry--a" data-depth="1.4" src="../img/cakes/cherries.png" alt="">
-      <img class="p-hero__cherry p-hero__cherry--b" data-depth="0.7" src="../img/cakes/cherries.png" alt="">
-      <div class="p-hero__top">
-        <nav class="p-crumbs" aria-label="Хлібні крихти"><a href="../index.html">Головна</a><i>/</i><span>Каталог</span></nav>
-        <p class="p-eyebrow">( 15 дизайнів · від €145 )</p>
+
+    <!-- ① The shop window: a striped awning, the glazed sign and a little table under it with a few cakes —
+         no other words here. The cakes land on their stands one by one and hop when the pointer passes. -->
+    <header class="kt-hero">
+      <div class="kt-awning" aria-hidden="true"><span class="kt-awning__cloth"></span></div>
+      <img class="kt-hero__cherry kt-hero__cherry--a" data-depth="1.4" src="../img/cakes/cherries.png" alt="">
+      <img class="kt-hero__cherry kt-hero__cherry--b" data-depth="0.7" src="../img/cakes/cherries.png" alt="">
+      <img class="kt-hero__cherry kt-hero__cherry--c" data-depth="1" src="../img/cakes/cherries.png" alt="">
+
+      <div class="kt-sign">
+        <h1 class="p-title kt-title"><span class="p-title__word" data-chars>Колекція</span><em class="p-script">тортів</em></h1>
       </div>
-      <h1 class="p-title"><span class="p-title__word" data-chars>Колекція</span><em class="p-script">тортів</em></h1>
-      <div class="p-hero__bottom">
-        <p class="p-lede" data-up>Фільтруйте за приводом, зберігайте улюблені в ♥ — або зберіть власний дизайн у конструкторі.</p>
-        <div class="p-hero__actions" data-up><a class="p-btn" href="constructor.html"><span>Зі своїм дизайном</span></a><a class="p-link" href="cake-price.html">З чого складається ціна →</a></div>
+
+      <div class="kt-table" data-kt-table aria-hidden="true">
+        <div class="kt-table__spread"></div>
+        <div class="kt-table__top"></div>
+        <div class="kt-table__cloth"></div>
+        <div class="kt-table__legs"><i></i><i></i><i></i><i></i></div>
       </div>
     </header>
-    <div class="p-ribbon " data-marquee aria-hidden="true"><div class="p-ribbon__track"><span>Весільні</span><b>✦</b><span>Дитячі</span><b>✦</b><span>Для коханих</span><b>✦</b><span>Для колег</span><b>✦</b><span>Ягідні</span><b>✦</b><span>Шоколадні</span><b>✦</b><span>Весільні</span><b>✦</b><span>Дитячі</span><b>✦</b><span>Для коханих</span><b>✦</b><span>Для колег</span><b>✦</b><span>Ягідні</span><b>✦</b><span>Шоколадні</span><b>✦</b></div></div>
-    <section class="p-wrap cat">
-      <div class="cat-bar">
-        <div class="cat-stickers" id="catalog-tabs" role="group" aria-label="Привід"></div>
-        <div class="cat-tools">
-          <span class="cat-count" id="catalog-count" aria-live="polite"></span>
-          <div class="cat-sort" id="catalog-sort" role="group" aria-label="Сортування"></div>
-          <button type="button" class="cat-fav" id="catalog-favs" aria-pressed="false">♥ Обране <b>0</b></button>
+
+    <!-- ② two ribbons crossed like a bow on a cake box -->
+    <div class="kt-ribbons" aria-hidden="true">
+      <div class="p-ribbon p-ribbon--pink kt-ribbon kt-ribbon--b" data-marquee="0.8" data-reverse><div class="p-ribbon__track"><span>Бісквіт печемо щоранку</span><b>♥</b><span>Живі ягоди</span><b>♥</b><span>Ручний декор</span><b>♥</b><span>Alkmaar · NL</span><b>♥</b><span>Бісквіт печемо щоранку</span><b>♥</b><span>Живі ягоди</span><b>♥</b><span>Ручний декор</span><b>♥</b><span>Alkmaar · NL</span><b>♥</b></div></div>
+      <div class="p-ribbon kt-ribbon kt-ribbon--a" data-marquee><div class="p-ribbon__track"><span>Весільні</span><b>✦</b><span>Дитячі</span><b>✦</b><span>Для коханих</span><b>✦</b><span>Для колег</span><b>✦</b><span>Ягідні</span><b>✦</b><span>Шоколадні</span><b>✦</b><span>Весільні</span><b>✦</b><span>Дитячі</span><b>✦</b><span>Для коханих</span><b>✦</b><span>Для колег</span><b>✦</b><span>Ягідні</span><b>✦</b><span>Шоколадні</span><b>✦</b></div></div>
+    </div>
+
+    <!-- ③ the shop itself: who is the cake for? Pick a reason and the shelves rearrange — cakes hop to their new places -->
+    <section class="kt-shop" id="vitryna" aria-labelledby="kt-shop-title">
+      <header class="kt-shop__head">
+        <h2 class="kt-h2" id="kt-shop-title" aria-label="Кому торт?"><span class="kt-h2__w" data-kt-split aria-hidden="true">Кому</span><span class="kt-h2__s" aria-hidden="true">торт?</span></h2>
+        <p class="kt-hand kt-shop__hint" data-up>оберіть привід — вітрина перебудується ↓</p>
+      </header>
+      <div class="kt-who" id="kt-who" role="group" aria-label="Привід"></div>
+
+      <div class="kt-shop__in">
+        <div class="kt-bar" id="kt-bar">
+          <p class="kt-bar__now" aria-live="polite"><b data-kt-now>Усі торти</b><span data-kt-n>15 тортів</span></p>
+          <div class="kt-bar__pills" id="kt-pills" role="group" aria-label="Привід, коротко"></div>
+          <div class="kt-bar__tools">
+            <div class="cat-sort" id="kt-sort" role="group" aria-label="Сортування"></div>
+            <button type="button" class="cat-fav" id="kt-favs" aria-pressed="false">♥ Обране <b>0</b></button>
+          </div>
         </div>
+        <div class="kt-grid" id="kt-grid"></div>
       </div>
-      <div class="p-grid" id="catalog-grid"></div>
     </section>
-    <section class="p-cta lab" data-sprinkles data-cake-lab>
-      <div class="lab__pols" aria-hidden="true">
-        <figure class="lab__pol" style="--x:-2.5%;--y:4%;--r:-14deg" data-depth="1.3"><img src="../img/cakes/drip.jpg" alt="" loading="lazy"><figcaption>не той</figcaption></figure>
-        <figure class="lab__pol" style="--x:-2.5%;--y:76%;--r:9deg" data-depth="0.8"><img src="../img/cakes/lilac.jpg" alt="" loading="lazy"><figcaption>майже…</figcaption></figure>
-        <figure class="lab__pol" style="--x:89%;--y:5%;--r:12deg" data-depth="1.1"><img src="../img/cakes/gold.jpg" alt="" loading="lazy"><figcaption>не той</figcaption></figure>
-        <figure class="lab__pol" style="--x:93%;--y:76%;--r:-8deg" data-depth="0.6"><img src="../img/cakes/redvelvet.jpg" alt="" loading="lazy"><figcaption>теж ні</figcaption></figure>
-      </div>
 
-      <div class="p-cta__inner lab__grid">
-        <div class="lab__copy">
-          <p class="p-eyebrow light" data-up>( Ваша черга · рецепт № ∞ )</p>
-          <h2 class="p-cta__title lab__title">
-            <span class="lab__line" data-rise>Не знайшли</span>
-            <em class="lab__script">свій торт<span class="lab__q">?</span></em>
-            <svg class="lab__swash" viewBox="0 0 420 40" preserveAspectRatio="none" aria-hidden="true"><path d="M6 28 C 90 6, 170 38, 250 18 S 380 10, 414 24"/></svg>
-          </h2>
-          <p class="lab__lede" data-up>Значить, його ще не існує. Тицьніть на порожню тарілку — і складіть свій, шар за шаром. Потім спечемо по-справжньому.</p>
-          <nav class="p-cta__links lab__links" aria-label="Швидкі посилання" data-up>
-            <a href="bento.html"><i>◐</i>Бенто</a><a href="flavors.html"><i>✿</i>Смаки</a><a href="contacts.html"><i>✉</i>Написати нам</a>
-          </nav>
+    <!-- ④ can't choose? lift the glass dome — a cake from the window is waiting under it -->
+    <section class="kt-luck" id="surpryz" aria-labelledby="kt-luck-title" data-sprinkles>
+      <div class="kt-luck__in">
+        <div class="kt-luck__copy">
+          <p class="p-eyebrow" data-up>( Торт-сюрприз )</p>
+          <h2 class="kt-h2 kt-h2--sm" id="kt-luck-title" aria-label="Не можете обрати?"><span class="kt-h2__w" data-kt-split aria-hidden="true">Не можете</span><span class="kt-h2__s" aria-hidden="true">обрати?</span></h2>
+          <p class="kt-luck__lede" data-up>Підніміть ковпак — під ним уже стоїть торт із нашої вітрини. Не той? Накрийте й спробуйте ще раз.</p>
+          <button type="button" class="p-btn kt-luck__go" data-kt-lift><span>Підняти ковпак</span></button>
+          <!-- a lucky ticket: the stub counts the tries, the name rolls like a slot reel before it stops -->
+          <div class="kt-luck__card" aria-live="polite">
+            <div class="kt-ticket" data-kt-ticket>
+              <div class="kt-ticket__body">
+                <p class="kt-ticket__top" aria-hidden="true">Щасливий квиток · Mariday</p>
+                <p class="kt-luck__wait" data-kt-luck-wait>Під ковпаком — один із <b data-kt-count>15 тортів</b>. Котрий — дізнаєтесь, коли піднімете.</p>
+                <div class="kt-luck__got" hidden>
+                  <p class="kt-hand">сьогодні вам випав…</p>
+                  <h3 data-kt-luck-name>Торт</h3>
+                  <p class="kt-luck__desc" data-kt-luck-desc></p>
+                  <div class="kt-luck__row"><b data-kt-luck-price>від €145</b><a class="p-btn" data-kt-luck-link href="product.html"><span>Хочу цей →</span></a></div>
+                </div>
+              </div>
+              <div class="kt-ticket__stub" aria-hidden="true"><small>спроба</small><b data-kt-try>00</b><small>♥</small></div>
+            </div>
+          </div>
         </div>
 
-        <div class="lab__stage">
-          <span class="lab__bigq" aria-hidden="true">?</span>
-          <p class="lab__note" aria-hidden="true">тиць сюди ↓</p>
-          <button class="lab__cake" type="button" aria-label="Додати шар до торта">
-            <span class="lab__ghost" aria-hidden="true"></span>
-            <span class="lab__stack" aria-hidden="true"></span>
-            <span class="lab__plate" aria-hidden="true"></span>
+        <div class="kt-luck__stage">
+          <button type="button" class="kt-luck__lift" data-kt-lift aria-label="Підняти ковпак">
+            <span class="kt-luck__rays" aria-hidden="true"></span>
+            <span class="kt-luck__glow" aria-hidden="true"></span>
+            <span class="kt-luck__stand" aria-hidden="true"><i></i></span>
+            <span class="kt-luck__cake" aria-hidden="true"><img src="../img/cutouts/gl-lilac.webp" alt="" draggable="false"></span>
+            <span class="kt-luck__q" aria-hidden="true">?</span>
+            <svg class="kt-luck__dome" viewBox="0 0 400 380" aria-hidden="true">
+              <defs>
+                <linearGradient id="kt-glass" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0.55"/><stop offset="0.22" stop-color="#fff" stop-opacity="0.12"/><stop offset="0.7" stop-color="#fff" stop-opacity="0.08"/><stop offset="1" stop-color="#fff" stop-opacity="0.45"/></linearGradient>
+                <radialGradient id="kt-knob" cx="0.35" cy="0.3" r="0.75"><stop offset="0" stop-color="#ff8fa3"/><stop offset="0.35" stop-color="#c0142a"/><stop offset="1" stop-color="#5a0206"/></radialGradient>
+              </defs>
+              <path class="kt-luck__glass" d="M24,352 C24,150 108,58 200,58 C292,58 376,150 376,352 Z" fill="url(#kt-glass)"/>
+              <path d="M24,352 C24,150 108,58 200,58 C292,58 376,150 376,352" fill="none" stroke="#fff" stroke-opacity="0.9" stroke-width="3"/>
+              <path d="M70,300 C62,200 104,124 160,96" fill="none" stroke="#fff" stroke-opacity="0.85" stroke-width="12" stroke-linecap="round"/>
+              <path d="M74,334 L72,318" fill="none" stroke="#fff" stroke-opacity="0.7" stroke-width="10" stroke-linecap="round"/>
+              <path d="M330,250 C334,214 326,180 310,152" fill="none" stroke="#fff" stroke-opacity="0.5" stroke-width="6" stroke-linecap="round"/>
+              <ellipse cx="200" cy="352" rx="178" ry="14" fill="none" stroke="#fff" stroke-opacity="0.9" stroke-width="4"/>
+              <path d="M200,58 C200,40 206,26 222,14" fill="none" stroke="#5c7a2a" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="200" cy="44" r="22" fill="url(#kt-knob)"/>
+              <ellipse cx="192" cy="36" rx="7" ry="5" fill="#fff" fill-opacity="0.7"/>
+            </svg>
           </button>
-          <ul class="lab__tags" aria-hidden="true"></ul>
-          <p class="lab__count" aria-live="polite"><span class="lab__msg">Шар 0 з 6</span><span class="lab__bar"><i></i></span></p>
-          <a class="p-magnet lab__magnet" href="constructor.html">
-            <svg class="lab__ring" viewBox="0 0 200 200" aria-hidden="true"><defs><path id="lab-ring" d="M100,100 m-82,0 a82,82 0 1,1 164,0 a82,82 0 1,1 -164,0"/></defs><text><textPath href="#lab-ring">зібрати свій ✦ зібрати свій ✦ зібрати свій ✦ </textPath></text></svg>
-            <span>Зібрати свій</span>
-          </a>
+          <p class="kt-luck__note kt-hand" aria-hidden="true">тиць — і ковпак угору ↑</p>
+          <svg class="kt-luck__seal" viewBox="0 0 120 120" aria-hidden="true">
+            <defs><path id="kt-seal-ring" d="M60,60 m-43,0 a43,43 0 1,1 86,0 a43,43 0 1,1 -86,0"/></defs>
+            <circle cx="60" cy="60" r="58"/>
+            <circle class="kt-luck__seal-dash" cx="60" cy="60" r="53"/>
+            <text><textPath href="#kt-seal-ring" textLength="268" lengthAdjust="spacing">торт-сюрприз ✦ на удачу ✦</textPath></text>
+            <text class="kt-luck__seal-mid" x="60" y="72">♥</text>
+          </svg>
         </div>
       </div>
-
-      <p class="p-cta__hint lab__hint">Клікніть будь-де — буде посипка ✦</p>
     </section>
+
+    <!-- ⑤ the cherry glaze runs off the bottom of the page and drips onto the footer -->
+    <div class="kt-pour" data-kt-pour aria-hidden="true">
+        <svg viewBox="0 0 1440 250" preserveAspectRatio="xMidYMin slice">
+          <defs>
+            <linearGradient id="kt-pour-g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="250"><stop offset="0" stop-color="#b01a20"/><stop offset="0.14" stop-color="#8e1014"/><stop offset="0.38" stop-color="#6d0809"/><stop offset="0.7" stop-color="#7a0a0c"/><stop offset="1" stop-color="#4a0305"/></linearGradient>
+          </defs>
+          <g fill="url(#kt-pour-g)">
+          <g class="kt-pour__drip" style="--d:0.35s"><path d="M40,94 C53,94 55,98 55,111 L57.1,125.8 A16.2,16.2 0 1 0 82.9,125.8 L85,111 C85,98 87,94 100,94 Z"/><path class="kt-pour__gloss" d="M63.3,106 L63.3,127.4"/></g>
+          <g class="kt-pour__drip" style="--d:0.05s"><path d="M140,94 C156,94 158,98 158,114 L161.1,176.2 A23.8,23.8 0 1 0 198.9,176.2 L202,114 C202,98 204,94 220,94 Z"/><path class="kt-pour__gloss" d="M170.1,106 L170.1,178.6"/></g>
+          <g class="kt-pour__drip" style="--d:0.5s"><path d="M266,94 C277,94 279,98 279,109 L280.8,120 A14,14 0 1 0 303.2,120 L305,109 C305,98 307,94 318,94 Z"/><path class="kt-pour__gloss" d="M286.1,106 L286.1,121.4"/></g>
+          <g class="kt-pour__drip" style="--d:0.2s"><path d="M359,94 C375,94 377,98 377,114 L379.5,154.6 A19.4,19.4 0 1 0 410.5,154.6 L413,114 C413,98 415,94 431,94 Z"/><path class="kt-pour__gloss" d="M386.9,106 L386.9,156.5"/></g>
+          <g class="kt-pour__drip" style="--d:0s"><path d="M477,94 C493,94 495,98 495,114 L498.5,193 A27,27 0 1 0 541.5,193 L545,114 C545,98 547,94 563,94 Z"/><path class="kt-pour__gloss" d="M508.8,106 L508.8,195.7"/></g>
+          <g class="kt-pour__drip" style="--d:0.45s"><path d="M612,94 C624,94 626,98 626,110 L628,132.9 A15.1,15.1 0 1 0 652,132.9 L654,110 C654,98 656,94 668,94 Z"/><path class="kt-pour__gloss" d="M633.7,106 L633.7,134.4"/></g>
+          <g class="kt-pour__drip" style="--d:0.15s"><path d="M707,94 C723,94 725,98 725,114 L727.8,170.4 A21.6,21.6 0 1 0 762.2,170.4 L765,114 C765,98 767,94 783,94 Z"/><path class="kt-pour__gloss" d="M736,106 L736,172.6"/></g>
+          <g class="kt-pour__drip" style="--d:0.6s"><path d="M838,94 C851,94 853,98 853,111 L855.1,119.8 A16.2,16.2 0 1 0 880.9,119.8 L883,111 C883,98 885,94 898,94 Z"/><path class="kt-pour__gloss" d="M861.3,106 L861.3,121.4"/></g>
+          <g class="kt-pour__drip" style="--d:0.1s"><path d="M934,94 C950,94 952,98 952,114 L955.2,187.2 A24.8,24.8 0 1 0 994.8,187.2 L998,114 C998,98 1000,94 1016,94 Z"/><path class="kt-pour__gloss" d="M964.6,106 L964.6,189.6"/></g>
+          <g class="kt-pour__drip" style="--d:0.4s"><path d="M1072,94 C1084,94 1086,98 1086,110 L1088,140.9 A15.1,15.1 0 1 0 1112,140.9 L1114,110 C1114,98 1116,94 1128,94 Z"/><path class="kt-pour__gloss" d="M1093.7,106 L1093.7,142.4"/></g>
+          <g class="kt-pour__drip" style="--d:0.25s"><path d="M1173,94 C1189,94 1191,98 1191,114 L1193.7,167.5 A20.5,20.5 0 1 0 1226.3,167.5 L1229,114 C1229,98 1231,94 1247,94 Z"/><path class="kt-pour__gloss" d="M1201.5,106 L1201.5,169.5"/></g>
+          <g class="kt-pour__drip" style="--d:0.55s"><path d="M1300,94 C1313,94 1315,98 1315,111 L1317.1,127.8 A16.2,16.2 0 1 0 1342.9,127.8 L1345,111 C1345,98 1347,94 1360,94 Z"/><path class="kt-pour__gloss" d="M1323.3,106 L1323.3,129.4"/></g>
+          <g class="kt-pour__drip" style="--d:0.3s"><path d="M1381,94 C1396,94 1398,98 1398,113 L1400.4,147.6 A18.4,18.4 0 1 0 1429.6,147.6 L1432,113 C1432,98 1434,94 1449,94 Z"/><path class="kt-pour__gloss" d="M1407.3,106 L1407.3,149.5"/></g>
+            <path d="M0,19 Q45,34 90,19 Q135,4 180,19 Q225,34 270,19 Q315,4 360,19 Q405,34 450,19 Q495,4 540,19 Q585,34 630,19 Q675,4 720,19 Q765,34 810,19 Q855,4 900,19 Q945,34 990,19 Q1035,4 1080,19 Q1125,34 1170,19 Q1215,4 1260,19 Q1305,34 1350,19 Q1395,4 1440,19 V96 Q1410,101 1380,96 Q1350,91 1320,96 Q1290,101 1260,96 Q1230,91 1200,96 Q1170,101 1140,96 Q1110,91 1080,96 Q1050,101 1020,96 Q990,91 960,96 Q930,101 900,96 Q870,91 840,96 Q810,101 780,96 Q750,91 720,96 Q690,101 660,96 Q630,91 600,96 Q570,101 540,96 Q510,91 480,96 Q450,101 420,96 Q390,91 360,96 Q330,101 300,96 Q270,91 240,96 Q210,101 180,96 Q150,91 120,96 Q90,101 60,96 Q30,91 0,96 Z"/>
+          </g>
+          <path class="kt-pour__shine" d="M0,26 Q45,41 90,26 Q135,11 180,26 Q225,41 270,26 Q315,11 360,26 Q405,41 450,26 Q495,11 540,26 Q585,41 630,26 Q675,11 720,26 Q765,41 810,26 Q855,11 900,26 Q945,41 990,26 Q1035,11 1080,26 Q1125,41 1170,26 Q1215,11 1260,26 Q1305,41 1350,26 Q1395,11 1440,26"/>
+          <g class="kt-pour__sprinkles"><rect x="30" y="63.6" width="13" height="4" rx="2" fill="#fff8f0" transform="rotate(101 36.5 65.6)"/><rect x="79.5" y="53.8" width="13" height="4" rx="2" fill="#f5bcc8" transform="rotate(80 86 55.8)"/><rect x="140.7" y="47.1" width="13" height="4" rx="2" fill="#dbefed" transform="rotate(158 147.2 49.1)"/><rect x="204.3" y="60.4" width="13" height="4" rx="2" fill="#f2c46d" transform="rotate(51 210.8 62.4)"/><rect x="273.8" y="70.3" width="13" height="4" rx="2" fill="#fff8f0" transform="rotate(14 280.3 72.3)"/><rect x="334.7" y="53.4" width="13" height="4" rx="2" fill="#f5bcc8" transform="rotate(121 341.2 55.4)"/><rect x="385.5" y="66.4" width="13" height="4" rx="2" fill="#dbefed" transform="rotate(88 392 68.4)"/><rect x="436.8" y="46" width="13" height="4" rx="2" fill="#f2c46d" transform="rotate(169 443.3 48)"/><rect x="511.9" y="48.8" width="13" height="4" rx="2" fill="#fff8f0" transform="rotate(80 518.4 50.8)"/><rect x="586.5" y="51.6" width="13" height="4" rx="2" fill="#f5bcc8" transform="rotate(75 593 53.6)"/><rect x="649" y="70.9" width="13" height="4" rx="2" fill="#dbefed" transform="rotate(51 655.5 72.9)"/><rect x="700.1" y="83.4" width="13" height="4" rx="2" fill="#f2c46d" transform="rotate(80 706.6 85.4)"/><rect x="753.1" y="65.9" width="13" height="4" rx="2" fill="#fff8f0" transform="rotate(59 759.6 67.9)"/><rect x="803.7" y="74.9" width="13" height="4" rx="2" fill="#f5bcc8" transform="rotate(63 810.2 76.9)"/><rect x="860.2" y="47.2" width="13" height="4" rx="2" fill="#dbefed" transform="rotate(167 866.7 49.2)"/><rect x="913.4" y="79.4" width="13" height="4" rx="2" fill="#f2c46d" transform="rotate(85 919.9 81.4)"/><rect x="966.5" y="68.1" width="13" height="4" rx="2" fill="#fff8f0" transform="rotate(72 973 70.1)"/><rect x="1035.2" y="70.1" width="13" height="4" rx="2" fill="#f5bcc8" transform="rotate(24 1041.7 72.1)"/><rect x="1088" y="62" width="13" height="4" rx="2" fill="#dbefed" transform="rotate(16 1094.5 64)"/><rect x="1135.4" y="60.5" width="13" height="4" rx="2" fill="#f2c46d" transform="rotate(123 1141.9 62.5)"/><rect x="1200.8" y="82.2" width="13" height="4" rx="2" fill="#fff8f0" transform="rotate(58 1207.3 84.2)"/><rect x="1259.9" y="63.8" width="13" height="4" rx="2" fill="#f5bcc8" transform="rotate(79 1266.4 65.8)"/><rect x="1331.1" y="62" width="13" height="4" rx="2" fill="#dbefed" transform="rotate(79 1337.6 64)"/><rect x="1385" y="53.5" width="13" height="4" rx="2" fill="#f2c46d" transform="rotate(134 1391.5 55.5)"/><rect x="1435" y="54.8" width="13" height="4" rx="2" fill="#fff8f0" transform="rotate(138 1441.5 56.8)"/></g>
+          <circle class="kt-pour__drop" cx="520" cy="236" r="7"/>
+          <circle class="kt-pour__drop kt-pour__drop--b" cx="975" cy="228" r="6"/>
+          <circle class="kt-pour__drop kt-pour__drop--c" cx="180" cy="216" r="5.5"/>
+        </svg>
+    </div>
   </main>
   <div id="site-footer"></div>
   <script src="../js/vendor/gsap.min.js"></script>
   <script src="../js/vendor/ScrollTrigger.min.js"></script>
   <script src="../js/vendor/lenis.min.js"></script>
-  <script src="../js/data.js?v=12"></script>
-  <script src="../js/content.js?v=1"></script>
+  <script src="../js/data.js?v=16"></script>
+  <script src="../js/content.js?v=3"></script>
   <script src="../js/cart.js?v=10"></script>
-  <script src="../js/layout.js?v=12"></script>
-  <script src="../js/app.js?v=14"></script>
-  <script src="../js/pages.js?v=12"></script>
+  <script src="../js/layout.js?v=24"></script>
+  <script src="../js/favs.js?v=1"></script>
+  <script src="../js/pages.js?v=13"></script>
+  <script src="../js/catalog.js?v=10"></script>
 </body>
 </html>

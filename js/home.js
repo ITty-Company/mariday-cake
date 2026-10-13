@@ -74,15 +74,41 @@
   const cutout = (c) => MARIDAY.cutout(c) || MARIDAY.img(c.img);
   const framed = (c) => (MARIDAY.cutout(c) ? "" : " is-photo");
 
-  function exSprinkles(i) {
-    return Array.from({ length: 9 }, (_, k) => `<i style="--c:${SPRINKLE[(k + i) % SPRINKLE.length]};--x:${(k * 37 + i * 13) % 100}%;--y:${(k * 53 + i * 7) % 70}%;--r:${(k * 67 + i * 20) % 180}deg;--z:${(k % 3) + 1}"></i>`).join("");
+  // Every cake brings its own moment under the lamp: the line its author opened the description with (emoji and all)
+  // on the tag hanging from the lamp, and its own weather pouring through the beam — read from that line's emoji, then its tags
+  const FX_EMOJI = [
+    [/💙/u, "heart", "#3f7fe0"], [/💜/u, "heart", "#8a45c4"], [/❤|♥/u, "heart", "#d21f3c"], [/🩷/u, "heart", "#ef7fa8"],
+    [/🩵/u, "heart", "#7cc4ef"], [/🤍/u, "heart", "#ffffff"], [/🤎/u, "heart", "#8a5634"], [/🧡/u, "heart", "#f08a2a"],
+    [/💛/u, "heart", "#f2c230"], [/💚/u, "heart", "#4f9a4a"], [/🖤/u, "heart", "#2a1a1a"],
+    [/❄|☃|⛄/u, "snow"], [/🍂|🍁|🎃/u, "leaf"], [/🌸|🌷|🌺|🌹|🥀|💐/u, "petal"], [/🦢|🪶/u, "feather"], [/🍓/u, "berry"], [/🍒/u, "cherry"],
+    [/🐶|🐕|🐩|🐾/u, "paw"], [/🏁|🏎/u, "flag"], [/🎀/u, "bow"], [/☁/u, "cloud"], [/⭐|🌟|✨|🪄|🧸|🏛|👑/u, "star"],
+  ];
+  const FX_TAGS = [
+    [/зимов|різдв|новоріч|сніж/i, "snow"], [/осін|гарбуз|halloween/i, "leaf"], [/квітк|троянд|орхіде|піон/i, "petal"],
+    [/серц|романт|кохан/i, "heart"], [/вишн/i, "cherry"], [/полун/i, "berry"], [/пес|собак|шпіц|цуцен/i, "paw"],
+    [/гонк|гоноч|^f1$|формул/i, "flag"], [/бант/i, "bow"], [/хмар/i, "cloud"], [/зір|казк|фе[їя]|принцес/i, "star"], [/дитяч|рочок|^1 рік/i, "confetti"],
+  ];
+  const YOURS_MOOD = { line: "Цей торт ще не спечений — придумаймо його разом ✍️", fx: [{ k: "confetti" }, { k: "star" }] };
+  let MOODS = [];
+  function cakeMood(c) {
+    const paras = String(c.desc || "").split(/\n+/).map((p) => p.trim()).filter(Boolean);
+    const para = paras.find((p) => (p.match(/\p{L}/gu) || []).length >= 12) || c.name;
+    const first = para.length > 90 && para.match(/^.+?[.!?…](?=\s|$)/u);
+    const line = first ? first[0] : para;
+    const found = FX_EMOJI.map(([re, k, col]) => ({ k, col, at: para.search(re) })).filter((f) => f.at > -1).sort((a, b) => a.at - b.at);
+    const fx = [];
+    found.forEach((f) => { if (fx.length < 3 && !fx.some((g) => g.k === f.k)) fx.push(f); });
+    // the tags only fill in when the line's own emoji leave the weather thin
+    (c.tags || []).forEach((t) => FX_TAGS.forEach(([re, k]) => { if (re.test(t) && fx.length < 2 && !fx.some((g) => g.k === k)) fx.push({ k }); }));
+    if (!fx.length) fx.push({ k: "heart" });
+    if (fx.length < 2) fx.push({ k: fx[0].k === "star" ? "confetti" : "star" });
+    return { line, fx };
   }
 
   function exhibitHTML(c, i, esc) {
     const name = esc(c.name);
-    return `<span class="ex__sprinkles" aria-hidden="true">${exSprinkles(i)}</span>
-      <span class="ex__stage"><span class="ex__lift"><img class="ex__cake${framed(c)}" src="${cutout(c)}" alt="${name}" loading="lazy" draggable="false"></span></span>
-      <span class="ex__plinth"><span class="ex__plate"><span class="ex__no">${pad(i + 1)}</span><span class="ex__orn" aria-hidden="true">✦</span><b>${name}</b></span></span>`;
+    return `<span class="ex__stage"><i class="ex__ring" aria-hidden="true"></i><span class="ex__lift"><img class="ex__cake${framed(c)}" src="${cutout(c)}" alt="${name}" loading="lazy" draggable="false"></span></span>
+      <span class="ex__plinth"><span class="ex__plate"><span class="ex__orn" aria-hidden="true">✦</span><b>${name}</b></span></span>`;
   }
 
   function renderCards() {
@@ -90,14 +116,13 @@
     if (!host || !window.MARIDAY) return;
     const esc = window.escapeHTML || ((v) => String(v));
     const shown = MARIDAY.cakes.slice(0, 8);
+    MOODS = shown.map(cakeMood);
     host.innerHTML = shown.map((c, i) => {
       const [bg, ac] = c.bg ? [c.bg, c.accent || "#c9506d"] : CAKE_TONE[c.id] || ["#f6dbe0", "#c9506d"];
       return `<a class="ex" href="pages/product.html?id=${encodeURIComponent(c.id)}" data-name="${esc(c.name)}" style="--bg:${bg};--ac:${ac};--ph:${PLINTH[i % PLINTH.length]}">${exhibitHTML(c, i, esc)}</a>`;
     }).join("");
     const now = $("[data-gl-now]");
     if (now && shown[0]) now.textContent = shown[0].name;
-    const num = $("[data-gl-yours]");
-    if (num) num.textContent = pad(shown.length + 1);
     // the cake stand under the title: every cake once more, in a ring
     const ring = $("[data-gl-carousel]");
     if (ring) ring.insertAdjacentHTML("beforeend", shown.map((c, i) => `<button type="button" tabindex="-1" class="gl__ride" data-i="${i}"><img class="${framed(c).trim()}" src="${cutout(c)}" alt="" draggable="false"></button>`).join(""));
@@ -506,8 +531,8 @@
     let W = 0, H = 0, dpr = 1;
     const size = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
-      W = innerWidth;
-      H = innerHeight;
+      W = canvas.clientWidth || innerWidth;
+      H = canvas.clientHeight || innerHeight;
       canvas.width = W * dpr;
       canvas.height = H * dpr;
     };
@@ -1224,9 +1249,315 @@
         const rad = Math.sqrt(rnd()) * 0.7;
         sprinkles += `<circle cx="${(300 + Math.cos(ang) * 250 * rad).toFixed(1)}" cy="${(60 + Math.sin(ang) * 46 * rad).toFixed(1)}" r="${(1.6 + rnd() * 1.6).toFixed(1)}" fill="${rnd() < 0.7 ? "#d8b46a" : "#ffffff"}"/>`;
       }
-      body = `<path d="${side}" fill="url(#s${id})"/>${sideShade}${drips("#6d0809", 13, 34, 13)}<ellipse cx="300" cy="60" rx="280" ry="60" fill="url(#t${id})"/>${sprinkles}${back}${front}`;
+      body = `<path d="${side}" fill="url(#s${id})"/>${sideShade}<g class="x-cut__drip">${drips("#6d0809", 13, 34, 13)}</g><ellipse cx="300" cy="60" rx="280" ry="60" fill="url(#t${id})"/>${sprinkles}${back}${front}`;
     }
     return `<svg viewBox="0 0 600 ${H}" aria-hidden="true"><defs>${defs}</defs>${body}</svg>`;
+  }
+
+  // Every step card carries one of the cakes in the catalogue right now: one cake per step, never the whole catalogue.
+  // Whole cut-outs come first (a cropped one would show its cut edge on the card's corner), then the other cut-outs,
+  // then a cake that only has its photo, framed
+  const STEP_CROPPED = ["berries", "slice", "strawslice", "tiramisu", "meringue"];
+  function stepCakes(sec) {
+    const cards = $$(".x-cut__card", sec);
+    const all = window.MARIDAY?.cakes || [];
+    const rank = (c) => (MARIDAY.cutout(c) ? (c.cutout || !STEP_CROPPED.includes(c.img) ? 0 : 1) : 2);
+    const picks = [0, 1, 2].flatMap((r) => all.filter((c) => rank(c) === r)).slice(0, cards.length);
+    picks.forEach((c, k) => {
+      const photo = rank(c) === 2;
+      const img = new Image();
+      img.className = `x-cut__thumb${photo ? " is-photo" : ""}`;
+      img.loading = "lazy";
+      img.draggable = false;
+      img.alt = c.name || "";
+      img.src = photo ? MARIDAY.img(c.img) : MARIDAY.cutout(c);
+      $(".x-cut__n", cards[k]).after(img);
+    });
+  }
+
+  // ─── Phones: the cake isn't taken apart, it is built in front of you. Each layer drops onto the plate in turn and
+  // lands with its own little scene (crumbs and a puff of flour, a piping bag piping the cream on, a rain of berries
+  // with a couple rolling off, a heavy chocolate thud with shavings, glaze running down and cherries on top), while
+  // the card above swaps to that layer and one of the catalogue cakes hops up out of it. A dashed outline shows the
+  // cake to be; the finale throws confetti and brings in the button.
+  const BUILD_NOTE = { sponge: "м'який і вологий", cream: "ніжний, але тримає форму", berry: "та сама кислинка ♡", choco: "обирайте свій смак", top: "вишенька на торті" };
+  const cutFront = (x) => 60 + 60 * Math.sqrt(Math.max(0, 1 - ((x - 300) / 280) ** 2)); // front edge of a layer's top
+  const BAG_SVG = `<svg class="fx-bag" viewBox="0 0 120 210"><defs>
+    <linearGradient id="xcb-bag" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f3a7b8"/><stop offset="0.45" stop-color="#fde3ea"/><stop offset="1" stop-color="#e98aa1"/></linearGradient>
+    <linearGradient id="xcb-tip" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9aa5ae"/><stop offset="0.5" stop-color="#f4f6f8"/><stop offset="1" stop-color="#8e99a3"/></linearGradient></defs>
+    <path d="M30,30 Q60,14 92,30 L66,168 Q60,176 54,168 Z" fill="url(#xcb-bag)" stroke="rgba(109,8,9,0.25)" stroke-width="1.5"/>
+    <path d="M44,40 Q58,90 58,150" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="3" stroke-linecap="round"/>
+    <path d="M30,30 Q44,6 60,14 Q78,2 92,30 Q62,20 30,30 Z" fill="#e98aa1"/>
+    <path d="M52,166 L68,166 L63,200 L57,200 Z" fill="url(#xcb-tip)"/><circle cx="60" cy="204" r="6" fill="#fbfeff"/></svg>`;
+
+  // The phone's story cards (one per layer, read from the layer's own card) and the props of the build. All of it is
+  // hidden on wider screens, where the cake comes apart instead.
+  function cutStory(sec, cake, layers) {
+    const story = document.createElement("div");
+    story.className = "x-cut__story";
+    layers.forEach((L) => {
+      const card = $(".x-cut__card", L);
+      if (!card) return;
+      const kind = L.dataset.kind;
+      const page = document.createElement("article");
+      page.className = "x-cut__page";
+      page.dataset.kind = kind;
+      page.innerHTML = `<p class="x-cut__note"></p><div class="x-cut__ptxt"><strong></strong><p></p><ul class="x-cut__chips"></ul></div>`;
+      $(".x-cut__note", page).textContent = BUILD_NOTE[kind] || "";
+      $("strong", page).textContent = $(".x-cut__txt strong", card)?.textContent || "";
+      $(".x-cut__ptxt p", page).textContent = $(".x-cut__txt p", card)?.textContent || "";
+      $$(".x-cut__chips li", card).forEach((li) => $("ul", page).append(li.cloneNode(true)));
+      const thumb = $(".x-cut__thumb", card);
+      if (thumb) {
+        const img = thumb.cloneNode();
+        img.className = `x-cut__pcake${thumb.classList.contains("is-photo") ? " is-photo" : ""}`;
+        img.loading = "eager";
+        page.append(img);
+      }
+      story.append(page);
+    });
+    $(".x-cut__head", sec).after(story);
+
+    // the cake to be, as a dashed outline from the sponge's foot to the glaze's top
+    const total = layers.reduce((s, L) => s + CAKE_T[L.dataset.kind], 0) + 120;
+    const foot = total - CAKE_T[layers[0].dataset.kind] - 60;
+    cake.insertAdjacentHTML("afterbegin", `<svg class="x-cut__ghost" viewBox="0 0 600 ${total}" aria-hidden="true"><path d="M20,60 L20,${foot} A280,60 0 0 0 580,${foot} L580,60"/><ellipse cx="300" cy="60" rx="280" ry="60"/></svg>`);
+
+    // each layer's props sit in a box of their own right above it (not inside it, so they don't repaint its shadow)
+    let seed = 11;
+    const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    layers.forEach((L) => {
+      const kind = L.dataset.kind;
+      const H = CAKE_T[kind] + 120;
+      const at = (x, y) => `left:${(x / 6).toFixed(2)}%;top:${((y / H) * 100).toFixed(2)}%`;
+      let html = "";
+      if (kind === "sponge") {
+        for (let i = 0; i < 12; i++) html += `<i class="fx-crumb" style="${at(150 + rnd() * 300, H - 4 - rnd() * 12)};--s:${(3 + rnd() * 4).toFixed(1)}px"></i>`;
+        html += `<i class="fx-puff" style="${at(40, H - 12)}"></i><i class="fx-puff" style="${at(560, H - 12)}"></i>`;
+      } else if (kind === "cream") html = BAG_SVG;
+      else if (kind === "berry") {
+        const spots = [[72, 66, -1], [528, 66, 1]];
+        for (let i = 0; i < 7; i++) {
+          const a = rnd() * Math.PI * 2, r = 0.2 + Math.sqrt(rnd()) * 0.55;
+          spots.push([300 + Math.cos(a) * 250 * r, 60 + Math.sin(a) * 46 * r, 0]);
+        }
+        spots.forEach(([x, y, roll], i) => (html += `<i class="fx-berry${i % 3 === 2 ? " is-blue" : ""}" style="${at(x, y)}"${roll ? ` data-roll="${roll}"` : ""}></i>`));
+      } else if (kind === "choco") {
+        for (let i = 0; i < 9; i++) html += `<i class="fx-shave" style="${at(300 + (rnd() - 0.5) * 70, 60 + (rnd() - 0.5) * 20)};--r:${Math.round(rnd() * 180)}deg"></i>`;
+      } else if (kind === "top") {
+        const tones = ["#d8b46a", "#ffffff", "#f5bcc8", "#e9c77e"];
+        for (let i = 0; i < 16; i++) html += `<i class="fx-spark" style="${at(300 + (rnd() - 0.5) * 90, 44)};--c:${tones[i % 4]}"></i>`;
+      }
+      if (!html) return;
+      L.insertAdjacentHTML("afterend", `<div class="x-cut__fx" aria-hidden="true" style="bottom:${L.style.bottom};z-index:${L.style.zIndex};aspect-ratio:600/${H}">${html}</div>`);
+    });
+    const tones = ["#6d0809", "#f5bcc8", "#d8b46a", "#ffffff", "#c9506d", "#9cc9c3"];
+    let party = "";
+    for (let i = 0; i < 24; i++) party += `<i style="--c:${tones[i % tones.length]};--h:${6 + (i % 3) * 3}px"></i>`;
+    cake.insertAdjacentHTML("beforeend", `<div class="x-cut__party" aria-hidden="true">${party}</div>`);
+  }
+
+  // One paused timeline holds the whole build, with a label after every layer; scrolling picks the label to reach and
+  // the timeline plays there in real time (faster when several layers are skipped, quicker still backwards), so each
+  // landing keeps its bounce however the page is scrolled. The sponge lands as the section arrives, the rest while
+  // it is pinned. Returns the cleanup for gsap.matchMedia.
+  function cutBuild(sec, cake, layers) {
+    const pin = $(".x-cut__pin", sec);
+    const pages = $$(".x-cut__page", sec);
+    const hint = $(".x-cut__hint", sec);
+    const fin = $(".x-cut__final", sec);
+    const facts = $(".x-cut__facts", sec);
+    const fxOf = (L) => (L.nextElementSibling?.classList.contains("x-cut__fx") ? L.nextElementSibling : null);
+    const fx = (L, s) => (fxOf(L) ? $$(s, fxOf(L)) : []);
+    const cream = layers.find((L) => L.dataset.kind === "cream");
+    const creamSvg = cream && $("svg", cream);
+    let seed = 5;
+    const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+
+    gsap.set([cake, ...layers], { transformOrigin: "50% 100%" });
+    gsap.set(layers.slice(1).filter((L) => L !== cream), { y: () => -innerHeight, autoAlpha: 0 });
+    gsap.set([...pages, fin, facts, ...$$(".x-cut__fx > *, .x-cut__party > *", sec)].filter(Boolean), { autoAlpha: 0 });
+    gsap.set($$(".x-cut__note", sec), { clipPath: "inset(0% 100% 0% 0%)" });
+    gsap.set($$(".x-cut__page .x-cut__chips li", sec), { autoAlpha: 0, scale: 0 });
+    gsap.set($$(".x-cut__pcake", sec), { autoAlpha: 0 });
+    const drip = $(".x-cut__drip", sec);
+    if (drip) gsap.set(drip, { scaleY: 0, transformOrigin: "50% 0%" });
+    const cherries = $(".x-cut__cherries", sec);
+    if (cherries) gsap.set(cherries, { autoAlpha: 0 });
+
+    const tl = gsap.timeline({ paused: true });
+    tl.addLabel("s0", 0);
+    let shown = null;
+    // the card for a layer: the last one leaves, this one swings in, its note is written on, the chips pop and the
+    // catalogue cake hops up out of its corner
+    const turn = (L, at) => {
+      if (shown) tl.to(shown, { autoAlpha: 0, y: -16, scale: 0.96, duration: 0.25, ease: "power2.in" }, at);
+      const p = pages.find((pg) => pg.dataset.kind === L.dataset.kind);
+      shown = p || null;
+      if (!p) return;
+      const k = pages.indexOf(p);
+      const tilt = k % 2 ? 1.2 : -1.2;
+      tl.fromTo(p, { autoAlpha: 0, y: 30, scale: 0.92, rotation: tilt * 3 }, { autoAlpha: 1, y: 0, scale: 1, rotation: tilt, duration: 0.55, ease: "back.out(1.7)", immediateRender: false }, at + 0.12)
+        .to($(".x-cut__note", p), { clipPath: "inset(0% 0% 0% 0%)", duration: 0.45, ease: "power2.out" }, at + 0.34)
+        .to($$(".x-cut__chips li", p), { autoAlpha: 1, scale: 1, duration: 0.3, ease: "back.out(2.6)", stagger: 0.07 }, at + 0.46);
+      const img = $(".x-cut__pcake", p);
+      if (img) {
+        tl.set(img, { autoAlpha: 1 }, at + 0.5)
+          .fromTo(img, { y: 50, scale: 0.4, rotation: -tilt * 10 }, { y: 0, scale: 1, rotation: tilt * 5, duration: 0.6, ease: "back.out(2.2)", immediateRender: false }, at + 0.5);
+      }
+    };
+    // a layer falls from a screen above, squashes as it lands and springs back; the whole cake gives a little under it
+    const land = (L, at, heavy) => {
+      const d = heavy ? 0.36 : 0.46;
+      tl.set(L, { autoAlpha: 1 }, at)
+        .to(L, { y: 0, duration: d, ease: "power2.in" }, at)
+        .fromTo(L, { rotation: rnd() < 0.5 ? -7 : 7 }, { rotation: 0, duration: d, ease: "power1.out", immediateRender: false }, at)
+        .to(L, { scaleY: heavy ? 0.74 : 0.84, scaleX: heavy ? 1.09 : 1.05, duration: 0.08, ease: "power1.out" }, at + d)
+        .to(L, { scaleY: 1, scaleX: 1, duration: 0.7, ease: "elastic.out(1.2, 0.32)" }, at + d + 0.08)
+        .to(cake, { scaleY: heavy ? 0.95 : 0.975, duration: 0.08, ease: "power1.out" }, at + d)
+        .to(cake, { scaleY: 1, duration: 0.5, ease: "elastic.out(1, 0.35)" }, at + d + 0.08);
+      return at + d;
+    };
+    // bits thrown up from a point that come down again: up to dy at the top of the arc, then down to land
+    const toss = (el, at, dx, dy, land, spin) => {
+      tl.set(el, { autoAlpha: 1, x: 0, y: 0, rotation: 0 }, at)
+        .to(el, { keyframes: [{ x: dx * 0.55, y: dy, rotation: spin / 2, duration: 0.24, ease: "power2.out" }, { x: dx, y: land, rotation: spin, duration: 0.32, ease: "power2.in" }] }, at);
+    };
+    const SCENE = {
+      sponge(L, hit) {
+        fx(L, ".fx-crumb").forEach((c) => {
+          const dir = parseFloat(c.style.left) < 50 ? -1 : 1;
+          toss(c, hit, dir * (26 + rnd() * 60), -(18 + rnd() * 34), 8 + rnd() * 10, dir * 240);
+          tl.to(c, { autoAlpha: 0, duration: 0.3 }, hit + 0.8);
+        });
+        fx(L, ".fx-puff").forEach((pf) => {
+          tl.set(pf, { autoAlpha: 0.9, scale: 0.3 }, hit).to(pf, { autoAlpha: 0, scale: 2, duration: 0.75, ease: "power2.out" }, hit);
+        });
+        return hit + 0.9;
+      },
+      berry(L, hit) {
+        const bs = fx(L, ".fx-berry");
+        bs.forEach((b, i) => {
+          const at = hit + 0.04 + i * 0.05;
+          tl.set(b, { autoAlpha: 1 }, at)
+            .fromTo(b, { y: -(180 + rnd() * 120), rotation: rnd() * 180 - 90 }, { y: 0, rotation: 0, duration: 0.62, ease: "bounce.out", immediateRender: false }, at);
+        });
+        // the two at the edges bounce off and roll down the side to the plate
+        bs.filter((b) => b.dataset.roll).forEach((b) => {
+          const dir = +b.dataset.roll;
+          tl.to(b, { x: () => dir * cake.offsetWidth * 0.05, y: () => cake.offsetHeight - fxOf(L).offsetTop - b.offsetTop - cake.offsetWidth * 0.07, rotation: dir * 420, duration: 0.5, ease: "power2.in" }, hit + 0.8);
+        });
+        return hit + 1.35;
+      },
+      choco(L, hit) {
+        tl.to(cake, { keyframes: { x: [0, -6, 6, -4, 3, 0], easeEach: "none" }, duration: 0.36 }, hit);
+        fx(L, ".fx-shave").forEach((s) => {
+          const dx = (rnd() - 0.5) * 150;
+          toss(s, hit + 0.04, dx, -(34 + rnd() * 50), (rnd() - 0.5) * 16, (dx > 0 ? 1 : -1) * 300);
+        });
+        return hit + 0.95;
+      },
+      top(L, hit) {
+        if (drip) tl.to(drip, { scaleY: 1, duration: 0.75, ease: "power2.out" }, hit + 0.02);
+        if (cherries) {
+          tl.set(cherries, { autoAlpha: 1 }, hit + 0.3)
+            .fromTo(cherries, { y: -240, rotation: 50 }, { y: 0, rotation: -8, duration: 0.65, ease: "bounce.out", immediateRender: false }, hit + 0.3);
+        }
+        fx(L, ".fx-spark").forEach((s) => {
+          const a = -Math.PI * (0.08 + 0.84 * rnd()), r = 50 + rnd() * 100;
+          toss(s, hit + 0.45, Math.cos(a) * r, Math.sin(a) * r, Math.sin(a) * r + 50, rnd() * 360);
+          tl.to(s, { autoAlpha: 0, duration: 0.25 }, hit + 1.05);
+        });
+        return hit + 1.3;
+      },
+    };
+    // the cream isn't dropped: a piping bag comes in and pipes it on from left to right along its front edge
+    const pipe = (L, at) => {
+      const bag = fx(L, ".fx-bag")[0];
+      const H = CAKE_T.cream + 120;
+      const pp = { p: 0 };
+      const put = () => {
+        const xu = 20 + 560 * pp.p;
+        if (bag) {
+          bag.style.left = `${xu / 6}%`;
+          bag.style.top = `${((cutFront(xu) - 3) / H) * 100}%`;
+        }
+        creamSvg.style.clipPath = `inset(0% ${(100 - pp.p * 100).toFixed(2)}% 0% 0%)`;
+      };
+      put();
+      if (bag) {
+        tl.set(bag, { autoAlpha: 1 }, at)
+          .fromTo(bag, { x: 150, y: -150, rotation: 30 }, { x: 0, y: 0, rotation: -8, duration: 0.36, ease: "power2.out", immediateRender: false }, at)
+          .to(bag, { rotation: -24, duration: 0.85, ease: "sine.inOut" }, at + 0.34)
+          .to(bag, { x: 140, y: -180, rotation: 26, autoAlpha: 0, duration: 0.36, ease: "power2.in" }, at + 1.2);
+      }
+      tl.to(pp, { p: 1, duration: 0.85, ease: "sine.inOut", onUpdate: put }, at + 0.34);
+      return at + 1.5;
+    };
+
+    let t = 0;
+    layers.slice(1).forEach((L, i) => {
+      const kind = L.dataset.kind;
+      const at = t;
+      turn(L, at);
+      if (i === 1 && hint) tl.to(hint, { autoAlpha: 0, duration: 0.3 }, at);
+      let end;
+      if (L === cream) end = pipe(L, at + 0.05);
+      else {
+        const hit = land(L, at + 0.05, kind === "choco");
+        end = SCENE[kind] ? SCENE[kind](L, hit) : hit + 0.7;
+      }
+      // the label waits for the last bit of the step to settle (crumbs fading, sparks falling)
+      t = Math.max(end, tl.duration(), at + 1.1);
+      tl.addLabel(`s${i + 1}`, t);
+    });
+    // finale: the last card goes, the caption and button come in, the cake hops and throws confetti, facts pop up
+    const ft = t;
+    if (shown) tl.to(shown, { autoAlpha: 0, y: -16, scale: 0.96, duration: 0.25, ease: "power2.in" }, ft);
+    if (fin) tl.fromTo(fin, { autoAlpha: 0, y: 26, scale: 0.94 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.7)", immediateRender: false }, ft + 0.15);
+    tl.to(".x-cut__ghost", { autoAlpha: 0, duration: 0.3 }, ft)
+      .to(cake, { keyframes: [{ y: -18, duration: 0.2, ease: "power2.out" }, { y: 0, duration: 0.55, ease: "bounce.out" }] }, ft + 0.05);
+    $$(".x-cut__party > i", sec).forEach((c) => {
+      const a = -Math.PI * (0.06 + 0.88 * rnd()), r = 90 + rnd() * 150;
+      const dx = Math.cos(a) * r, dy = Math.sin(a) * r;
+      tl.set(c, { autoAlpha: 1, x: 0, y: 0 }, ft + 0.12)
+        .to(c, { keyframes: [{ x: dx, y: dy, rotation: rnd() * 360, duration: 0.42, ease: "power2.out" }, { x: dx * 1.2, y: dy + 140 + rnd() * 90, rotation: 360 + rnd() * 360, duration: 0.9, ease: "power1.in" }] }, ft + 0.12)
+        .to(c, { autoAlpha: 0, duration: 0.3 }, ft + 1.15);
+    });
+    if (facts) {
+      tl.set(facts, { autoAlpha: 1 }, ft + 0.35)
+        .fromTo(facts.children, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "back.out(2)", stagger: 0.08, immediateRender: false }, ft + 0.35);
+    }
+    tl.addLabel(`s${layers.length}`, Math.max(tl.duration(), ft + 1.5));
+
+    // pin progress at which each later layer, then the finale, comes in
+    const steps = layers.length - 1;
+    const marks = Array.from({ length: steps }, (_, j) => 0.06 + (j * 0.76) / (steps - 1));
+    let goal = 0, run = null;
+    const want = (k) => {
+      if (k === goal) return;
+      const n = Math.abs(k - goal);
+      goal = k;
+      run?.kill();
+      const to = tl.labels[`s${k}`], now = tl.time();
+      run = gsap.to(tl, { time: to, duration: Math.abs(to - now) / (to < now ? 2.5 : n > 1 ? n * 1.2 : 1), ease: "none" });
+    };
+    const pinST = ScrollTrigger.create({ trigger: sec, start: "top top", end: "+=250%", pin, anticipatePin: 1 });
+    let intro = null;
+    const sync = () => {
+      if (!intro) return;
+      const y = pinST.scroll();
+      if (y < intro.start) return want(0);
+      if (y < pinST.start) return want(1);
+      const p = (y - pinST.start) / Math.max(1, pinST.end - pinST.start);
+      want(1 + marks.filter((v) => p >= v).length);
+    };
+    intro = ScrollTrigger.create({ trigger: sec, start: "top 30%", end: () => pinST.end, onUpdate: sync, onToggle: sync, onRefresh: sync });
+    sync();
+    return () => {
+      run?.kill();
+      if (creamSvg) creamSvg.style.clipPath = "";
+    };
   }
 
   function cutCake() {
@@ -1245,21 +1576,15 @@
     cake.style.height = `calc(var(--w) * ${bottom + 120} / 600)`;
     const priceEl = $("[data-min-price]", sec);
     if (priceEl && window.MARIDAY?.cakes?.length) priceEl.textContent = `€${Math.min(...MARIDAY.cakes.map((c) => c.price))}`;
-    if (!hasLibs) return;
+    stepCakes(sec);
+    cutStory(sec, cake, layers);
+    // without the animation libraries the phone simply lists the cards under the built cake
+    if (!hasLibs) return sec.classList.add("is-still");
 
     const W = () => cake.offsetWidth;
     const gap = () => W() * (innerWidth < 760 ? 0.22 : 0.18);
     const labels = layers.map((L) => $(".x-cut__label", L));
     const explode = (L, k) => ({ y: -k * gap(), x: 0, rotation: 0 });
-
-    if (reduce) {
-      layers.forEach((L, k) => { if (k) gsap.set(L, explode(L, k)); });
-      gsap.set(labels.filter(Boolean).map((l) => $(".x-cut__card", l)), { opacity: 1 });
-      gsap.set(labels.filter(Boolean).map((l) => $(".x-cut__wire path", l)), { strokeDashoffset: 0 });
-      gsap.set([".x-cut__final", ".x-cut__facts"], { opacity: 1 });
-      gsap.set(labels.filter(Boolean).map((l) => $(".x-cut__wire", l)), { opacity: 1 });
-      return;
-    }
 
     // Assembled cake is shown big and centred; it shrinks to make room while the layers fly apart
     const stage = $(".x-cut__stage", sec);
@@ -1267,58 +1592,208 @@
       const hs = stage.clientHeight;
       const ch = cake.offsetHeight;
       const mb = parseFloat(getComputedStyle(cake).marginBottom) || 0;
-      const sc = Math.min(1.45, (hs * 0.78) / ch);
-      return { scale: sc, y: -(hs / 2 - mb - (ch * sc) / 2) };
+      // on phones the closing caption sits under the cake, so the cake is centred in the band above it
+      const fin = $(".x-cut__final", sec);
+      const band = matchMedia("(max-width: 760px)").matches ? fin.offsetTop - stage.offsetTop - 16 : hs;
+      const sc = Math.min(1.45, (band * 0.78) / ch, (stage.clientWidth * 0.96) / cake.offsetWidth);
+      return { scale: sc, y: band / 2 + (ch * sc) / 2 - (hs - mb) };
     };
-    const tl = gsap.timeline({
-      scrollTrigger: { trigger: sec, start: "top top", end: "+=110%", pin: ".x-cut__pin", scrub: 0.6, invalidateOnRefresh: true },
-    });
-    const heroVars = { scale: () => hero().scale, y: () => hero().y };
-    gsap.set(cake, { transformOrigin: "50% 100%" });
-    tl.fromTo(cake, heroVars, { scale: 1, y: 0, duration: 0.45, ease: "power2.inOut", immediateRender: true }, 0);
-    const n = layers.length;
-    for (let k = n - 1; k >= 1; k--) {
-      const at = 0.05 + (n - 1 - k) * 0.17;
-      tl.to(layers[k], { y: () => explode(layers[k], k).y, x: () => explode(layers[k], k).x, rotation: explode(layers[k], k).rotation, duration: 1, ease: "power2.out" }, at);
-      if (labels[k]) {
-        const wire = $(".x-cut__wire path", labels[k]);
-        const card = $(".x-cut__card", labels[k]);
-        tl.set(wire.parentNode, { opacity: 1 }, at + 0.4)
-          .fromTo(wire, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.3, ease: "none" }, at + 0.4)
-          .fromTo(card, { opacity: 0, x: k % 2 ? -24 : 24, scale: 0.94 }, { opacity: 1, x: 0, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, at + 0.55)
-          .fromTo($(".x-cut__n", card), { scale: 0, rotation: -120 }, { scale: 1, rotation: 0, duration: 0.4, ease: "back.out(2.2)" }, at + 0.62)
-          .fromTo($(".x-cut__thumb", card), { y: 24, scale: 0.6, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.45, ease: "back.out(2)" }, at + 0.68);
-      }
-    }
+
+    // Cards hang off their layers but are spread down each side of the exploded cake so none overlap; each wire
+    // bends from its layer to its card's seal. Garnish is then nudged clear of the cards, the cake and the captions.
     const garnish = $$(".x-cut__garnish > *", sec);
-    garnish.forEach((g, i) => {
-      const d = parseFloat(getComputedStyle(g).getPropertyValue("--d")) || 1;
-      tl.fromTo(g, { opacity: 0, scale: 0.3, y: 60 * d, rotation: -40 + i * 20 }, { opacity: 1, scale: 1, y: -40 * d, rotation: i * 25, duration: 1.4, ease: "power2.out" }, 0.3 + i * 0.08);
+    const spread = () => {
+      const cards = labels.map((l) => l && $(".x-cut__card", l));
+      sec.classList.remove("is-snug", "is-tight", "is-tighter");
+      cards.forEach((c) => c && (c.style.marginTop = ""));
+      garnish.forEach((el) => { el.style.margin = ""; el.style.visibility = ""; });
+      const g = gap(), w = W(), cx = cake.offsetLeft, cy = cake.offsetTop;
+      const lo = 6 - cy, hi = stage.clientHeight - cy - 6; // stage edges in cake coordinates
+      const SEAL = 30, AIR = 14; // the seal pokes out above a card; air between two cards
+      // a card's cake stands up out of its top corner: that much room is kept clear of the card above it, so no card
+      // ever covers a cake (its box plus a little for the tilt; a cake hidden on tablets takes no room). The cakes get
+      // a little smaller on short screens, so it is measured again for each fallback
+      const overOf = (c) => {
+        const t = c && $(".x-cut__thumb", c);
+        return t && t.offsetParent ? Math.max(SEAL, 8 - t.offsetTop) : SEAL;
+      };
+      let over = cards.map(overOf);
+      const busy = [];
+      // phones show the cards as pills on the layers themselves, so only the garnish needs placing there
+      if (!matchMedia("(max-width: 760px)").matches) {
+        const sideKs = (s) => labels.map((l, k) => k).filter((k) => labels[k]?.classList.contains(`x-cut__label--${s}`)).reverse();
+        const off = [];
+        for (const mode of ["", "is-snug", "is-tight", "is-tighter"]) {
+          if (mode) sec.classList.add(mode);
+          over = cards.map(overOf);
+          let fits = true;
+          for (const ks of [sideKs("r"), sideKs("l")]) {
+            const pin = ks.map((k) => layers[k].offsetTop + layers[k].offsetHeight / 2 - k * g);
+            const h = ks.map((k) => cards[k].offsetHeight);
+            const t = pin.map((p, i) => p - h[i] / 2);
+            const o = ks.map((k) => over[k]);
+            for (let i = 0; i < t.length; i++) t[i] = Math.max(t[i], i ? t[i - 1] + h[i - 1] + o[i] + AIR : lo + o[0]);
+            const z = t.length - 1;
+            if (t[z] + h[z] > hi) {
+              t[z] = hi - h[z];
+              for (let i = z - 1; i >= 0; i--) t[i] = Math.min(t[i], t[i + 1] - AIR - o[i + 1] - h[i]);
+            }
+            if (t[0] < lo + o[0]) fits = false;
+            ks.forEach((k, i) => (off[k] = t[i] - pin[i]));
+          }
+          if (fits) break;
+      }
+      labels.forEach((l, k) => {
+        if (!l) return;
+        const card = cards[k];
+        const wire = $(".x-cut__wire", l);
+        card.style.marginTop = `${off[k]}px`;
+        const ww = parseFloat(getComputedStyle(wire).width), end = off[k] + 4, top = Math.min(0, end) - 6, hh = Math.abs(end) + 12;
+        const y0 = -top, y1 = end - top;
+        wire.style.marginTop = `${top}px`;
+        wire.style.height = `${hh}px`;
+        wire.setAttribute("viewBox", `0 0 ${ww} ${hh}`);
+        $("path", wire).setAttribute("d", `M2,${y0} C${ww * 0.55},${y0} ${ww * 0.45},${y1} ${ww},${y1}`);
+        $("circle", wire).setAttribute("cy", y0);
+        const x = cx + layers[k].offsetLeft + l.offsetLeft + card.offsetLeft;
+        const y = cy + layers[k].offsetTop - k * g + l.offsetTop + card.offsetTop;
+        busy.push({ x: x - 44, y: y - over[k], w: card.offsetWidth + 88, h: card.offsetHeight + over[k] });
+      });
+      }
+      const n = layers.length;
+      const topY = cy + layers[n - 1].offsetTop - (n - 1) * g - w * 0.14;
+      busy.push({ x: cx - 10, y: topY, w: w + 20, h: cy + cake.offsetHeight - topY });
+      if (!reduce) {
+        const { scale: s, y: hy } = hero();
+        const bot = cy + cake.offsetHeight + hy;
+        busy.push({ x: cx + w / 2 - (w * s) / 2 - 10, y: bot - cake.offsetHeight * s - w * s * 0.14, w: w * s + 20, h: cake.offsetHeight * s + w * s * 0.14 });
+      }
+      $$(".x-cut__head, .x-cut__final, .x-cut__facts", sec).forEach((el) => busy.push({ x: el.offsetLeft - stage.offsetLeft, y: el.offsetTop - stage.offsetTop, w: el.offsetWidth, h: el.offsetHeight }));
+      const hit = (a) => busy.some((b) => a.x < b.x + b.w + 8 && b.x < a.x + a.w + 8 && a.y < b.y + b.h + 8 && b.y < a.y + a.h + 8);
+      const sw = stage.clientWidth;
+      garnish.forEach((el, i) => {
+        const d = parseFloat(getComputedStyle(el).getPropertyValue("--d")) || 1;
+        // where it ends up: lifted by 40·d and turned by i·25° (see the timeline), so test the turned box
+        const a = (i * 25 * Math.PI) / 180, w0 = el.offsetWidth, h0 = el.offsetHeight || w0;
+        const gw = Math.abs(w0 * Math.cos(a)) + Math.abs(h0 * Math.sin(a)), gh = Math.abs(w0 * Math.sin(a)) + Math.abs(h0 * Math.cos(a));
+        const r0 = { x: el.offsetLeft + (w0 - gw) / 2, y: el.offsetTop - 40 * d + (h0 - gh) / 2, w: gw, h: gh };
+        const dir = r0.x + gw / 2 < sw / 2 ? -1 : 1;
+        for (const dy of [0, -40, 40, -80, 80, -120, 120]) {
+          for (let dx = 0; dx <= sw / 2; dx += 16) {
+            const r = { ...r0, x: r0.x + dir * dx, y: r0.y + dy };
+            if (r.x < 0 || r.x + gw > sw) break;
+            if (!hit(r)) {
+              el.style.margin = `${dy}px 0 0 ${dir * dx}px`;
+              busy.push(r);
+              return;
+            }
+          }
+        }
+        el.style.visibility = "hidden";
+      });
+    };
+    // phones build the cake up layer by layer (see cutBuild); wider screens take it apart
+    const mm = gsap.matchMedia();
+    mm.add("(max-width: 760px)", () => {
+      if (!reduce) return cutBuild(sec, cake, layers);
+      sec.classList.add("is-still");
+      return () => sec.classList.remove("is-still");
     });
-    tl.to(".x-cut__hint", { opacity: 0, duration: 0.3 }, 0.2)
-      .to({}, { duration: 0.2 })
-      .addLabel("assemble")
-      .to(labels.filter(Boolean).map((l) => $(".x-cut__card", l)), { opacity: 0, y: -10, duration: 0.3 }, "assemble")
-      .to(labels.filter(Boolean).map((l) => $(".x-cut__wire", l)), { opacity: 0, duration: 0.25 }, "assemble")
-      .to(cake, { ...heroVars, duration: 0.8, ease: "power3.inOut" }, "assemble+=0.15")
-      .to(layers.slice(1), { y: 0, x: 0, rotation: 0, duration: 0.8, ease: "bounce.out", stagger: { each: 0.04, from: "start" } }, "assemble")
-      .fromTo([".x-cut__final", ".x-cut__facts"], { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.1 }, "assemble+=0.5");
+    mm.add("(min-width: 761px)", () => apart());
+
+    function apart() {
+      let live = true;
+      spread();
+      document.fonts?.ready.then(() => live && spread());
+
+      if (reduce) {
+        addEventListener("resize", spread);
+        layers.forEach((L, k) => { if (k) gsap.set(L, explode(L, k)); });
+        gsap.set(labels.filter(Boolean).map((l) => $(".x-cut__card", l)), { opacity: 1 });
+        gsap.set(labels.filter(Boolean).map((l) => $(".x-cut__wire path", l)), { strokeDashoffset: 0 });
+        gsap.set([".x-cut__final", ".x-cut__facts"], { opacity: 1 });
+        gsap.set(labels.filter(Boolean).map((l) => $(".x-cut__wire", l)), { opacity: 1 });
+        return () => { live = false; removeEventListener("resize", spread); };
+      }
+
+      ScrollTrigger.addEventListener("refreshInit", spread);
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: sec, start: "top top", end: "+=110%", pin: ".x-cut__pin", scrub: 0.6, invalidateOnRefresh: true },
+      });
+      const heroVars = { scale: () => hero().scale, y: () => hero().y };
+      gsap.set(cake, { transformOrigin: "50% 100%" });
+      tl.fromTo(cake, heroVars, { scale: 1, y: 0, duration: 0.45, ease: "power2.inOut", immediateRender: true }, 0);
+      const n = layers.length;
+      for (let k = n - 1; k >= 1; k--) {
+        const at = 0.05 + (n - 1 - k) * 0.17;
+        tl.to(layers[k], { y: () => explode(layers[k], k).y, x: () => explode(layers[k], k).x, rotation: explode(layers[k], k).rotation, duration: 1, ease: "power2.out" }, at);
+        if (labels[k]) {
+          const wire = $(".x-cut__wire path", labels[k]);
+          const card = $(".x-cut__card", labels[k]);
+          tl.set(wire.parentNode, { opacity: 1 }, at + 0.4)
+            .fromTo(wire, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.3, ease: "none" }, at + 0.4)
+            .fromTo(card, { opacity: 0, x: k % 2 ? -24 : 24, scale: 0.94 }, { opacity: 1, x: 0, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, at + 0.55)
+            .fromTo($(".x-cut__n", card), { scale: 0, rotation: -120 }, { scale: 1, rotation: 0, duration: 0.4, ease: "back.out(2.2)" }, at + 0.62);
+          // the cake hops up out of the card (more steps than cakes in the catalogue leaves a card without one)
+          const thumb = $(".x-cut__thumb", card);
+          if (thumb) tl.fromTo(thumb, { y: 40, scale: 0.5, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.45, ease: "back.out(2)" }, at + 0.68);
+        }
+      }
+      garnish.forEach((g, i) => {
+        const d = parseFloat(getComputedStyle(g).getPropertyValue("--d")) || 1;
+        tl.fromTo(g, { opacity: 0, scale: 0.3, y: 60 * d, rotation: -40 + i * 20 }, { opacity: 1, scale: 1, y: -40 * d, rotation: i * 25, duration: 1.4, ease: "power2.out" }, 0.3 + i * 0.08);
+      });
+      tl.to(".x-cut__hint", { opacity: 0, duration: 0.3 }, 0.2)
+        .to({}, { duration: 0.2 })
+        .addLabel("assemble")
+        .to(labels.filter(Boolean).map((l) => $(".x-cut__card", l)), { opacity: 0, y: -10, duration: 0.3 }, "assemble")
+        .to(labels.filter(Boolean).map((l) => $(".x-cut__wire", l)), { opacity: 0, duration: 0.25 }, "assemble")
+        .to(cake, { ...heroVars, duration: 0.8, ease: "power3.inOut" }, "assemble+=0.15")
+        .to(layers.slice(1), { y: 0, x: 0, rotation: 0, duration: 0.8, ease: "bounce.out", stagger: { each: 0.04, from: "start" } }, "assemble")
+        .fromTo([".x-cut__final", ".x-cut__facts"], { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.1 }, "assemble+=0.5");
+      return () => { live = false; ScrollTrigger.removeEventListener("refreshInit", spread); };
+    }
+  }
+
+  // The manifesto's side walls: the cakes in the catalogue right now, dealt out to the two walls in turn, no captions.
+  // Whole cut-outs first; cropped cut-outs, then framed photos, only when the catalogue runs short of whole ones
+  function sideCakes(sec) {
+    const walls = $$(".x-ing", sec);
+    const all = window.MARIDAY?.cakes || [];
+    const rank = (c) => (MARIDAY.cutout(c) ? (c.cutout || !STEP_CROPPED.includes(c.img) ? 0 : 1) : 2);
+    let picks = [];
+    for (let r = 0; r < 3 && picks.length < 4; r++) picks = picks.concat(all.filter((c) => rank(c) === r));
+    picks.forEach((c, k) => {
+      const photo = rank(c) === 2;
+      const fig = document.createElement("figure");
+      fig.className = "x-ing__item";
+      const img = new Image();
+      if (photo) img.className = "is-photo";
+      if (k > 1) img.loading = "lazy";
+      img.draggable = false;
+      img.alt = c.name || "";
+      img.src = photo ? MARIDAY.img(c.img) : MARIDAY.cutout(c);
+      fig.appendChild(img);
+      walls[k % walls.length].appendChild(fig);
+    });
   }
 
   // Manifesto 1/3: letters (and cherries) fall, pile up and can be thrown around; then a piping bag writes in cream
   function dropLetters() {
     const sec = $(".x-drop");
     if (!sec) return;
+    sideCakes(sec);
     const world = $(".x-drop__world", sec);
     let started = false;
     let visible = false;
+    // starts once a quarter of the section is in view, so even a visitor scrolling straight on sees the phrase land
     new IntersectionObserver(([e]) => {
       visible = e.isIntersecting;
       if (visible && !started) {
         started = true;
         start();
       }
-    }, { threshold: 0.45 }).observe(sec);
+    }, { threshold: 0.25 }).observe(sec);
 
     function start() {
       const W = sec.clientWidth;
@@ -1341,7 +1816,8 @@
       const makeBody = (el, rad, x, y, delay, mass, slotY) => {
         el.style.width = el.style.height = `${rad * 2}px`;
         world.appendChild(el);
-        const b = { el, r: rad, m: mass, still: 0, sleep: false, landY: slotY, homeX: slotY ? x : undefined, homeY: slotY, x, y, vx: 0, vy: 0, a: slotY ? 0 : (Math.random() - 0.5) * 0.1, va: 0, born: performance.now() + delay, grab: false, tx: 0, ty: 0 };
+        // letters are thrown down rather than dropped from rest, so the whole phrase is in place in about a second
+        const b = { el, r: rad, m: mass, still: 0, sleep: false, landY: slotY, homeX: slotY ? x : undefined, homeY: slotY, x, y, vx: 0, vy: slotY ? 9 : 0, a: slotY ? 0 : (Math.random() - 0.5) * 0.1, va: 0, born: performance.now() + delay, grab: false, tx: 0, ty: 0 };
         el.style.transform = `translate3d(${x - rad}px, -400px, 0)`;
         bodies.push(b);
         return b;
@@ -1368,13 +1844,14 @@
             const rad = ch === "*" ? r * 0.92 : r;
             makeBody(el, rad, x, -rad - Math.random() * 30, delay, 4, floor - r - ri * r * 2 + (r - rad));
           }
-          delay += 60;
+          delay += 15;
         });
-        delay += 380 + ri * 40;
+        delay += 80;
       });
       for (let i = 0; i < 12; i++) {
-        makeBody(cherry(), fs * 0.3, r + Math.random() * (W - 2 * r), -200 - Math.random() * 300, delay + 200 + i * 140, 1);
+        makeBody(cherry(), fs * 0.3, r + Math.random() * (W - 2 * r), -200 - Math.random() * 300, delay - 200 + i * 60, 1);
       }
+      ingredients(W, r, floor);
 
       // drag & throw
       bodies.forEach((b) => {
@@ -1420,11 +1897,11 @@
           if (now < b.born || b.sleep) continue;
           // letters drop straight into their grid slot and bounce, so the phrase always lands readable
           if (b.landY !== undefined && !b.grab) {
-            b.vy += 0.9;
+            b.vy += 1.6;
             b.y += b.vy;
             if (b.y >= b.landY) {
               b.y = b.landY;
-              b.vy *= -0.28;
+              b.vy *= -0.24;
               if (Math.abs(b.vy) < 1.2) { b.vy = 0; b.sleep = true; b.landY = undefined; }
             }
             continue;
@@ -1488,9 +1965,11 @@
         }
       };
       let acc = 0;
+      // keeps falling off-screen until everything has landed: scrolled past mid-drop, the phrase is waiting on the way back
+      const landBy = performance.now() + delay + 2500;
       gsap.ticker.add((time, dt) => {
-        if (!visible) return;
         const now = performance.now();
+        if (!visible && now > landBy) return;
         acc = Math.min(acc + dt, 70);
         while (acc >= 16.67) { step(now); acc -= 16.67; }
         for (const b of bodies) {
@@ -1499,7 +1978,49 @@
         }
       });
 
-      setTimeout(() => { pipe(); sec.classList.add("is-done"); }, delay - 300);
+      // the cream line is piped while the letters are still falling, not after them
+      setTimeout(pipe, 150);
+      setTimeout(() => sec.classList.add("is-done"), delay);
+    }
+
+    // The side walls: one catalogue cake per side pops out, then the sides take turns serving the next one.
+    // They hang beside the two upper rows (the widest free wall), between the cream line and «ПРОСТО»
+    function ingredients(W, r, floor) {
+      const box = $(".x-drop__ing", sec);
+      if (!box) return;
+      if (!$(".x-ing__item", box)) { box.classList.add("is-off"); return; }
+      const top = $(".x-drop__top", sec).getBoundingClientRect().bottom - sec.getBoundingClientRect().top + 6;
+      const bottom = floor - r * 4;
+      const side = (W - r * 12) / 2;
+      const w = Math.min(side * 0.74, 280, (bottom - top) / 1.2);
+      if (w < 110) { box.classList.add("is-off"); return; }
+      box.style.setProperty("--side", side.toFixed(0) + "px");
+      box.style.setProperty("--mid", ((top + bottom) / 2).toFixed(0) + "px");
+      box.style.setProperty("--wmax", w.toFixed(0) + "px");
+      const walls = $$(".x-ing", box).map((wall) => ({ wall, items: $$(".x-ing__item", wall), i: 0, touched: 0 })).filter((wl) => wl.items.length);
+      const popIn = (el, delay) => gsap.fromTo(el,
+        { visibility: "visible", scale: 0, yPercent: 30, rotation: gsap.utils.random(-25, 25) },
+        { scale: 1, yPercent: 0, rotation: 0, duration: 0.75, delay, ease: "back.out(2.2)", overwrite: "auto" });
+      const popOut = (el) => gsap.to(el, { scale: 0, yPercent: 25, rotation: gsap.utils.random(-30, 30), duration: 0.32, ease: "back.in(2)", overwrite: "auto", onComplete: () => gsap.set(el, { visibility: "hidden" }) });
+      const swap = (wl) => {
+        if (wl.items.length < 2) return;
+        popOut(wl.items[wl.i]);
+        wl.i = (wl.i + 1) % wl.items.length;
+        popIn(wl.items[wl.i], 0.22);
+      };
+      walls.forEach((wl, k) => {
+        popIn(wl.items[0], 0.2 + k * 0.12);
+        // a click serves the next cake at once; a hover makes the one on show wobble like jelly
+        wl.wall.addEventListener("click", () => { wl.touched = performance.now(); swap(wl); });
+        if (fine) wl.wall.addEventListener("pointerenter", () => {
+          gsap.fromTo($("img", wl.items[wl.i]), { scaleX: 1.12, scaleY: 0.86, transformOrigin: "50% 100%" }, { scaleX: 1, scaleY: 1, duration: 0.9, ease: "elastic.out(1.2, 0.35)", overwrite: "auto" });
+        });
+      });
+      let turn = 0;
+      setInterval(() => {
+        const wl = walls[turn++ % walls.length];
+        if (visible && !document.hidden && performance.now() - wl.touched > 2500) swap(wl);
+      }, 1700);
     }
 
     function pipe() {
@@ -1512,7 +2033,7 @@
       gsap.set(bag, { opacity: 1 });
       gsap.to(st, {
         p: 1,
-        duration: 2.8,
+        duration: 1.5,
         ease: "none",
         onUpdate: () => {
           const w = text.offsetWidth;
@@ -1810,16 +2331,29 @@
 
   // Section-to-section transitions: waves, irises, knife cuts, frosting scallops, piped cream, sprinkles, stacking
   const EDGES = [
-    { before: ".x-drop", type: "wave", color: "var(--cherry)", bg: "var(--bg)" },
-    { target: ".gl", trigger: ".gl", type: "iris", at: "50% 0%" },
+    { before: ".x-drop", type: "wave", color: "var(--cherry)", bg: "var(--bg)", gloss: true },
+    { before: ".gl", type: "glaze" },
     { before: ".x-order", type: "wave", color: "var(--bg)", bg: "var(--cherry)" },
     { before: "#how-to-order", type: "scallop", color: "#fff7ef", bg: "var(--bg)" },
     { before: ".x-dress", type: "drip", color: "#fff7ef", bg: "var(--bg)" },
     { before: ".x-dress", type: "sprinkles" },
-    { before: ".x-cta", type: "wave", color: "var(--cherry)", bg: "var(--bg)", big: true },
-    { before: "#site-footer", type: "drip", color: "var(--cherry)", bg: "var(--pink)" },
+    { before: "#site-footer", type: "drip", color: "var(--bg)", bg: "var(--pink)" },
   ];
   const SPRINKLE_COLORS = ["#6d0809", "#f5bcc8", "#e2849a", "#bcd6f3", "#fbe6b8", "#ffffff", "#9ed9b8"];
+  // the wave's edge across a 1440-wide box: shared by the edge that rises out of the cake section and the band that
+  // hangs over its top (cutCap), so both ends of the section wear the same wave
+  const waveY = (x, base, amp, ph) => base + Math.sin((x / 1440) * Math.PI * 3 + ph) * amp * 0.6 + Math.sin((x / 1440) * Math.PI * 7 - ph * 0.6) * amp * 0.25;
+  // glints along a glossy wave: short strokes that follow its edge just inside the cherry and drift with it
+  const waveShine = (ys, dy, ph) => {
+    let d = "", pen = false;
+    ys.forEach((y, i) => {
+      const x = i * 40;
+      const lit = x > 30 && x < 1410 && Math.sin((x / 1440) * Math.PI * 5 + ph * 0.4) > 0.15;
+      if (lit) d += `${pen ? " L" : " M"}${x},${(y + dy).toFixed(1)}`;
+      pen = lit;
+    });
+    return d;
+  };
 
   // insert divider elements first, so pinned sections get their spacers around the right nodes
   function buildEdges() {
@@ -1832,7 +2366,8 @@
       if (cfg.bg) edge.style.setProperty("--edge-bg", cfg.bg);
       edge.setAttribute("aria-hidden", "true");
       if (cfg.type === "wave" || cfg.type === "scallop" || cfg.type === "drip") {
-        edge.innerHTML = `<svg class="x-edge__svg" viewBox="0 0 1440 140" preserveAspectRatio="none"><path style="fill:${cfg.color}"/></svg>`;
+        edge.innerHTML = `<svg class="x-edge__svg" viewBox="0 0 1440 140" preserveAspectRatio="none"><path style="fill:${cfg.color}"/>${cfg.gloss ? '<path class="x-wave-shine"/>' : ""}</svg>`;
+        if (cfg.gloss) edge.classList.add("x-edge--gloss");
         if (cfg.big) edge.style.setProperty("--eh", "clamp(110px, 13vw, 210px)");
         if (cfg.type === "drip") $("path", edge).setAttribute("d", dripPath(53));
         if (cfg.type === "scallop") {
@@ -1850,9 +2385,114 @@
           h += `<i style="left:${(Math.random() * 98).toFixed(1)}%;top:${(15 + Math.random() * 60).toFixed(0)}%;background:${SPRINKLE_COLORS[i % SPRINKLE_COLORS.length]};rotate:${(Math.random() * 180).toFixed(0)}deg"></i>`;
         }
         edge.innerHTML = `<div class="x-edge__sprinkles">${h}</div>`;
+      } else if (cfg.type === "glaze") {
+        edge.innerHTML = `<svg class="x-edge__glaze"><defs><linearGradient id="x-glaze" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="200"><stop offset="0" stop-color="#6d0809"/><stop offset="0.5" stop-color="#7c0b10"/><stop offset="1" stop-color="#a01a22"/></linearGradient><linearGradient id="x-glaze-feather" gradientUnits="userSpaceOnUse" x1="0" y1="-30" x2="0" y2="0"><stop offset="0" stop-color="#6d0809" stop-opacity="0"/><stop offset="1" stop-color="#6d0809"/></linearGradient></defs><rect class="x-glaze__feather" x="0" y="-30" height="31" fill="url(#x-glaze-feather)"/><path class="x-glaze__body" fill="url(#x-glaze)"/><path class="x-glaze__shine"/></svg>`;
       }
       next.parentNode.insertBefore(edge, next);
       cfg.el = edge;
+    });
+  }
+
+  // Cherry glaze running off the manifesto onto the gallery: the drips stretch as the seam rises up the screen,
+  // stretch further on a fast scroll and spring back when it stops, then leave with the cherry section as the gallery pins
+  function glazeEdge(edge) {
+    const svg = $("svg", edge);
+    const body = $(".x-glaze__body", svg);
+    const shine = $(".x-glaze__shine", svg);
+    const BAND = 8;
+    let drips = [], W = 0, H = 0;
+    const layout = () => {
+      W = edge.offsetWidth || innerWidth;
+      const k = Math.min(1.15, Math.max(0.6, W / 1440));
+      let seed = 23;
+      const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+      drips = [];
+      let x = rnd() * 40 * k;
+      for (;;) {
+        const r = (12 + rnd() * 20) * k;
+        const f = Math.min(r * 0.8, 12 * k);
+        const min = f + r * 1.1 + 2 + rnd() * 10 * k;
+        const max = Math.max(min + 14 * k, (rnd() < 0.24 ? 150 + rnd() * 120 : 30 + rnd() * 90) * k);
+        x += f + r;
+        if (x + r + f > W) break;
+        drips.push({ x, r, f, min, max, lag: rnd() * 0.4, ph: rnd() * 6.3 });
+        x += r + f + (4 + rnd() * 54) * k;
+      }
+      H = Math.ceil(Math.max(0, ...drips.map((d) => d.max)) * 1.5 + BAND + 60);
+      svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+      svg.style.height = H + "px";
+      // a soft lip of glaze above the seam: whatever lies on the manifesto's floor sinks into it
+      $(".x-glaze__feather", svg).setAttribute("width", W);
+      shine.setAttribute("stroke-width", (3.2 * k).toFixed(1));
+      // the band stays the exact cherry of the section above, so the seam can't show; only the drips warm up towards their tips
+      const grad = $("linearGradient", svg);
+      grad.setAttribute("y1", BAND + 4);
+      grad.setAttribute("y2", Math.round(BAND + Math.max(0, ...drips.map((d) => d.max)) * 1.1));
+    };
+    // p: how far the seam has risen (0 at the bottom of the screen, 1 at the top); s: the springy stretch from scroll speed
+    const draw = (p, s, t) => {
+      let d = `M0,-2 L0,${BAND}`;
+      let hi = "";
+      drips.forEach((dr) => {
+        const g = Math.min(1, Math.max(0, (p - dr.lag) / (1 - dr.lag)));
+        const { x, r, f } = dr;
+        const L = Math.max(f + r + 1, dr.min + (dr.max - dr.min) * (1 - (1 - g) * (1 - g)) + s * dr.max * 0.4 + Math.sin(t * 1.7 + dr.ph) * 2.5);
+        // the drop at the end swells only once the drip is long enough to carry it, and thins when it is pulled fast
+        const rb = r * (1 + Math.min(1, (L - f - r) / (r * 3)) * (0.12 - 0.16 * Math.max(0, s)));
+        const yb = BAND + Math.max(f, L - rb);
+        const c = BAND + f + (yb - BAND - f) * 0.5;
+        const c2 = Math.max(c, yb - rb * 0.9);
+        d += ` L${(x - r - f).toFixed(1)},${BAND} Q${(x - r).toFixed(1)},${BAND} ${(x - r).toFixed(1)},${(BAND + f).toFixed(1)}`;
+        d += ` C${(x - r).toFixed(1)},${c.toFixed(1)} ${(x - rb).toFixed(1)},${c2.toFixed(1)} ${(x - rb).toFixed(1)},${yb.toFixed(1)}`;
+        d += ` A${rb.toFixed(1)},${rb.toFixed(1)} 0 0 0 ${(x + rb).toFixed(1)},${yb.toFixed(1)}`;
+        d += ` C${(x + rb).toFixed(1)},${c2.toFixed(1)} ${(x + r).toFixed(1)},${c.toFixed(1)} ${(x + r).toFixed(1)},${(BAND + f).toFixed(1)}`;
+        d += ` Q${(x + r).toFixed(1)},${BAND} ${(x + r + f).toFixed(1)},${BAND}`;
+        // a streak of light down the drip and a glint on its drop
+        if (yb - rb * 0.4 > BAND + f + 6) hi += `M${(x - r * 0.42).toFixed(1)},${(BAND + f + 2).toFixed(1)} L${(x - rb * 0.46).toFixed(1)},${(yb - rb * 0.4).toFixed(1)} `;
+        hi += `M${(x - rb * 0.4).toFixed(1)},${(yb + rb * 0.18).toFixed(1)} l0.1,0 `;
+      });
+      body.setAttribute("d", `${d} L${W},${BAND} L${W},-2 Z`);
+      shine.setAttribute("d", hi);
+    };
+
+    let pp = 0, s = 0, sv = 0, prevTop = null;
+    const tick = (time, dtMs) => {
+      const top = edge.getBoundingClientRect().top;
+      const vh = innerHeight;
+      const dt = Math.max(1 / 240, (dtMs || 16) / 1000);
+      // screens per second, positive while scrolling down: the glaze lags behind the rising seam and pulls longer
+      const speed = prevTop == null ? 0 : (prevTop - top) / vh / dt;
+      prevTop = top;
+      sv += (Math.max(-0.45, Math.min(1, speed * 0.3)) - s) * 0.1;
+      sv *= 0.8;
+      s += sv;
+      pp += (Math.min(1, Math.max(0, 1 - top / vh)) - pp) * 0.2;
+      draw(pp, s, time);
+    };
+    layout();
+    draw(0, 0, 0);
+    ScrollTrigger.create({
+      trigger: edge,
+      start: "top bottom",
+      end: () => `top -${H}px`,
+      onToggle: (self) => {
+        if (self.isActive) {
+          prevTop = null;
+          gsap.ticker.add(tick);
+        } else {
+          gsap.ticker.remove(tick);
+          pp = self.progress > 0.5 ? 1 : 0;
+          s = sv = 0;
+          draw(pp, 0, 0);
+        }
+      },
+    });
+    let lastW = W;
+    addEventListener("resize", () => {
+      if (edge.offsetWidth === lastW) return;
+      lastW = edge.offsetWidth;
+      layout();
+      draw(pp, 0, 0);
     });
   }
 
@@ -1860,17 +2500,18 @@
     EDGES.forEach((cfg) => {
       if (cfg.el) {
         const st = { trigger: cfg.el, start: "top bottom", end: "top 35%", scrub: 0.6 };
-        if (cfg.type === "wave") {
+        if (cfg.type === "glaze") {
+          glazeEdge(cfg.el);
+        } else if (cfg.type === "wave") {
           const path = $("path", cfg.el);
+          const shine = $(".x-wave-shine", cfg.el);
           const draw = (p) => {
             const base = 140 - p * 110;
             const amp = 34 * Math.sin(Math.min(1, p) * Math.PI) + 10 * p;
-            let d = "M0,141 L0," + base.toFixed(1);
-            for (let x = 0; x <= 1440; x += 40) {
-              const y = base + Math.sin(x / 1440 * Math.PI * 3 + p * 5) * amp * 0.6 + Math.sin(x / 1440 * Math.PI * 7 - p * 3) * amp * 0.25;
-              d += ` L${x},${Math.min(141, y).toFixed(1)}`;
-            }
-            path.setAttribute("d", `${d} L1440,141 Z`);
+            const ys = [];
+            for (let x = 0; x <= 1440; x += 40) ys.push(Math.min(141, waveY(x, base, amp, p * 5)));
+            path.setAttribute("d", `M0,141 ${ys.map((y, i) => `L${i * 40},${y.toFixed(1)}`).join(" ")} L1440,141 Z`);
+            if (shine) shine.setAttribute("d", p > 0.15 ? waveShine(ys, 9, p * 5) : "");
           };
           draw(0);
           ScrollTrigger.create({ ...st, onUpdate: (self) => draw(self.progress) });
@@ -1899,6 +2540,79 @@
         gsap.fromTo(target, { scale: 1, filter: "brightness(1)" }, { scale: 0.88, filter: "brightness(0.6)", borderRadius: 40, transformOrigin: "50% 100%", ease: "none", scrollTrigger: { ...st, end: "top 15%" } });
       }
     });
+  }
+
+  // Phones: Safari paints its status bar in the body colour. As the cake section takes the screen, a cherry band pours
+  // down out of the status bar (which turns cherry with it), wearing the same glossy wave as the edge that rises at
+  // the section's end. It hangs there, rippling, until that wave comes up to meet it; the status bar stays cherry over
+  // the manifesto and lets go once the gallery reaches the top
+  function cutCap() {
+    const sec = $(".x-cut");
+    const edge = EDGES.find((c) => c.before === ".x-drop")?.el;
+    const gl = $(".gl");
+    if (!sec || !edge) return;
+    const phone = matchMedia("(max-width: 760px)");
+    const cap = document.createElement("div");
+    cap.className = "x-cap";
+    cap.setAttribute("aria-hidden", "true");
+    cap.innerHTML = '<svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path class="x-cap__body"/><path class="x-wave-shine"/></svg>';
+    document.body.appendChild(cap);
+    const body = $(".x-cap__body", cap);
+    const shine = $(".x-wave-shine", cap);
+    let g = 0, s = 0, sv = 0, prev = null, running = false;
+
+    const state = () => {
+      const live = phone.matches;
+      const top = sec.getBoundingClientRect().top;
+      // pours in over the last quarter of a screen before the section reaches the top, and stays until the rising
+      // wave has slid under it all the way
+      const k = Math.min(1, Math.max(0, 1 - top / (innerHeight * 0.25)));
+      // how far down the rising edge's own mint still shows: the band covers at least 13px, and draws back up only
+      // once the cherry below has closed that gap
+      const gap = edge.getBoundingClientRect().top + edge.offsetHeight * 0.28 + 2;
+      g = live ? (1 - (1 - k) * (1 - k)) * Math.min(1, Math.max(0, gap / 13)) : 0;
+      // Safari tints its status bar from a fixed box along the top edge: the band's lip is that box, solid cherry and
+      // always inside the wave, and a 2px lip stays over the manifesto until the gallery comes up
+      const dark = live && k > 0.1 && (!gl || gl.getBoundingClientRect().top > 0);
+      cap.classList.toggle("is-on", g > 0 || dark);
+      cap.style.height = dark ? `${Math.max(2, 13 * g).toFixed(1)}px` : "0px";
+      return top;
+    };
+    const draw = (t) => {
+      const ph = scrollY / 380 + t * 0.5;
+      const base = g * (46 + s * 30), amp = g * (22 + s * 30);
+      const ys = [];
+      for (let x = 0; x <= 1440; x += 40) ys.push(waveY(x, base, amp, ph));
+      body.setAttribute("d", `M0,-2 ${ys.map((y, i) => `L${i * 40},${y.toFixed(1)}`).join(" ")} L1440,-2 Z`);
+      shine.setAttribute("d", g > 0.5 ? waveShine(ys, -9, ph) : "");
+    };
+    // while it hangs, the glaze keeps rippling and swings deeper on a fast scroll, springing back when it stops
+    const frame = (time, dtMs) => {
+      const top = state();
+      const dt = Math.max(1 / 240, (dtMs || 16) / 1000);
+      const speed = prev == null ? 0 : Math.abs(prev - top) / innerHeight / dt;
+      prev = top;
+      sv += (Math.min(1, speed * 0.3) - s) * 0.1;
+      sv *= 0.8;
+      s += sv;
+      draw(time);
+      if (!g) {
+        running = false;
+        prev = null;
+        s = sv = 0;
+        gsap.ticker.remove(frame);
+      }
+    };
+    const check = () => {
+      state();
+      if (g && !running) {
+        running = true;
+        gsap.ticker.add(frame);
+      }
+    };
+    addEventListener("scroll", check, { passive: true });
+    addEventListener("resize", check);
+    check();
   }
 
   function reveals() {
@@ -1969,12 +2683,313 @@
     });
   }
 
+  /* ───────── ⑥ Each cake's own moment under the lamp ───────── */
+  // A paper tag hangs from the lamp's rim on a string — a real pendulum, pushed about as the lamp travels the rail —
+  // and twirls round to the line of the cake it reaches. The cake hops onto its plinth, a ring of light runs out under it,
+  // and the lamp pours that cake's own weather: snow falling, petals and leaves fluttering, hearts rising off the cake,
+  // cherries bouncing on the plinth, paw prints walking over the top. It keeps falling softly for as long as you stay
+  const FX_ART = {
+    heart: (c) => `<svg viewBox="0 0 24 24"><path fill="${c}" d="M12 21.2s-7.6-4.7-9.7-9.5C.9 8.4 2.9 4.8 6.4 4.8c2.3 0 3.7 1.3 4.5 2.7a1.3 1.3 0 0 0 2.2 0c.8-1.4 2.2-2.7 4.5-2.7 3.5 0 5.5 3.6 4.1 6.9-2.1 4.8-9.7 9.5-9.7 9.5z"/><ellipse cx="7.4" cy="8.6" rx="2.3" ry="1.3" fill="#fff" opacity=".55" transform="rotate(-38 7.4 8.6)"/></svg>`,
+    snow: () => `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"><path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7M9.6 3.6 12 5.6l2.4-2M9.6 20.4 12 18.4l2.4 2M3.9 10.1l3.1-.6-.9-3M20.1 13.9l-3.1.6.9 3M3.9 13.9l3.1.6-.9 3M20.1 10.1l-3.1-.6.9-3"/></svg>`,
+    petal: (c) => `<svg viewBox="0 0 24 24"><path fill="${c}" d="M12 1.5c4.6 4 6.3 9.6 0 21-6.3-11.4-4.6-17 0-21z"/><path d="M12 5c1.4 3.6 1.4 8 0 13" stroke="#fff" stroke-opacity=".5" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>`,
+    leaf: (c) => `<svg viewBox="0 0 24 24"><path fill="${c}" d="M3.5 20.5C3 11 9 3.8 21 3c-.6 12-7.6 18-17.5 17.5z"/><path d="M3.5 20.5 15.5 8.5M9 15l-.6-4.2M12.4 11.6l-.2-3.6M9 15l4 .3M12.4 11.6l3.4.4" stroke="#fff" stroke-opacity=".35" stroke-width="1.1" fill="none" stroke-linecap="round"/></svg>`,
+    feather: () => `<svg viewBox="0 0 24 24"><path fill="#fff" d="M19.8 2.6c-7.4 1.2-13 7.2-14 16.4 7.8-1.4 13-7.6 14-16.4z"/><path d="M3.6 21.4 19 3.4" stroke="#cdbfb0" stroke-width=".9" stroke-linecap="round"/></svg>`,
+    star: (c) => `<svg viewBox="0 0 24 24"><path fill="${c}" d="M12 0c.9 6.6 4.4 10.4 12 12-7.6 1.6-11.1 5.4-12 12-.9-6.6-4.4-10.4-12-12C7.6 10.4 11.1 6.6 12 0z"/></svg>`,
+    confetti: (c) => `<svg viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="6" rx="3" fill="${c}"/></svg>`,
+    cloud: () => `<svg viewBox="0 0 32 24"><path fill="#fff" d="M9 21h15.5a6 6 0 0 0 .7-12A8 8 0 0 0 9.8 8.3 6.4 6.4 0 0 0 9 21z"/></svg>`,
+    bow: (c) => `<svg viewBox="0 0 24 24"><g fill="${c}"><path d="M12 11.5C9 6.5 3.5 4.6 2.6 8c-.8 3 3.6 6 9.4 3.5zM12 11.5c3-5 8.5-6.9 9.4-3.5.8 3-3.6 6-9.4 3.5z"/><path d="M11.2 12.2 8 21l2.2-.9 1.3 2 .9-9.4zM12.8 12.2 16 21l-2.2-.9-1.3 2-.9-9.4z"/></g><circle cx="12" cy="11.8" r="2.2" fill="${c}" stroke="rgba(0,0,0,.18)" stroke-width=".8"/></svg>`,
+    paw: (c) => `<svg viewBox="0 0 24 24" fill="${c}"><ellipse cx="12" cy="16.2" rx="5.2" ry="4.4"/><ellipse cx="5.4" cy="10.4" rx="2.1" ry="2.7" transform="rotate(-20 5.4 10.4)"/><ellipse cx="9.6" cy="6.6" rx="2.1" ry="2.8" transform="rotate(-6 9.6 6.6)"/><ellipse cx="14.4" cy="6.6" rx="2.1" ry="2.8" transform="rotate(6 14.4 6.6)"/><ellipse cx="18.6" cy="10.4" rx="2.1" ry="2.7" transform="rotate(20 18.6 10.4)"/></svg>`,
+    flag: () => `<svg viewBox="0 0 24 24"><path d="M5 2.5v20" stroke="#2a1a1a" stroke-width="1.6" stroke-linecap="round"/><path fill="#fff" stroke="#2a1a1a" stroke-width=".8" d="M5.8 3h14v10h-14z"/><path fill="#2a1a1a" d="M5.8 3h3.5v2.5H5.8zm7 0h3.5v2.5h-3.5zM9.3 5.5h3.5V8H9.3zm7 0h3.5V8h-3.5zM5.8 8h3.5v2.5H5.8zm7 0h3.5v2.5h-3.5zM9.3 10.5h3.5V13H9.3zm7 0h3.5V13h-3.5z"/></svg>`,
+    berry: () => `<svg viewBox="0 0 24 24"><path fill="#e3263a" d="M12 22.5c-6.4-3.6-8.6-9-7-12.4 1.4-2.8 4.6-2.6 7-1.4 2.4-1.2 5.6-1.4 7 1.4 1.6 3.4-.6 8.8-7 12.4z"/><ellipse cx="8.4" cy="11.4" rx="1.6" ry="1" fill="#fff" opacity=".35" transform="rotate(-40 8.4 11.4)"/><g fill="#ffe28a"><ellipse cx="8.6" cy="13.4" rx=".55" ry=".85"/><ellipse cx="12" cy="12.4" rx=".55" ry=".85"/><ellipse cx="15.4" cy="13.4" rx=".55" ry=".85"/><ellipse cx="10.2" cy="16.4" rx=".55" ry=".85"/><ellipse cx="13.8" cy="16.4" rx=".55" ry=".85"/><ellipse cx="12" cy="19.4" rx=".55" ry=".85"/></g><path fill="#3f8f3a" d="M12 9.2C10.4 6.4 7.6 6 6.4 6.6 7.8 7 8.6 7.8 8.8 8.6 7.6 8.6 6.6 9.2 6.2 9.8 8.4 10.4 10.4 10 12 9.2zm0 0c1.6-2.8 4.4-3.2 5.6-2.6-1.4.4-2.2 1.2-2.4 2 1.2 0 2.2.6 2.6 1.2-2.2.6-4.2.2-5.8-.6z"/><path d="M12 9V5" stroke="#3f8f3a" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+    cherry: () => `<img src="${MARIDAY.root}img/cakes/cherries.png" alt="" draggable="false">`,
+  };
+  const FX_MODE = { heart: "rise", cloud: "rise", star: "twinkle", paw: "stamp", berry: "heavy", cherry: "heavy" }; // the rest fall
+  const FX_SIZE = { heart: [18, 34], cloud: [30, 46], snow: [12, 28], petal: [15, 26], leaf: [18, 30], feather: [22, 34], confetti: [13, 20], bow: [20, 30], flag: [22, 32], paw: [18, 26], star: [16, 30], berry: [20, 28], cherry: [28, 38] };
+  const FX_FLIP = new Set(["petal", "leaf", "confetti", "feather", "bow"]);
+  const LEAVES = ["#e07b28", "#b4441c", "#e6a93a", "#8a3a16"];
+  const hex6 = (h) => (/^#[0-9a-f]{6}$/i.test(h || "") ? h : "#c9506d");
+
+  function lampMoments(sec, track, items, state) {
+    const lamp = $(".gl__lamp", sec);
+    if (!lamp || !items.length) return;
+    const R = gsap.utils.random;
+    const clamp = gsap.utils.clamp;
+    const moods = items.map((el, i) => (el.classList.contains("ex--yours") ? YOURS_MOOD : MOODS[i] || YOURS_MOOD));
+    const accents = items.map((el) => hex6(el.style.getPropertyValue("--ac").trim()));
+    const bodyOf = (item) => $(".ex__cake", item) || $(".ex__ghost", item) || $(".ex__stage", item);
+
+    // the tag: a string from the lamp's rim, a paper tag with a punched hole and a gold eyelet
+    const tag = document.createElement("div");
+    tag.className = "gl__tag";
+    tag.setAttribute("aria-hidden", "true");
+    tag.innerHTML = '<i class="gl__tag-string"></i><span class="gl__tag-hang"><span class="gl__tag-card"><span class="gl__tag-text"></span></span></span>';
+    // it lives in the row, over the cakes and under the weather; it is placed back at the lamp every frame
+    track.append(tag);
+    const str = $(".gl__tag-string", tag);
+    const hang = $(".gl__tag-hang", tag);
+    const card = $(".gl__tag-card", tag);
+    const text = $(".gl__tag-text", tag);
+    let shown = -1, cardH = 0, cardW = 0, len = 0, vis = 0, th = 0, w = 0, ppx = null, pvx = 0, axs = 0, twirl = null;
+    const measure = () => { cardH = card.offsetHeight; cardW = card.offsetWidth; };
+    const write = (i) => { text.textContent = moods[i].line; shown = i; measure(); };
+    addEventListener("resize", measure);
+    if (document.fonts) document.fonts.ready.then(measure);
+
+    // the weather rides along with the row, so what fell on a cake moves on with it
+    const layer = document.createElement("div");
+    layer.className = "gl__fx";
+    layer.setAttribute("aria-hidden", "true");
+    track.append(layer);
+    const MAX = fine ? 46 : 24;
+    const pool = [];
+    const live = [];
+    const popEase = gsap.parseEase("back.out(2.6)");
+
+    // measured once a frame, before anything in it is written (a read after a write lays the page out again)
+    const geo = (i, tr, sr, lampTop) => {
+      const s = state();
+      const t = (s.tilt * Math.PI) / 180;
+      const c = bodyOf(items[i]).getBoundingClientRect();
+      const p = $(".ex__plinth", items[i]).getBoundingClientRect();
+      return {
+        cx: c.left + c.width / 2 - tr.left, top: c.top - tr.top, w: Math.max(c.width, 60), h: Math.max(c.height, 60),
+        pl: p.left - tr.left, pw: p.width, floor: p.top - tr.top,
+        // the bulb under the shade, where the weather pours from
+        bx: s.lx - 33 * Math.sin(t) - tr.left, by: sr.top + lampTop + 33 * Math.cos(t) - tr.top,
+      };
+    };
+    const paint = (k, f, ac) => {
+      if (k === "heart") return f.col || ac;
+      if (k === "petal") return shade(ac, R([0.3, 0.5, 0.72]));
+      if (k === "leaf") return R(LEAVES);
+      if (k === "bow") return shade(ac, R([0.25, 0.55]));
+      if (k === "confetti") return R([...SPRINKLE.slice(0, 4), ac]);
+      if (k === "star") return R(["#f3cc63", "#ffe9a8", "#fff6d8"]);
+      if (k === "paw") return shade(ac, -0.12);
+      return "#fff";
+    };
+    let stampN = 0;
+    const spawn = (i, f, g) => {
+      if (live.length >= MAX || !g) return;
+      const k = f.k;
+      const mode = FX_MODE[k] || "fall";
+      const col = paint(k, f, accents[i]);
+      const el = pool.pop() || layer.appendChild(document.createElement("i"));
+      el.className = `gl__p gl__p--${k}` + (k === "snow" || k === "cloud" || k === "feather" || col === "#ffffff" ? " is-white" : "");
+      el.innerHTML = FX_ART[k](col);
+      const s = R(FX_SIZE[k][0], FX_SIZE[k][1]);
+      el.style.setProperty("--s", s.toFixed(0) + "px");
+      const p = { el, k, mode, t: 0, r: R(-30, 30), vr: R(-90, 90), ph: R(0, 6.28), amp: 0, fw: 1, bounces: 0, rest: 0 };
+      if (mode === "fall" || mode === "heavy") {
+        // fruit drops out of the lamp; light things fall all through the upper part of the beam
+        const sky = mode === "heavy" ? 0 : R(0, 1) ** 0.7 * Math.max(0, g.top - 40 - g.by);
+        p.x = g.bx + R(-6, 6) + R(-0.5, 0.5) * sky * 1.3;
+        p.y = g.by + R(0, 14) + sky;
+        const tx = g.pl + g.pw * R(0.1, 0.9); // it comes down over the plinth
+        p.floor = g.floor + R(-0.02, 0.05) * g.pw;
+        const D = Math.max(60, p.floor - p.y);
+        if (mode === "heavy") {
+          p.vy = R(0, 40);
+          p.vx = (tx - p.x) / Math.sqrt((2 * D) / 1500);
+        } else {
+          p.vt = k === "feather" ? R(70, 100) : k === "snow" ? R(90, 130) : R(115, 170);
+          p.vy = 70;
+          p.vx = (tx - p.x) / (D / p.vt);
+          p.amp = R(10, 26);
+          p.fw = R(1.6, 3);
+          if (k === "snow") p.vr = R(-40, 40);
+        }
+      } else if (mode === "rise") {
+        p.x = g.cx + R(-0.4, 0.4) * g.w;
+        p.y = g.top + g.h * R(0.1, 0.5);
+        p.vy = -R(30, 55);
+        p.vx = R(-8, 8);
+        p.life = R(2.2, 3.2);
+        p.amp = R(6, 16);
+        p.fw = R(1.5, 2.6);
+      } else if (mode === "twinkle") {
+        p.x = g.cx + R(-0.75, 0.75) * g.w;
+        p.y = g.top + R(-0.35, 0.55) * g.h;
+        p.vy = R(4, 14);
+        p.vx = 0;
+        p.vr = R(-40, 40);
+        p.life = R(1.1, 1.7);
+      } else {
+        // paw prints run round the cake — up one side, over its top, down the other — left foot, right foot
+        const u = Math.PI * (0.85 + ((stampN++ % 11) / 10) * 1.3);
+        const rx = g.w * 0.5 + 30, ry = g.h * 0.55 + 4, cy = g.top + g.h * 0.55;
+        const side = stampN % 2 ? 1 : -1;
+        const a = Math.atan2(ry * Math.cos(u), -rx * Math.sin(u)); // the way it runs, clockwise
+        p.x = g.cx + rx * Math.cos(u) - Math.sin(a) * side * 8;
+        p.y = cy + ry * Math.sin(u) + Math.cos(a) * side * 8;
+        p.r = (a * 180) / Math.PI + 90;
+        p.vx = p.vy = p.vr = 0;
+        p.life = 2.4;
+      }
+      live.push(p);
+    };
+
+    // a cake reaching the light: it hops onto its plinth, the ring runs out, the tag twirls round, the weather bursts out
+    const hops = new Map();
+    const hopVals = new Map();
+    let lit = -1, queue = [], emitAt = 0, trickle = 0;
+    const arrive = (i, time) => {
+      const item = items[i];
+      hops.get(item)?.kill();
+      // the hop runs on plain numbers written out each frame: a tween of the page's own values reads them first,
+      // and that read lays out the whole hall in the middle of the scroll
+      let h = hopVals.get(item);
+      if (!h) hopVals.set(item, (h = { hop: 0, sx: 1, sy: 1, rg: 0 }));
+      const out = () => {
+        item.style.setProperty("--hop", h.hop.toFixed(2));
+        item.style.setProperty("--sx", h.sx.toFixed(3));
+        item.style.setProperty("--sy", h.sy.toFixed(3));
+        item.style.setProperty("--rg", h.rg.toFixed(3));
+      };
+      hops.set(item, gsap.timeline({ onUpdate: out })
+        .to(h, { hop: 26, sx: 0.95, sy: 1.06, duration: 0.22, ease: "power2.out" })
+        .to(h, { hop: 0, sx: 1, sy: 1, duration: 0.2, ease: "power2.in" })
+        .to(h, { sx: 1.07, sy: 0.92, duration: 0.07, ease: "power1.out" })
+        .fromTo(h, { rg: 0 }, { rg: 1, duration: 0.9, ease: "power2.out" }, "<")
+        .to(h, { sx: 1, sy: 1, duration: 0.8, ease: "elastic.out(1, 0.35)" }, "<0.07"));
+      if (shown < 0 || vis < 0.05) write(i);
+      else if (shown !== i) {
+        if (twirl) twirl.kill();
+        w += (Math.random() < 0.5 ? -1 : 1) * 1.4;
+        twirl = gsap.timeline()
+          .to(card, { rotationY: 90, duration: 0.16, ease: "power2.in" })
+          .call(() => write(i))
+          .fromTo(card, { rotationY: -90 }, { rotationY: 0, duration: 1.1, ease: "elastic.out(1, 0.45)" });
+      }
+      stampN = 0;
+      const fx = moods[i].fx;
+      queue = Array.from({ length: fine ? 18 : 10 }, (_, n) => ({ i, f: fx[n % fx.length], at: time + 0.12 + n * 0.055 }));
+      emitAt = time + 1.2;
+    };
+
+    gsap.ticker.add((time, dtMs) => {
+      const st = state();
+      if (!st.active || st.lx == null) return;
+      const dt = clamp(1 / 240, 1 / 20, dtMs / 1000);
+
+      // a cake still flying off the stand gets its moment once it has landed
+      if (st.aim !== lit) {
+        const body = st.aim >= 0 && $(".ex__cake", items[st.aim]);
+        if (!body || body.style.opacity !== "0") {
+          lit = st.aim;
+          if (lit >= 0) arrive(lit, time);
+          else queue = [];
+        }
+      }
+      // every measurement of the frame first
+      const tr = track.getBoundingClientRect(), sr = sec.getBoundingClientRect();
+      const lampTop = lamp.offsetTop;
+      const due = lit >= 0 && live.length < MAX && ((queue.length && queue[0].at <= time) || time >= emitAt);
+      const g = due ? geo(lit, tr, sr, lampTop) : null;
+      const litTop = lit >= 0 && shown >= 0 && cardH ? bodyOf(items[lit]).getBoundingClientRect().top : 0;
+      while (queue.length && queue[0].at <= time) { const q = queue.shift(); if (q.i === lit) spawn(q.i, q.f, g); }
+      if (lit >= 0 && time >= emitAt) {
+        emitAt = time + (fine ? 0.17 : 0.3);
+        const fx = moods[lit].fx;
+        spawn(lit, fx[trickle++ % fx.length], g);
+      }
+
+      // the tag hangs from the rim of the shade, for as long as there is room above the cake in the light
+      const t = (st.tilt * Math.PI) / 180;
+      const px = st.lx + 20 * Math.cos(t) - 31 * Math.sin(t);
+      const py = lampTop + 20 * Math.sin(t) + 31 * Math.cos(t);
+      let want = 0, sc = 1, fits = false;
+      if (lit >= 0 && shown >= 0 && cardH) {
+        const top = litTop - sr.top;
+        const room = top - py - 14;
+        sc = Math.min(1, (room - 16) / cardH);
+        // and only once the whole tag is on screen: while a cake is still sliding in at the edge, it waits rolled up
+        fits = sc > 0.62 && px - (cardW * sc) / 2 > 6 && px + (cardW * sc) / 2 < innerWidth - 6;
+        want = fits ? Math.min(110, room - cardH * sc) : 0;
+      }
+      vis += ((fits ? 1 : 0) - vis) * (fits ? 0.07 : 0.16);
+      len += (want - len) * 0.1;
+      // a pendulum on a moving lamp: gravity pulls it straight, the lamp's acceleration swings it, a breath of air keeps it alive
+      const vx = ppx == null ? 0 : (px - ppx) / dt;
+      ppx = px;
+      axs += (clamp(-5000, 5000, (vx - pvx) / dt) - axs) * 0.35;
+      pvx = vx;
+      const L = Math.max(40, len * vis + cardH * sc * 0.55);
+      w += ((-2400 * Math.sin(th) + axs * Math.cos(th)) / L - 2.6 * w + Math.sin(time * 1.3) * 0.35) * dt;
+      th = clamp(-0.75, 0.75, th + w * dt);
+      const drop = len * vis;
+      tag.style.transform = `translate(${(px - tr.left).toFixed(1)}px, ${(py + sr.top - tr.top).toFixed(1)}px) rotate(${th.toFixed(4)}rad)`;
+      str.style.height = (drop + 11 * sc).toFixed(1) + "px";
+      hang.style.transform = `translateY(${drop.toFixed(1)}px) scale(${(sc * (0.55 + vis * 0.45)).toFixed(3)})`;
+      hang.style.opacity = vis.toFixed(3);
+      tag.style.visibility = vis < 0.01 ? "hidden" : "";
+
+      // the weather
+      for (let n = live.length - 1; n >= 0; n--) {
+        const p = live[n];
+        p.t += dt;
+        let x = p.x, sx = 1, sy = 1, op = 1, dead = false;
+        if (p.mode === "fall") {
+          p.vy += (p.vt - p.vy) * Math.min(1, dt * 2.5);
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.r += p.vr * dt;
+          x = p.x + Math.sin(p.t * p.fw + p.ph) * p.amp;
+          if (FX_FLIP.has(p.k)) sx = Math.cos(p.t * p.fw * 1.7 + p.ph);
+          op = Math.min(1, p.t / 0.25) * clamp(0, 1, (p.floor - p.y) / 36);
+          dead = p.y >= p.floor || p.t > 12;
+        } else if (p.mode === "heavy") {
+          if (!p.rest) {
+            p.vy += 1500 * dt;
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            p.r += p.vr * dt;
+            if (p.y >= p.floor) {
+              p.y = p.floor;
+              if (p.bounces++ < 2 && p.vy > 140) { p.vy *= -0.36; p.vx *= 0.45; p.vr *= 0.5; } else { p.rest = p.t; p.vy = 0; }
+            }
+          }
+          x = p.x;
+          op = Math.min(1, p.t / 0.15) * (p.rest ? clamp(0, 1, 1 - (p.t - p.rest - 0.9) / 0.5) : 1);
+          dead = (p.rest && p.t - p.rest > 1.4) || p.t > 8;
+        } else if (p.mode === "rise") {
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          x = p.x + Math.sin(p.t * p.fw + p.ph) * p.amp;
+          p.r = Math.sin(p.t * p.fw + p.ph) * 14;
+          sx = sy = 0.3 + 0.7 * popEase(Math.min(1, p.t / 0.4));
+          op = clamp(0, 1, p.t / 0.15) * clamp(0, 1, (p.life - p.t) / 0.8);
+          dead = p.t > p.life;
+        } else if (p.mode === "twinkle") {
+          p.y += p.vy * dt;
+          p.r += p.vr * dt;
+          sx = sy = Math.max(0, Math.sin((Math.PI * p.t) / p.life));
+          dead = p.t > p.life;
+        } else {
+          sx = sy = popEase(Math.min(1, p.t / 0.3));
+          op = clamp(0, 1, (p.life - p.t) / 0.7);
+          dead = p.t > p.life;
+        }
+        if (dead) {
+          p.el.style.opacity = 0;
+          pool.push(p.el);
+          live.splice(n, 1);
+          continue;
+        }
+        p.el.style.transform = `translate3d(${x.toFixed(1)}px, ${p.y.toFixed(1)}px, 0) rotate(${p.r.toFixed(1)}deg) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
+        p.el.style.opacity = op.toFixed(3);
+      }
+    }, false, true); // first in the frame: it measures the page as last painted, before the hall's own frame writes to it
+  }
+
   function horizontal() {
     const sec = $(".gl");
     const track = $(".gl__track", sec);
     if (!sec || !track) return;
     const items = $$(".ex", sec);
-    const dist = () => Math.max(0, track.scrollWidth - innerWidth);
+    // the row travels until its last card stands in the middle, under the lamp
+    const tail = items[items.length - 1];
+    const dist = () => Math.max(0, tail ? tail.offsetLeft + tail.offsetWidth / 2 - innerWidth / 2 : track.scrollWidth - innerWidth);
     const tween = gsap.to(track, {
       x: () => -dist(),
       ease: "none",
@@ -1982,6 +2997,15 @@
     });
     gsap.timeline({ scrollTrigger: { trigger: sec, start: "top top", end: () => "+=" + dist() * 0.75, scrub: 1 } })
       .to($$(".gl__berry", sec), { x: (i) => -innerWidth * (0.45 + i * 0.25), y: (i) => (i ? -60 : 40), rotation: (i) => (i ? 40 : -30), ease: "none" }, 0);
+    // while the room holds the top of the screen the body wears its colour: Safari paints its status bar and the strip
+    // under its bottom bar with the body, so on a phone the room runs edge to edge instead of sitting in cherry/mint bands
+    const pinned = tween.scrollTrigger;
+    document.body.style.setProperty("--edge-gl", getComputedStyle(sec).getPropertyValue("--bg").trim());
+    ScrollTrigger.create({
+      start: () => pinned.start,
+      end: () => pinned.end + sec.offsetHeight,
+      onToggle: (st) => document.body.classList.toggle("is-edge-gl", st.isActive),
+    });
     const FOCUS = 0.5; // where on screen a card counts as "in focus": the middle, under the title
 
     // Intro: the title waits in the dark; as the lamp comes on above it, «Обрані» rises letter by letter,
@@ -2027,14 +3051,25 @@
         const base = (lh - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2 + m.fontBoundingBoxAscent + (h - lh) / 2;
         return { cv, ctx, dpr, w, h, letter, base, font, x: ch.offsetLeft, y: ch.offsetTop };
       });
+      reelW = w1.offsetWidth;
+      reelH = w1.offsetHeight;
+      reelL = -1;
     };
+    // the word's size is measured with the letters, not on every frame (a read there would force a layout each time)
+    let reelW = 0, reelH = 0, reelL = -1, reelAt = 0;
     const reelDraw = () => {
       if (!pens.length || reel.readyState < 2) return;
-      const W = w1.offsetWidth, H = w1.offsetHeight;
+      const W = reelW, H = reelH;
+      const lxt = parseFloat(w1.style.getPropertyValue("--lxt")) || W / 2;
+      // the film runs at 30 frames a second and a phone screen refreshes at 60–120: paint the letters only when there
+      // can be a new frame of it, or when the light on them has moved
+      const now = performance.now();
+      if ((reel.paused || now - reelAt < 30) && Math.abs(lxt - reelL) < 0.5) return;
+      reelAt = now;
+      reelL = lxt;
       const vw = reel.videoWidth, vh = reel.videoHeight;
       const k = Math.max(W / vw, H / vh) * REEL.zoom;
       const ox = (W - vw * k) * REEL.fx, oy = (H - vh * k) * REEL.fy;
-      const lxt = parseFloat(w1.style.getPropertyValue("--lxt")) || W / 2;
       pens.forEach((p) => {
         const { ctx, dpr, w, h } = p;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -2084,13 +3119,14 @@
       });
       introBox.addEventListener("pointerleave", () => { torch = null; introBox.style.setProperty("--torch", 0); });
     }
-    gsap.timeline({ scrollTrigger: { trigger: sec, start: "top 55%" } })
-      .from(chars, { yPercent: 115, rotate: 10, duration: 1.1, stagger: 0.05, ease: "expo.out" }, 0.85)
-      .fromTo($(".gl__light", sec), { opacity: 0, scale: 0.6, rotation: -20, "--gp": "100%" }, { opacity: 1, scale: 1, rotation: 0, duration: 1.1, ease: "back.out(1.7)" }, 1.1)
-      .from($$(".gl__berry", sec), { scale: 0, opacity: 0, duration: 1.3, stagger: 0.15, ease: "back.out(1.8)" }, 1.3)
-      .from($$(".gl__call", sec), { opacity: 0, y: (i) => (i ? 16 : -16), duration: 0.9, stagger: 0.2, ease: "power3.out" }, 1.8)
-      .to($(".gl__light", sec), { "--gp": "0%", duration: 1.8, ease: "power2.inOut" }, 1.3)
-      .call(() => { introDone = true; }, null, 3.2);
+    // starts while the hall is still opening and is all in place within about a second, so nobody walks into an empty room
+    gsap.timeline({ scrollTrigger: { trigger: sec, start: "top 65%" } })
+      .from(chars, { yPercent: 115, rotate: 10, duration: 0.8, stagger: 0.035, ease: "expo.out" }, 0.1)
+      .fromTo($(".gl__light", sec), { opacity: 0, scale: 0.6, rotation: -20, "--gp": "100%" }, { opacity: 1, scale: 1, rotation: 0, duration: 0.8, ease: "back.out(1.7)" }, 0.3)
+      .from($$(".gl__berry", sec), { scale: 0, opacity: 0, duration: 0.9, stagger: 0.1, ease: "back.out(1.8)" }, 0.35)
+      .from($$(".gl__call", sec), { opacity: 0, y: (i) => (i ? 16 : -16), duration: 0.6, stagger: 0.12, ease: "power3.out" }, 0.5)
+      .to($(".gl__light", sec), { "--gp": "0%", duration: 1.2, ease: "power2.inOut" }, 0.4)
+      .call(() => { introDone = true; }, null, 1.6);
 
     // touch a letter and it wobbles like jelly
     if (fine) chars.forEach((ch) => ch.parentNode.addEventListener("pointerenter", () => {
@@ -2132,24 +3168,37 @@
     const swap = (el, text) => {
       if (!el || el.textContent === text) return;
       gsap.timeline()
-        .to(el, { yPercent: -50, opacity: 0, duration: 0.18, ease: "power2.in" })
+        .fromTo(el, { yPercent: 0, opacity: 1 }, { yPercent: -50, opacity: 0, duration: 0.18, ease: "power2.in" })
         .call(() => { el.textContent = text; })
         .fromTo(el, { yPercent: 50, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.45, ease: "expo.out" });
     };
+    // each cake's colours sit in its own style attribute; the computed style is the fallback
     const tone = (el) => {
+      const bg = el.style.getPropertyValue("--bg").trim(), ac = el.style.getPropertyValue("--ac").trim();
+      if (bg && ac) return { bg, ac };
       const cs = getComputedStyle(el);
       return { bg: cs.getPropertyValue("--bg").trim(), ac: cs.getPropertyValue("--ac").trim() };
     };
+    // the hall's colours now, kept here so the colour change never reads them back from the page
+    let hue = null;
     const focus = (i) => {
       const t = tone(items[i]);
       const name = items[i].dataset.name || "Ваш торт";
-      gsap.to(sec, { "--bg": t.bg, "--ac": t.ac, duration: 0.9, ease: "power2.out", overwrite: "auto" });
+      if (!hue) hue = tone(sec);
+      gsap.to(hue, {
+        bg: t.bg, ac: t.ac, duration: 0.9, ease: "power2.out", overwrite: "auto",
+        onUpdate: () => { sec.style.setProperty("--bg", hue.bg); sec.style.setProperty("--ac", hue.ac); },
+      });
+      // set at once, not tweened: a value changing on the body restyles the whole page on every frame,
+      // and Safari only re-reads its bar colour while scrolling anyway
+      document.body.style.setProperty("--edge-gl", t.bg);
       swap(nowEl, name);
       dots.forEach((b, k) => b.classList.toggle("is-on", k === i));
     };
 
     let active = false;
     let last = -1;
+    let aim = -1; // the cake the lamp is lighting right now; -1 while it is on the title
     let lx = null;
     let tilt = 0;
     let il = 1;
@@ -2161,48 +3210,63 @@
 
     // walking in, the hall is dim; the lamp stutters on and lands its beam on the first cake
     gsap.set(sec, { "--lamp": 0, "--dim": 1 });
-    gsap.timeline({ scrollTrigger: { trigger: sec, start: "top 55%" } })
+    gsap.timeline({ scrollTrigger: { trigger: sec, start: "top 65%" } })
       .to(sec, { keyframes: [
-        { "--lamp": 0.9, duration: 0.06 }, { "--lamp": 0.1, duration: 0.1 }, { "--lamp": 0.7, duration: 0.05 },
-        { "--lamp": 0.05, duration: 0.18 }, { "--lamp": 1, duration: 0.08 }, { "--lamp": 0.6, duration: 0.05 }, { "--lamp": 1, duration: 0.2 },
-      ], ease: "none" }, 0.2)
-      .to(sec, { "--dim": 0, duration: 1.4, ease: "power2.out" }, 0.75);
+        { "--lamp": 0.9, duration: 0.05 }, { "--lamp": 0.1, duration: 0.07 }, { "--lamp": 0.7, duration: 0.04 },
+        { "--lamp": 0.05, duration: 0.1 }, { "--lamp": 1, duration: 0.06 }, { "--lamp": 0.6, duration: 0.04 }, { "--lamp": 1, duration: 0.12 },
+      ], ease: "none" }, 0)
+      .to(sec, { "--dim": 0, duration: 0.9, ease: "power2.out" }, 0.3);
     new IntersectionObserver(([e]) => { active = e.isIntersecting; }).observe(sec);
+    // a style value that has not changed is not written again: every write makes the browser restyle the hall
+    const written = new WeakMap();
+    const put = (el, prop, v) => {
+      let m = written.get(el);
+      if (!m) written.set(el, (m = {}));
+      if (m[prop] === v) return;
+      m[prop] = v;
+      el.style.setProperty(prop, v);
+    };
     gsap.ticker.add(() => {
       if (!active) return;
       const vw = innerWidth;
       let best = Infinity;
       let idx = last < 0 ? 0 : last;
+      // all the measuring first, then all the writing: a read after a write forces a fresh layout, on every frame
+      const rects = items.map((c) => c.getBoundingClientRect());
+      const nr = note && note.getBoundingClientRect();
+      const tt = titleEl && titleEl.getBoundingClientRect();
+      const w1Left = w1 && tt ? w1.getBoundingClientRect().left : 0;
+      const goldRects = introDone && tt ? golds.map((g) => g.el.getBoundingClientRect()) : null;
       items.forEach((c, i) => {
-        const r = c.getBoundingClientRect();
-        if (r.right < -100 || r.left > vw + 100) { c.style.setProperty("--on", 0); return; }
+        const r = rects[i];
+        if (r.right < -100 || r.left > vw + 100) { put(c, "--on", "0"); return; }
         const d = (r.left + r.width / 2 - vw * FOCUS) / vw;
         if (Math.abs(d) < best) { best = Math.abs(d); idx = i; }
         const dc = gsap.utils.clamp(-1, 1, d);
-        c.style.setProperty("--on", gsap.utils.clamp(0, 1, 1 - Math.abs(d) * 2.6).toFixed(3));
-        c.style.setProperty("--d", dc.toFixed(3));
-        c.style.setProperty("--ad", Math.abs(dc).toFixed(3));
+        put(c, "--on", gsap.utils.clamp(0, 1, 1 - Math.abs(d) * 2.6).toFixed(3));
+        put(c, "--d", dc.toFixed(3));
+        put(c, "--ad", Math.abs(dc).toFixed(3));
       });
       if (idx !== last) { last = idx; focus(idx); }
 
       // the lamp rides the rail towards the cake in focus; on the way its beam tilts so it stays aimed at the cake.
       // while the title is nearer the middle than any cake (at the very start), the lamp lights the title
-      const nr = note && note.getBoundingClientRect();
       const onNote = !!nr && Math.abs(nr.left + nr.width / 2 - vw * FOCUS) / vw < best;
       const onIntro = onNote;
+      aim = onIntro ? -1 : idx;
       il += ((onIntro ? 1 : 0) - il) * 0.08;
-      sec.style.setProperty("--il", il.toFixed(3));
-      const tr = onNote ? nr : items[idx].getBoundingClientRect();
+      put(sec, "--il", il.toFixed(3));
+      const tr = onNote ? nr : rects[idx];
       const tx = tr.left + tr.width / 2;
       lx = lx == null ? tx : lx + (tx - lx) * 0.07;
       const reach = Math.max(200, tr.top + tr.height * 0.45 - lampY);
       tilt += (gsap.utils.clamp(-38, 38, (-Math.atan2(tx - lx, reach) * 180) / Math.PI) - tilt) * 0.25;
-      sec.style.setProperty("--lx", lx.toFixed(1) + "px");
-      sec.style.setProperty("--tilt", tilt.toFixed(2) + "deg");
+      put(sec, "--lx", lx.toFixed(1) + "px");
+      put(sec, "--tilt", tilt.toFixed(2) + "deg");
 
       // the title casts a shadow on the wall away from the lamp: straight down under it, longer and softer as the lamp moves off
       if (titleEl) {
-        const t = titleEl.getBoundingClientRect();
+        const t = tt;
         if (t.right > -200 && t.left < innerWidth + 200) {
           // the light source is the visitor's torch while the pointer is over the text, otherwise the lamp
           const srcX = torch ? torch.x : lx;
@@ -2211,24 +3275,26 @@
           const len = Math.hypot(dx, dy) || 1;
           const shx = gsap.utils.clamp(-48, 48, dx * 0.06);
           const shy = torch ? gsap.utils.clamp(-30, 30, dy * 0.08) : gsap.utils.clamp(8, 30, 6 + dy * 0.03 + Math.abs(dx) * 0.012);
-          intro.style.setProperty("--shx", shx.toFixed(1) + "px");
-          intro.style.setProperty("--shy", shy.toFixed(1) + "px");
-          intro.style.setProperty("--shb", (6 + Math.abs(dx) * 0.02).toFixed(1) + "px");
-          intro.style.setProperty("--ux", (dx / len).toFixed(3));
-          intro.style.setProperty("--uy", (dy / len).toFixed(3));
-          if (w1) w1.style.setProperty("--lxt", (srcX - w1.getBoundingClientRect().left).toFixed(1) + "px");
+          put(intro, "--shx", shx.toFixed(1) + "px");
+          put(intro, "--shy", shy.toFixed(1) + "px");
+          put(intro, "--shb", (6 + Math.abs(dx) * 0.02).toFixed(1) + "px");
+          put(intro, "--ux", (dx / len).toFixed(3));
+          put(intro, "--uy", (dy / len).toFixed(3));
+          if (w1) put(w1, "--lxt", (srcX - w1Left).toFixed(1) + "px");
           reelDraw();
           // the gold catches the light where the lamp is
-          if (introDone) golds.forEach((g) => {
-            const r = g.el.getBoundingClientRect();
+          if (goldRects) golds.forEach((g, j) => {
+            const r = goldRects[j];
             const target = gsap.utils.clamp(0, 100, (0.5 - (srcX - r.left - r.width / 2) / r.width / 1.6) * 100);
             g.p += (target - g.p) * 0.1;
-            g.el.style.setProperty("--gp", g.p.toFixed(2) + "%");
+            put(g.el, "--gp", g.p.toFixed(2) + "%");
           });
         }
       }
-      if (bar) bar.style.setProperty("--p", along(tween.progress()).toFixed(4));
+      if (bar) put(bar, "--p", along(tween.progress()).toFixed(4));
     });
+
+    lampMoments(sec, track, items, () => ({ aim, lx, tilt, active }));
 
     // The cake stand under the title: the cakes ride an ellipse — large and in full colour at the front, small and dim at the back.
     // It turns slowly by itself, slower still under the pointer; scrolling gives it a spin. A click goes to that cake's plinth
@@ -2275,6 +3341,19 @@
         spin += (dt / 1000) * (slow ? 0.05 : 0.3) + kick * 14 * (1 - f);
         const rr = ring.getBoundingClientRect();
         const cx = rr.left + rr.width / 2;
+        // measure every landing spot before moving any cake (reads between writes would lay the page out per cake)
+        const fis = rides.map((el, i) => gsap.utils.clamp(0, 1, (f - i * 0.045) / 0.62));
+        const spots = rides.map((el, i) => {
+          const home = homes[i];
+          if (!(fis[i] > 0 && home)) return null;
+          // where the cake stands on its plinth right now (a lazy image not loaded yet: the stage it will fill)
+          let t = home.getBoundingClientRect();
+          if (t.height < 2) {
+            const st = home.closest(".ex__stage").getBoundingClientRect();
+            t = { left: st.left, width: st.width, bottom: st.bottom, height: st.height * 0.8 };
+          }
+          return { t, ih: imgs[i].offsetHeight };
+        });
         rides.forEach((el, i) => {
           const a = spin + (i / rides.length) * Math.PI * 2;
           const k = (Math.cos(a) + 1) / 2; // 1 at the front, 0 at the back
@@ -2283,32 +3362,27 @@
           let sc = 0.42 + k * 0.58;
           let rot = 0;
           let lit = k;
-          const fi = gsap.utils.clamp(0, 1, (f - i * 0.045) / 0.62);
+          const fi = fis[i];
           const home = homes[i];
-          if (home) home.style.opacity = fi >= 1 ? "" : "0";
-          el.style.visibility = fi >= 1 ? "hidden" : "";
-          if (fi > 0 && home) {
-            // where the cake stands on its plinth right now (a lazy image not loaded yet: the stage it will fill)
-            let t = home.getBoundingClientRect();
-            if (t.height < 2) {
-              const st = home.closest(".ex__stage").getBoundingClientRect();
-              t = { left: st.left, width: st.width, bottom: st.bottom, height: st.height * 0.8 };
-            }
+          if (home) put(home, "opacity", fi >= 1 ? "" : "0");
+          put(el, "visibility", fi >= 1 ? "hidden" : "");
+          if (spots[i]) {
+            const { t, ih } = spots[i];
             const e = fly(fi);
             const arc = Math.sin(Math.PI * fi);
             x += (t.left + t.width / 2 - cx - x) * e;
             y += (t.bottom - rr.top - y) * e - arc * innerHeight * 0.04; // a low hop: the path stays under the title
-            sc += ((imgs[i].offsetHeight ? t.height / imgs[i].offsetHeight : 1) - sc) * e;
+            sc += ((ih ? t.height / ih : 1) - sc) * e;
             rot = arc * (i % 2 ? 14 : -14);
             lit += (1 - lit) * e;
           }
-          el.style.transform = `translate(calc(-50% + ${x.toFixed(1)}px), calc(-100% + ${y.toFixed(1)}px)) rotate(${rot.toFixed(2)}deg) scale(${sc.toFixed(3)})`;
-          el.style.zIndex = fi > 0 ? 200 + i : 1 + Math.round(k * 100);
-          el.style.filter = `brightness(${(0.8 + lit * 0.2).toFixed(3)}) saturate(${(0.55 + lit * 0.45).toFixed(3)})`;
+          put(el, "transform", `translate(calc(-50% + ${x.toFixed(1)}px), calc(-100% + ${y.toFixed(1)}px)) rotate(${rot.toFixed(2)}deg) scale(${sc.toFixed(3)})`);
+          put(el, "z-index", String(fi > 0 ? 200 + i : 1 + Math.round(k * 100)));
+          put(el, "filter", `brightness(${(0.8 + lit * 0.2).toFixed(3)}) saturate(${(0.55 + lit * 0.45).toFixed(3)})`);
         });
       });
       // as the lamp comes on, the cakes drop onto the stand one after another
-      gsap.from($$("img", ring), { yPercent: -140, opacity: 0, duration: 1, stagger: 0.09, ease: "bounce.out", scrollTrigger: { trigger: sec, start: "top 55%" }, delay: 1.2 });
+      gsap.from($$("img", ring), { yPercent: -140, opacity: 0, duration: 0.85, stagger: 0.06, ease: "bounce.out", scrollTrigger: { trigger: sec, start: "top 65%" }, delay: 0.3 });
     }
 
     // A cake can be lifted off its plinth and carried about; let go and it drops back with a little wobble
@@ -2361,9 +3435,29 @@
       <circle cx="200" cy="200" r="163" fill="none" stroke="#e2849a" stroke-width="1.2" stroke-dasharray="2 5"/>`;
   }
 
+  // The «Торти» course on the plate is one of the cakes in the catalogue right now: the two-tier «Cherry Romance» with
+  // its cherries while it is on sale (tiers, as the card beside it promises, and the cherry the whole site runs on),
+  // else the first whole cut-out. Its width follows its shape, so a tall cake stands as high on the plate as a wide one
+  function orderStar(sec) {
+    const span = $(".x-treat span", sec);
+    const whole = (window.MARIDAY?.cakes || []).filter((c) => MARIDAY.cutout(c) && (c.cutout || !STEP_CROPPED.includes(c.img)));
+    const c = whole.find((k) => k.id === "cherry-romance") || whole[0];
+    if (!span || !c) return;
+    const img = $("img", span);
+    const src = MARIDAY.cutout(c);
+    const fit = () => {
+      if (img.naturalWidth) span.style.setProperty("--w", Math.min(80, (84 * img.naturalWidth) / img.naturalHeight).toFixed(1) + "%");
+    };
+    img.alt = c.name || "";
+    if (img.getAttribute("src") === src && img.complete) return fit();
+    img.addEventListener("load", fit, { once: true });
+    img.src = src;
+  }
+
   function orderMenu(live) {
     const sec = $(".x-order");
     if (!sec) return;
+    orderStar(sec);
     const pin = $(".x-order__pin", sec);
     const stage = $(".x-order__stage", sec);
     const dish = $(".x-dish", sec);
@@ -2374,7 +3468,6 @@
     const btns = $$(".x-order__nav button", sec);
     const cards = $$(".x-menu", sec);
     const cherry = $(".x-order__cherry", sec);
-    const num = $("[data-dish-num]", sec);
     const barFill = $(".x-order__bar i", sec);
     const flood = $(".x-order__flood", sec);
     const burst = $(".x-dish__burst", sec);
@@ -2516,7 +3609,6 @@
       });
       sec.style.setProperty("--tint", cards[i].dataset.tint);
       splash(cards[i].dataset.tint);
-      num.textContent = pad(i + 1);
       cur = i;
       moveCherry();
       if (live) serve(treats[i], prev, dir);
@@ -2996,8 +4088,18 @@
   // Videos must never stay paused: restart on any pause, tab return, or first user gesture
   function keepVideosPlaying() {
     const videos = $$("video");
+    // a film plays only while it is near the screen: two full-HD films decoding all the way down the page wear a phone out
+    const near = new Map(videos.map((v) => [v, true]));
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((es) => es.forEach((e) => {
+        near.set(e.target, e.isIntersecting);
+        if (e.isIntersecting) play(e.target);
+        else e.target.pause();
+      }), { rootMargin: "50% 0px" });
+      videos.forEach((v) => io.observe(v));
+    }
     const play = (v) => {
-      if (document.hidden) return;
+      if (document.hidden || !near.get(v)) return;
       v.muted = true;
       v.loop = true;
       v.playsInline = true;
@@ -3021,6 +4123,8 @@
     storyPhone();
     const world = $(".x-drop__world");
     if (world) world.innerHTML = '<p class="x-mani-static">Ми не печемо <span>«просто торти»</span></p>';
+    const drop = $(".x-drop");
+    if (drop) sideCakes(drop);
     cutCake();
     cakeWheel(false);
     orderMenu(false);
@@ -3031,7 +4135,14 @@
     onScroll();
   }
 
+  function edgeTint() {
+    const set = () => document.body.classList.toggle("is-edge-dark", scrollY < 2);
+    addEventListener("scroll", set, { passive: true });
+    set();
+  }
+
   function init() {
+    edgeTint();
     renderCards();
     renderWheel();
     renderFaq();
@@ -3073,6 +4184,7 @@
     pageTransitions();
 
     animateEdges();
+    cutCap();
     ScrollTrigger.sort();
 
     runLoader(() => {
@@ -3082,6 +4194,18 @@
 
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
     addEventListener("load", () => ScrollTrigger.refresh());
+    // a lazy image or a late font can still grow a section after the last refresh, and every pin below it would then
+    // start too early (Safari sizes unloaded lazy images at 0) — so whenever the page's height changes, re-measure
+    if (window.ResizeObserver) {
+      let pageH = document.documentElement.scrollHeight, wait = 0;
+      new ResizeObserver(() => {
+        const h = document.documentElement.scrollHeight;
+        if (Math.abs(h - pageH) < 2) return;
+        pageH = h;
+        clearTimeout(wait);
+        wait = setTimeout(() => ScrollTrigger.refresh(), 200);
+      }).observe(document.body);
+    }
   }
 
   MARIDAY.onReady(init);

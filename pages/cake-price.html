@@ -9,70 +9,92 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236d0809'/%3E%3Cpath d='M14 44h36v6H14z' fill='%23dbefed'/%3E%3Cpath d='M20 28h24v16H20z' fill='%23f5bcc8'/%3E%3Cpath d='M25 18h14v10H25z' fill='%23dbefed'/%3E%3Ccircle cx='32' cy='13' r='5' fill='%23f5bcc8'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="../css/main.css?v=10">
-  <link rel="stylesheet" href="../css/pages.css?v=12">
+  <link rel="stylesheet" href="../css/main.css?v=23">
+  <link rel="stylesheet" href="../css/pages.css?v=13">
   <link rel="stylesheet" href="../css/glaze.css?v=1">
+  <link rel="stylesheet" href="../css/price.css?v=2">
 </head>
-<body data-page="price" class="inner inner--default">
+<body data-page="price" class="inner inner--default cp">
   <div class="grain" aria-hidden="true"></div>
   <a class="p-skip" href="#main">До вмісту</a>
   <div id="site-header"></div>
   <main id="main">
-    <header class="p-hero p-hero--sky">
-      <img class="p-hero__cherry p-hero__cherry--a" data-depth="1.4" src="../img/cakes/cherries.png" alt="">
-      <img class="p-hero__cherry p-hero__cherry--b" data-depth="0.7" src="../img/cakes/cherries.png" alt="">
-      <div class="p-hero__top">
+
+    <!-- ① The anatomy of the price: a real cake from the catalogue comes apart in three layers — decor on top,
+         filling in the middle, weight at the bottom — each with a handwritten note; the stand is the delivery,
+         a little clock is the timing. Its own price tag swings under it. Tap the cake to take apart the next one. -->
+    <header class="cp-hero">
+      <img class="p-hero__cherry p-hero__cherry--a cp-hero__cherry" data-depth="1.4" src="../img/cakes/cherries.png" alt="">
+      <div class="cp-hero__copy">
         <nav class="p-crumbs" aria-label="Хлібні крихти"><a href="../index.html">Головна</a><i>/</i><span>Ціна</span></nav>
-        <p class="p-eyebrow">( Прозорість )</p>
+        <h1 class="p-title cp-title"><span class="p-title__word" data-chars>З чого</span><em class="p-script">ціна торта</em></h1>
+        <p class="p-lede cp-hero__lede" data-up>Вага, декор, начинка й терміни — ось і вся магія. Розберемо торт по шарах і порахуємо ваш за пів хвилини.</p>
+        <div class="p-hero__actions" data-up><a class="p-btn" href="#calc"><span>Порахувати торт</span></a><a class="p-link" href="#koly">Коли замовляти →</a></div>
       </div>
-      <h1 class="p-title"><span class="p-title__word" data-chars>З чого</span><em class="p-script">ціна торта</em></h1>
-      <div class="p-hero__bottom">
-        <p class="p-lede" data-up>Вага, декор, начинка й терміни — ось і вся магія. Порахуйте свій торт за пів хвилини.</p>
-        
+
+      <div class="cp-x" data-cp-x>
+        <button type="button" class="cp-x__stage" data-cp-x-go aria-label="Розібрати інший торт">
+          <span class="cp-x__glow" aria-hidden="true"></span>
+          <span class="cp-x__cake" data-cp-x-cake aria-hidden="true"></span>
+          <span class="cp-x__stand" aria-hidden="true"><i></i></span>
+        </button>
+        <ul class="cp-x__notes" data-cp-x-notes>
+          <li class="cp-x__note cp-x__note--decor"><b>декор</b><span>квіти, фігурки, розпис</span></li>
+          <li class="cp-x__note cp-x__note--fill"><b>начинка</b><span>більшість — уже в ціні</span></li>
+          <li class="cp-x__note cp-x__note--kg"><b>вага</b><span>150–200 г на гостя</span></li>
+          <li class="cp-x__note cp-x__note--time"><span class="cp-x__clock" aria-hidden="true"><i></i><i></i></span><b>терміни</b><span>на завтра +20%</span></li>
+          <li class="cp-x__note cp-x__note--road"><b>доставка</b><span>самовивіз — €0</span></li>
+        </ul>
+        <a class="cp-x__tag" data-cp-x-tag href="cakes.html" hidden><span data-cp-x-name></span><b data-cp-x-price></b></a>
+        <p class="cp-hand cp-x__hint" aria-hidden="true">тиць по торту — розберемо інший ↺</p>
       </div>
     </header>
-    <section class="p-wrap p-section">
-      <div class="p-section__head">
-        <h2 class="p-h2" data-rise>Калькулятор <span class="p-light">торта</span></h2>
-        <p class="p-hand" data-up>рухайте повзунок — рахуємо вагу на гостей ↓</p>
-      </div>
-      <div class="pc" id="price-calc"></div>
+
+    <div class="cp-ribbon" aria-hidden="true">
+      <div class="p-ribbon p-ribbon--tilt" data-marquee><div class="p-ribbon__track"><span>150–200 г на гостя</span><b>🍒</b><span>Самовивіз — €0</span><b>🍒</b><span>Терміново +20%</span><b>🍒</b><span>Бенто — без доплати</span><b>🍒</b><span>150–200 г на гостя</span><b>🍒</b><span>Самовивіз — €0</span><b>🍒</b><span>Терміново +20%</span><b>🍒</b><span>Бенто — без доплати</span><b>🍒</b></div></div>
+      <svg class="cp-ribbon__drips" viewBox="0 0 1200 60" preserveAspectRatio="none" data-cp-drips></svg>
+    </div>
+
+    <!-- ② The kitchen scale: the guests sit down at the table, the cake grows on the pan, the needle swings to its weight;
+         the till prints the receipt line by line, a rubber stamp slams down for an urgent order. -->
+    <section class="cp-calc" id="calc" aria-labelledby="cp-calc-title">
+      <header class="cp-calc__head">
+        <h2 class="cp-h2" id="cp-calc-title" aria-label="Скільки торта треба?"><span class="cp-h2__w" data-cp-split aria-hidden="true">Скільки</span><span class="cp-h2__s" aria-hidden="true">торта треба?</span></h2>
+      </header>
+      <div class="cp-calc__in" data-cp-calc></div>
     </section>
-    <div class="p-ribbon p-ribbon--tilt" data-marquee aria-hidden="true"><div class="p-ribbon__track"><span>150–200 г на гостя</span><b>✦</b><span>Самовивіз — €0</span><b>✦</b><span>Терміново +20%</span><b>✦</b><span>Бенто — без доплати</span><b>✦</b><span>150–200 г на гостя</span><b>✦</b><span>Самовивіз — €0</span><b>✦</b><span>Терміново +20%</span><b>✦</b><span>Бенто — без доплати</span><b>✦</b></div></div>
-    <section class="p-wrap p-section">
-      <h2 class="p-h2" data-rise>5 інгредієнтів <span class="p-light">ціни</span></h2>
-      <div class="pf-grid" id="price-factors"></div>
+
+    <!-- ③ The recipe of a price: five jars on the pantry shelf, one ingredient in each — weights, sprinkles,
+         layers of a real filling, an hourglass, a cake box. They drop onto the shelf; tap one and its lid pops. -->
+    <section class="cp-pantry" id="recept" aria-labelledby="cp-pantry-title">
+      <svg class="cp-edge cp-edge--scallop" viewBox="0 0 1200 40" preserveAspectRatio="none" aria-hidden="true" data-cp-scallop></svg>
+      <header class="cp-pantry__head">
+        <h2 class="cp-h2" id="cp-pantry-title" aria-label="Рецепт ціни"><span class="cp-h2__w" data-cp-split aria-hidden="true">Рецепт</span><span class="cp-h2__s" aria-hidden="true">ціни</span></h2>
+        <p class="cp-hand cp-pantry__note">п’ять інгредієнтів — і жодних секретних ↓</p>
+      </header>
+      <div class="cp-shelf" data-cp-shelf></div>
     </section>
-    <section class="p-wrap p-section ruler">
-      <h2 class="p-h2" data-rise>Коли <span class="p-light">замовляти?</span></h2>
-      <div class="ruler__track" data-up>
-        <div class="ruler__line" aria-hidden="true"><i></i></div>
-        <div class="ruler__stop" style="--x:4%"><b>1 день</b><span>Бенто</span></div>
-        <div class="ruler__stop" style="--x:30%"><b>5–7 днів</b><span>Класичні торти</span></div>
-        <div class="ruler__stop" style="--x:56%"><b>7 днів</b><span>Candy bar</span></div>
-        <div class="ruler__stop" style="--x:88%"><b>2–3 тижні</b><span>Весільні й скульптурні</span></div>
-      </div>
-      <p class="p-hand" data-up>+20% — термінове замовлення на наступний день (крім бенто)</p>
+
+    <!-- ④ When to order: the kitchen's ticket rail. Order tickets clip onto it at their lead time; slide the cherry
+         to the day of the party and every ticket stamps itself «встигаємо» or «краще раніше». -->
+    <section class="cp-rail" id="koly" aria-labelledby="cp-rail-title">
+      <svg class="cp-edge cp-edge--wave" viewBox="0 0 1200 50" preserveAspectRatio="none" aria-hidden="true" data-cp-wave></svg>
+      <header class="cp-rail__head">
+        <h2 class="cp-h2" id="cp-rail-title" aria-label="Коли замовляти?"><span class="cp-h2__w" data-cp-split aria-hidden="true">Коли</span><span class="cp-h2__s" aria-hidden="true">замовляти?</span></h2>
+      </header>
+      <div class="cp-rail__in" data-cp-rail></div>
     </section>
-    <section class="p-cta" data-sprinkles>
-      <div class="p-cta__inner">
-        <p class="p-eyebrow light" data-up>( Ваша черга )</p>
-        <h2 class="p-cta__title" data-rise>Порахували? <em>Зберемо!</em></h2>
-        <a class="p-magnet" href="constructor.html"><span>У конструктор</span></a>
-        
-        <p class="p-cta__hint">Клікніть будь-де — буде посипка ✦</p>
-      </div>
-    </section>
+
   </main>
   <div id="site-footer"></div>
   <script src="../js/vendor/gsap.min.js"></script>
   <script src="../js/vendor/ScrollTrigger.min.js"></script>
   <script src="../js/vendor/lenis.min.js"></script>
-  <script src="../js/data.js?v=12"></script>
-  <script src="../js/content.js?v=1"></script>
+  <script src="../js/data.js?v=16"></script>
+  <script src="../js/content.js?v=3"></script>
   <script src="../js/cart.js?v=10"></script>
-  <script src="../js/layout.js?v=12"></script>
-  <script src="../js/app.js?v=14"></script>
-  <script src="../js/pages.js?v=11"></script>
+  <script src="../js/layout.js?v=24"></script>
+  <script src="../js/pages.js?v=12"></script>
+  <script src="../js/price.js?v=2"></script>
 </body>
 </html>

@@ -281,125 +281,6 @@
     });
   }
 
-  /* ───────── Cake lab: tap the cake to stack your own ───────── */
-  function cakeLab() {
-    const FLAVORS = [
-      { n: "Ваніль", c: "#fbe6b8", t: "#6d0809" },
-      { n: "Малина", c: "#e2849a", t: "#fff" },
-      { n: "Шоколад", c: "#4a1a12", t: "#fbe6b8" },
-      { n: "Фісташка", c: "#cfe0b0", t: "#3d0405" },
-      { n: "Солона карамель", c: "#d9a066", t: "#3d0405" },
-      { n: "Чорниця", c: "#9b86c9", t: "#fff" },
-      { n: "Полуниця", c: "#f5bcc8", t: "#6d0809" },
-      { n: "Червоний оксамит", c: "#a3161c", t: "#fbe6b8" },
-      { n: "Лимонний курд", c: "#f6e27a", t: "#3d0405" },
-      { n: "Манго-маракуя", c: "#f4b860", t: "#3d0405" },
-    ];
-    const DONE = ["Шедевр! Такого ще ніхто не пік", "Ідеально. Тепер — по-справжньому →", "Кондитер уже плаче від щастя"];
-    const MAX = 6;
-    const rnd = (a, b) => a + Math.random() * (b - a);
-
-    $$("[data-cake-lab]").forEach((sec) => {
-      const cake = $(".lab__cake", sec);
-      const stack = $(".lab__stack", sec);
-      const tags = $(".lab__tags", sec);
-      const msg = $(".lab__msg", sec);
-      const bar = $(".lab__bar i", sec);
-      let n = 0;
-      let bag = [];
-      let busy = false;
-
-      sec.classList.add("js-lab");
-      if (!live || !("IntersectionObserver" in window)) sec.classList.add("is-in");
-      else {
-        const io = new IntersectionObserver((es) => {
-          if (es.some((e) => e.isIntersecting)) { sec.classList.add("is-in"); io.disconnect(); }
-        }, { threshold: 0.25 });
-        io.observe(sec);
-      }
-
-      const pick = () => {
-        if (!bag.length) bag = FLAVORS.slice().sort(() => Math.random() - 0.5);
-        return bag.pop();
-      };
-      const status = () => {
-        bar.style.width = (n / MAX) * 100 + "%";
-        msg.textContent = n >= MAX ? DONE[(Math.random() * DONE.length) | 0] : n ? `Шар ${n} з ${MAX}` : `Шар 0 з ${MAX} — почнімо?`;
-        cake.setAttribute("aria-label", n >= MAX ? "Торт готовий. Натисніть, щоб почати заново" : `Додати шар до торта (${n} з ${MAX})`);
-      };
-      const tag = (f, layer) => {
-        // offsets, not rects: the layer is still mid-drop when we place its label
-        const top = cake.offsetTop + stack.offsetTop + layer.offsetTop;
-        const left = n % 2;
-        const li = document.createElement("li");
-        const dot = document.createElement("i");
-        li.style.setProperty("--c", f.c);
-        li.style.setProperty("--tr", `${rnd(-10, 10).toFixed(1)}deg`);
-        li.style.top = `${top - 4}px`;
-        if (left) li.style.right = `${cake.offsetParent.clientWidth - cake.offsetLeft + 14}px`;
-        else li.style.left = `${cake.offsetLeft + cake.offsetWidth + 14}px`;
-        li.append(dot, `+ ${f.n}`);
-        li.addEventListener("animationend", () => li.remove());
-        if (matchMedia("(max-width: 900px)").matches) tags.replaceChildren();
-        tags.appendChild(li);
-      };
-      const cakeTop = () => {
-        const s = sec.getBoundingClientRect();
-        const c = (stack.children[MAX - 1] || cake).getBoundingClientRect();
-        return [c.left + c.width / 2 - s.left, c.top - s.top];
-      };
-      const finish = () => {
-        stack.lastElementChild.classList.add("lab__layer--top");
-        const cherry = document.createElement("span");
-        cherry.className = "lab__cherry";
-        stack.appendChild(cherry);
-        sec.classList.add("is-done");
-        setTimeout(() => {
-          const [x, y] = cakeTop();
-          sec._burst?.(x, y, 140);
-        }, reduce ? 0 : 650);
-      };
-      const reset = () => {
-        busy = true;
-        const kids = [...stack.children];
-        kids.forEach((el, i) => {
-          el.style.setProperty("--fx", `${rnd(-260, 260).toFixed(0)}px`);
-          el.style.setProperty("--fr", `${rnd(-90, 90).toFixed(0)}deg`);
-          el.style.animationDelay = `${(kids.length - i) * 0.05}s`;
-          el.classList.add("is-leaving");
-        });
-        setTimeout(() => {
-          stack.innerHTML = "";
-          n = 0;
-          busy = false;
-          sec.classList.remove("is-done", "is-started");
-          status();
-        }, reduce ? 0 : 750);
-      };
-      const add = () => {
-        if (busy) return;
-        if (n >= MAX) return reset();
-        const f = pick();
-        const layer = document.createElement("span");
-        layer.className = "lab__layer";
-        layer.textContent = f.n;
-        layer.style.setProperty("--c", f.c);
-        layer.style.setProperty("--t", f.t);
-        layer.style.setProperty("--dx", `${rnd(-5, 5).toFixed(1)}px`);
-        layer.style.setProperty("--rr", `${rnd(-18, 18).toFixed(0)}deg`);
-        stack.appendChild(layer);
-        n++;
-        sec.classList.add("is-started");
-        tag(f, layer);
-        if (n === MAX) finish();
-        status();
-      };
-
-      cake.addEventListener("click", add);
-      status();
-    });
-  }
-
   /* ───────── Page transitions: three-layer curtain ───────── */
   function pageTransitions() {
     if (!live) return;
@@ -458,7 +339,6 @@
     magnets();
     tilt();
     sprinkles();
-    cakeLab();
     pageTransitions();
     footerWord();
     if (hasLibs) {

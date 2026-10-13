@@ -1,6 +1,5 @@
 /* Catalog cards as exhibits — the same showcase as «Обрані роботи» on the home page:
-   each cake in a room of its own colour, on a marble plinth with its number in gold; the lamp lights it on hover
-   and a snapshot of the real cake peeks out from behind. */
+   each cake in a room of its own colour, on a marble plinth with its number in gold; the lamp lights it on hover. */
 .ex-card__room {
   position: relative;
   display: block;
@@ -33,12 +32,6 @@
 .ex-card__plinth::before { content: ""; position: absolute; left: 0; right: 0; top: -7cqw; height: 14cqw; border-radius: 50%; background: radial-gradient(ellipse at 50% 40%, #fffdfb, #f4e7e3 70%, color-mix(in srgb, var(--accent) 18%, #e6d2ce)); box-shadow: inset 0 -2px 0 rgba(201, 160, 82, 0.55); }
 .ex-card__no { position: relative; font-family: var(--font-luxe); font-style: italic; font-size: 11cqw; line-height: 1; background: linear-gradient(180deg, #e9c77b, #b8862f 55%, #8a5a12); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .ex-card__no sup { font-size: 0.4em; margin-right: 0.1em; }
-
-/* the snapshot of the real cake, pinned behind the exhibit */
-.ex-card__snap { position: absolute; z-index: 3; left: 6%; top: 9%; width: 34%; padding: 2.2cqw 2.2cqw 6cqw; background: #fff; box-shadow: 0 2cqw 5cqw rgba(61, 4, 5, 0.25); rotate: -9deg; scale: 0; transform-origin: 80% 80%; transition: scale 0.55s cubic-bezier(0.34, 1.7, 0.5, 1), rotate 0.55s; }
-.ex-card__snap img { width: 100%; aspect-ratio: 1; object-fit: cover; }
-.ex-card__snap i { position: absolute; left: 0; right: 0; bottom: 1cqw; font-family: var(--font-hand); font-style: normal; font-weight: 700; font-size: 5cqw; text-align: center; color: var(--cherry); }
-.ex-card:hover .ex-card__snap { scale: 1; rotate: -6deg; }
 
 .ex-card .ex-card__price { z-index: 4; right: 5%; bottom: 5%; width: 25cqw; }
 .ex-card .ex-card__price b { font-size: 6.4cqw; }
