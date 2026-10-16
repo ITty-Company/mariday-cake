@@ -1,0 +1,21 @@
+/* Mariday · tablets and phones — fixes for the sizes between the phone and the laptop layouts.
+   Loaded last on every page, so it only adjusts; the designs themselves live in each page's own stylesheet. */
+
+/* ── the menu sheet on a tablet: the phone's small links would float in a sea of white ── */
+@media (min-width: 700px) and (min-height: 700px) {
+  .mnav__in { max-width: 640px; }
+  .mnav__list { gap: clamp(22px, 3.6svh, 40px); }
+  .mnav__link { font-size: 1.2rem; letter-spacing: 0.2em; }
+  .mnav__more { max-width: 460px; gap: 6px 22px; }
+  .mnav__more a { font-size: 0.92rem; }
+  .mnav__soc { width: 48px; height: 48px; }
+  .mnav__soc svg { width: 21px; height: 21px; }
+}
+
+/* ── home · how to order: on a tablet the road's two columns are narrow, and the real cakes drifting beside it
+   (sized for a laptop) would sail over the chapters' text — they shrink to the margins ── */
+@media (min-width: 761px) and (max-width: 1100px) {
+  .x-path__lm { width: calc(var(--w) * 0.56); }
+  /* 02 · the cut fraisier: its halves fall apart within the picture's own column, not over the chapter beside it */
+  .x-pv-split { width: 190px; height: 190px; margin-left: -95px; }
+}

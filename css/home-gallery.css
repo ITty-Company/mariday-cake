@@ -818,3 +818,57 @@
 @media (max-width: 560px) {
   .gl__tag-card { font-size: 1.1rem; padding: 24px 0.9em 0.65em; }
 }
+
+/* ── phones: the stage lift (horizontal() in js/home.js sets .is-lift) ──
+   nothing travels sideways: a stage floor with a trapdoor under the lamp; the title rises away like a curtain,
+   then the cakes come up through the floor on their plinths one at a time and sink back as the next one rises */
+.gl__floor { display: none; }
+.gl.is-lift .gl__track { position: absolute; inset: 0; display: block; width: auto; padding: 0; will-change: auto; }
+.gl.is-lift .gl__hall {
+  position: absolute;
+  inset: calc(var(--header) + 24px) 0 calc(var(--floor, 110px) + 10px);
+  margin: 0;
+  will-change: transform, opacity;
+}
+.gl.is-lift .gl__cards { position: absolute; z-index: 1; inset: 0; display: block; }
+.gl.is-lift .gl__cards::after { display: none; }
+/* every plinth stands in the trapdoor, its foot hidden under the hole's front rim; --sink lowers it into the floor */
+.gl.is-lift .ex {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--floor, 110px) - var(--hry, 28px) * 0.5);
+  margin-left: calc(var(--cw) * -0.5);
+  transform: translateY(var(--sink, 0px));
+}
+/* the two sheets of floor: the far one (with the hole) behind the plinths, the near one in front of them */
+.gl.is-lift .gl__floor { display: block; position: absolute; left: 0; bottom: 0; width: 100%; overflow: visible; pointer-events: none; }
+.gl.is-lift .gl__floor--back { z-index: 0; }
+.gl.is-lift .gl__floor--front { z-index: 3; filter: drop-shadow(0 -1px 0 rgba(255, 250, 240, 0.55)); }
+.gl__floor-far { stop-color: color-mix(in srgb, var(--bg) 84%, var(--cherry)); transition: stop-color 0.9s; }
+.gl__floor-near { stop-color: color-mix(in srgb, var(--bg) 62%, #fffaf4); transition: stop-color 0.9s; }
+.gl__floor-hi { opacity: calc(var(--lamp, 1) * 0.9); }
+.gl__floor-seam { fill: none; stroke: color-mix(in srgb, var(--cherry) 28%, transparent); stroke-width: 1.5; }
+.gl__floor-rim { fill: none; stroke: #d3ac5c; stroke-width: 2; opacity: 0.85; }
+/* warm light breathes out of the hole while a plinth is going through it */
+.gl__floor-puff { opacity: var(--puff, 0); }
+.gl.is-lift .gl__cards::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--floor, 110px) - var(--hry, 28px));
+  width: calc(var(--cw) * 1.2);
+  height: calc(var(--cw) * 0.7);
+  translate: -50% 0;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  background: radial-gradient(ellipse 50% 100% at 50% 100%, rgba(255, 240, 208, 0.75), rgba(255, 228, 190, 0.25) 45%, transparent 75%);
+  opacity: var(--puff, 0);
+  pointer-events: none;
+}
+.gl.is-lift .ex::before { opacity: calc(var(--on) * var(--lamp, 1) * (1 - var(--il, 0))); }
+
+/* without the scripts, a phone gets the cakes one under another instead of a row to swipe */
+@media (max-width: 760px) {
+  .x-static .gl__track { flex-direction: column; align-items: center; width: auto; overflow: visible; scroll-snap-type: none; padding: 40px var(--gutter); gap: 64px; }
+  .x-static .gl__hall { flex: none; margin: 0; }
+  .x-static .gl__cards { flex-direction: column; align-items: center; gap: 64px; }
+}

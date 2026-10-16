@@ -1,11 +1,11 @@
 /* ═══════════════════════════════════════════
    MARIDAY — the flavour map (pages/flavors.html, js/flavors.js)
    From the glaze on top to the board at the bottom:
-   ① the top — cherry glaze, the title in pink sugar, every filling's real cake peeking over the piped cream edge;
+   ① the top — soft strawberry-milk glaze, the title in cherry glaze, every filling's real cake peeking over the piped cream edge;
    ② the island — every filling is a place on a cream island with its real cake; a cherry rolls from cake to cake;
    ③ the pastry ring — answers drop layers into a ring on a gold board, the real cake of your filling takes its place;
    ④ the gift box — the lid lifts, a little cake pops up in every paper cup;
-   ⑤ the board — the filling you found, next to the button that builds it.
+   ⑤ the carousel — the filling you found on a cake stand, the others riding round it; the button builds it.
    Same materials as the home page: cherry glaze on cream, Pacifico piped across, Caveat notes.
    ═══════════════════════════════════════════ */
 
@@ -17,8 +17,8 @@
   /* a line of cream between two layers */
   --fl-seam: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='20' viewBox='0 0 120 20'%3E%3Cpath d='M0 6 Q30 0 60 6 T120 6 V14 Q90 20 60 14 T0 14 Z' fill='%23fff8f0'/%3E%3C/svg%3E");
 }
-/* Safari paints its status bar with the body colour: cherry while the glaze is at the top */
-.fl.is-edge-dark, .fl.is-edge-dark::before { background: var(--cherry); }
+/* Safari paints its status bar with the body colour: the blush of the glaze while it is at the top */
+.fl.is-edge-dark, .fl.is-edge-dark::before { background: #fde6eb; }
 .fl #main { overflow-x: clip; }
 .fl-hand { margin: 0; font-family: var(--font-hand); font-weight: 500; font-size: clamp(1.2rem, 1.7vw, 1.55rem); line-height: 1.2; color: var(--cherry); }
 
@@ -161,7 +161,7 @@ img[data-edge~="b"] { --m-y: linear-gradient(to top, transparent, #000 18%); }
   min-height: max(100svh, 760px);
   margin-top: calc(-1 * var(--fl-hdr, 0px));
   padding: calc(var(--fl-hdr, 0px) + clamp(1.2rem, 3.5vh, 2.6rem)) var(--gutter) 0;
-  color: #ffe9ee;
+  color: var(--cherry);
   text-align: center;
   isolation: isolate;
   /* the cakes sinking behind the cream edge must not show over the map below */
@@ -173,16 +173,16 @@ img[data-edge~="b"] { --m-y: linear-gradient(to top, transparent, #000 18%); }
   z-index: -1;
   overflow: hidden;
   background:
-    radial-gradient(42% 46% at var(--mx) var(--my), rgba(255, 128, 140, 0.3), transparent 70%),
-    radial-gradient(90% 70% at 50% 0%, rgba(214, 50, 58, 0.45), transparent 70%),
-    radial-gradient(140% 100% at 50% 10%, #8e0f15 0%, #6d0809 42%, #4f0507 78%, #3a0304 100%);
+    radial-gradient(40% 44% at var(--mx) var(--my), rgba(255, 255, 255, 0.75), transparent 70%),
+    radial-gradient(70% 55% at 50% 0%, #fff6f7, transparent 70%),
+    linear-gradient(180deg, #fde6eb 0%, #fadbe2 55%, #f7ced8 100%);
   transition: --mx 0.8s var(--ease-out), --my 0.8s var(--ease-out);
 }
 /* a slow gloss runs across the glaze */
 .fl-top__shine {
   position: absolute;
   inset: -30% -40%;
-  background: linear-gradient(112deg, transparent 42%, rgba(255, 255, 255, 0.05) 47%, rgba(255, 220, 226, 0.13) 50%, rgba(255, 255, 255, 0.04) 53%, transparent 58%);
+  background: linear-gradient(112deg, transparent 42%, rgba(255, 255, 255, 0.12) 47%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.1) 53%, transparent 58%);
   animation: fl-shine 9s ease-in-out infinite;
 }
 @keyframes fl-shine { 0%, 15% { translate: -40% 0; } 65%, 100% { translate: 40% 0; } }
@@ -192,14 +192,14 @@ img[data-edge~="b"] { --m-y: linear-gradient(to top, transparent, #000 18%); }
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle, rgba(255, 220, 228, 0.35) 0 1px, transparent 1.6px) 0 0 / 46px 52px,
-    radial-gradient(circle, rgba(255, 220, 228, 0.22) 0 1px, transparent 1.6px) 23px 26px / 46px 52px;
+    radial-gradient(circle, rgba(194, 91, 114, 0.22) 0 1px, transparent 1.6px) 0 0 / 46px 52px,
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 1.6px) 23px 26px / 46px 52px;
   -webkit-mask: linear-gradient(transparent, #000 30%, #000 70%, transparent);
   mask: linear-gradient(transparent, #000 30%, #000 70%, transparent);
 }
 .fl-top__copy { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; width: 100%; }
-.fl-crumbs { color: rgba(255, 233, 238, 0.6); }
-.fl-crumbs a { color: #ffd9e1; }
+.fl-crumbs { color: rgba(109, 8, 9, 0.5); }
+.fl-crumbs a { color: var(--cherry); }
 .fl-top__title { margin-top: clamp(1.4rem, 3.5vh, 2.6rem); font-size: clamp(3.4rem, 14vw, 13rem); line-height: 0.86; }
 .fl-top__title .fl-h2__s { right: -0.2em; bottom: -0.42em; font-size: 0.42em; }
 /* a pair of cherries sits on the title */
@@ -211,18 +211,18 @@ img[data-edge~="b"] { --m-y: linear-gradient(to top, transparent, #000 18%); }
   width: 0.62em;
   rotate: 14deg;
   transform-origin: 30% 10%;
-  filter: drop-shadow(0 0.06em 0.05em rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 0.06em 0.05em rgba(109, 8, 9, 0.3));
   animation: fl-sway 3.6s ease-in-out infinite;
   pointer-events: none;
 }
 @keyframes fl-sway { 50% { transform: rotate(-9deg) translateY(-3%); } }
 .fl-js .fl-top__cherry { animation: fl-cherry-in 0.9s var(--expo) 0.75s both, fl-sway 3.6s ease-in-out 1.65s infinite; }
 @keyframes fl-cherry-in { from { opacity: 0; transform: translateY(-120%) rotate(-30deg); } }
-.fl-top__lede { max-width: 36rem; margin: clamp(2.6rem, 6vh, 3.6rem) 0 1.6rem; font-size: clamp(1rem, 1.3vw, 1.14rem); line-height: 1.65; color: rgba(255, 233, 238, 0.82); }
+.fl-top__lede { max-width: 36rem; margin: clamp(2.6rem, 6vh, 3.6rem) 0 1.6rem; font-size: clamp(1rem, 1.3vw, 1.14rem); line-height: 1.65; color: rgba(61, 4, 5, 0.72); }
 .fl-top__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1rem 1.8rem; }
-.fl-btn { background: var(--pink); color: var(--cherry); box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.45); }
+.fl-btn { background: var(--cherry); color: var(--fl-cream); box-shadow: 0 14px 30px -14px rgba(109, 8, 9, 0.55); }
 .fl-btn::before { background: var(--fl-cream); }
-.fl-top__link { color: #ffd9e1; }
+.fl-top__link { color: var(--cherry); }
 .fl-js .fl-top__lede, .fl-js .fl-top__actions, .fl-js .fl-crumbs { animation: fl-up 0.8s var(--expo) both; }
 .fl-js .fl-crumbs { animation-delay: 0.05s; }
 .fl-js .fl-top__lede { animation-delay: 0.45s; }
@@ -262,15 +262,15 @@ img[data-edge~="b"] { --m-y: linear-gradient(to top, transparent, #000 18%); }
   height: 100%;
   object-fit: contain;
   object-position: 50% 100%;
-  filter: drop-shadow(0 18px 18px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 18px 16px rgba(109, 8, 9, 0.2));
   animation: fl-bob 4.2s ease-in-out calc(var(--k) * -0.47s) infinite;
   transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @keyframes fl-bob { 50% { translate: 0 -3%; } }
 .fl-peek:hover .fl-peek__cake img, .fl-peek:focus-visible .fl-peek__cake img { transform: translateY(-14%) rotate(-2deg) scale(1.04); }
 .fl-peek__flag { position: absolute; left: 50%; bottom: 92%; display: flex; flex-direction: column; align-items: center; opacity: 0; transform: translate(-50%, 20px) scale(0.6); transition: opacity 0.3s, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; }
-.fl-peek__flag b { order: -1; padding: 0.3rem 0.9rem 0.4rem; border-radius: 999px; background: var(--fl-cream); color: var(--cherry); font-family: "Pacifico", var(--font-script); font-weight: 400; font-size: 0.95rem; line-height: 1.2; white-space: nowrap; box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.5); }
-.fl-peek__flag i { width: 2px; height: 18px; background: var(--fl-cream); opacity: 0.8; }
+.fl-peek__flag b { order: -1; padding: 0.3rem 0.9rem 0.4rem; border-radius: 999px; background: var(--fl-cream); color: var(--cherry); font-family: "Pacifico", var(--font-script); font-weight: 400; font-size: 0.95rem; line-height: 1.2; white-space: nowrap; box-shadow: 0 10px 20px -8px rgba(109, 8, 9, 0.35); }
+.fl-peek__flag i { width: 2px; height: 18px; background: var(--cherry); opacity: 0.5; }
 .fl-peek:hover .fl-peek__flag, .fl-peek:focus-visible .fl-peek__flag { opacity: 1; transform: translate(-50%, -14%) scale(1); }
 
 /* the piped cream edge: a row of shells, each tail tucked under the next one */
@@ -282,7 +282,7 @@ img[data-edge~="b"] { --m-y: linear-gradient(to top, transparent, #000 18%); }
   bottom: -20px;
   height: 50px;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='50' viewBox='0 0 60 50'%3E%3Cdefs%3E%3CradialGradient id='g' cx='0.28' cy='0.32' r='0.8'%3E%3Cstop offset='0' stop-color='%23fff'/%3E%3Cstop offset='0.45' stop-color='%23fff4e8'/%3E%3Cstop offset='1' stop-color='%23d9bca3'/%3E%3C/radialGradient%3E%3Cg id='s'%3E%3Cpath d='M3 32 C1 16 16 5 30 8 C45 11 63 22 81 31 C63 37 45 46 30 46 C13 48 5 43 3 32 Z' fill='url%28%23g%29'/%3E%3Cpath d='M10 19 Q43 16 81 31 M7 32 Q43 29 81 31 M12 42 Q43 43 81 31' fill='none' stroke='%23cfae93' stroke-opacity='0.75' stroke-width='1.3' stroke-linecap='round'/%3E%3Cpath d='M11 24 Q43 22 79 31 M10 37 Q43 37 79 31' fill='none' stroke='%23fff' stroke-opacity='0.8' stroke-width='1.1' stroke-linecap='round'/%3E%3Cpath d='M12 15 Q22 9 33 10' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round'/%3E%3C/g%3E%3C/defs%3E%3Crect y='41' width='60' height='9' fill='%23fff8f0'/%3E%3Cuse href='%23s' x='-60'/%3E%3Cuse href='%23s'/%3E%3C/svg%3E") 0 0 / 60px 50px repeat-x;
-  filter: drop-shadow(0 -3px 4px rgba(0, 0, 0, 0.22)) drop-shadow(0 6px 6px rgba(61, 4, 5, 0.14));
+  filter: drop-shadow(0 -3px 4px rgba(109, 8, 9, 0.12)) drop-shadow(0 6px 6px rgba(61, 4, 5, 0.1));
   pointer-events: none;
 }
 
@@ -842,21 +842,61 @@ img[data-edge~="b"] { --m-y: linear-gradient(to top, transparent, #000 18%); }
 .fl-stamp b { position: relative; display: grid; justify-items: center; font-family: var(--font-hand); font-size: clamp(1rem, 1.3vw, 1.2rem); font-weight: 700; line-height: 1; color: var(--pink); }
 .fl-stamp b span { font-family: "Dela Gothic One", var(--font-wide); font-weight: 400; font-size: clamp(1.1rem, 1.6vw, 1.5rem); color: var(--fl-cream); }
 
-/* ═══════════════ ⑤ The board ═══════════════ */
-.fl-end { margin-top: 0; padding-top: clamp(5rem, 9vw, 8rem); padding-bottom: clamp(3rem, 5vw, 4rem); background: radial-gradient(50% 60% at 30% 55%, rgba(245, 188, 200, 0.2), transparent 70%), var(--cherry); }
+/* ═══════════════ ⑤ The carousel ═══════════════ */
+/* JS measures the stage and sets the track (--cy, --rx, --ry), the stand (--plate, --foot) and the big cake (--cw, --ch) */
+.fl-end {
+  margin-top: 0;
+  padding-top: clamp(4.6rem, 8vw, 6.6rem);
+  padding-bottom: clamp(2.4rem, 4vw, 3.2rem);
+  background: radial-gradient(50% 46% at 50% 62%, #fdeef1, transparent 72%), var(--fl-cream);
+  color: var(--cherry);
+}
 .fl-end::before { top: -1px; background: radial-gradient(circle at 50% 0, var(--fl-blush) 18px, transparent 19px) 0 0 / 52px 36px repeat-x; }
-.fl-end__in { position: relative; z-index: 3; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(1.5rem, 4vw, 4rem); max-width: 1180px; margin: 0 auto; }
-.fl-end__cake { position: relative; display: grid; place-items: end center; height: clamp(300px, 36vw, 480px); }
-.fl-end__cake::before { content: ""; position: absolute; left: 50%; bottom: 0; width: 120%; aspect-ratio: 1; translate: -50% 35%; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--tone, var(--pink)) 55%, transparent), transparent); opacity: 0.7; pointer-events: none; }
-.fl-end__cake .fl-pic { filter: drop-shadow(0 34px 30px rgba(0, 0, 0, 0.4)); }
-.fl-end__cake .fl-flag { top: 2%; left: 60%; }
-.fl-end__copy { display: grid; justify-items: center; gap: 1.6rem; }
-.fl-end__copy .fl-end__go { margin-top: clamp(2.4rem, 4vw, 3.4rem); }
-.fl-end__title { margin-bottom: 0.4em; font-size: clamp(2.8rem, 6.6vw, 6.4rem); }
-.fl-end__pick { max-width: 26rem; color: #ffd9e1; text-align: center; }
-.fl-end__go { position: relative; box-shadow: 0 20px 40px -14px rgba(0, 0, 0, 0.5), inset 0 -8px 0 rgba(109, 8, 9, 0.12), inset 0 6px 0 rgba(255, 255, 255, 0.5); }
-.fl-end__cherry { position: absolute; left: 50%; top: -38%; width: 64%; translate: -50% 0; filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.35)); animation: fl-sway 3.4s ease-in-out infinite; transform-origin: 50% 0; pointer-events: none; }
-.fl-end__hint { position: relative; z-index: 3; margin-top: clamp(2rem, 4vw, 3rem); }
+/* the scallops over the footer are the cream of this section */
+.fl main:has(> .fl-end:last-child) + #site-footer::before { background-image: radial-gradient(circle at 50% 0, var(--fl-cream) 18px, transparent 19px); }
+.fl-end__in { position: relative; z-index: 3; display: grid; justify-items: center; max-width: 1180px; margin: 0 auto; }
+.fl-end__title { font-size: clamp(2.6rem, 6vw, 5.8rem); }
+.fl-end__stage {
+  --cy: 82%; --rx: 40%; --ry: 60px; --plate: 64%; --foot: 84%; --cw: 40%; --ch: 60%;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: clamp(330px, 36vw, 480px);
+  margin-top: clamp(1.2rem, 3vw, 2.2rem);
+}
+/* the track: a soft disc tinted with the cake on the stand, a piped dotted line round it — its front half passes over the stand */
+.fl-end__track { position: absolute; left: calc(50% - var(--rx)); top: calc(var(--cy) - var(--ry)); width: calc(var(--rx) * 2); height: calc(var(--ry) * 2); border-radius: 50%; border: 2px dashed rgba(109, 8, 9, 0.2); pointer-events: none; }
+.fl-end__track--back { z-index: 1; background: radial-gradient(closest-side, color-mix(in srgb, var(--tone, var(--pink)) 38%, #fff), color-mix(in srgb, var(--tone, var(--pink)) 16%, transparent) 72%, transparent); transition: background 0.8s; }
+.fl-end__track--front { z-index: 4; clip-path: inset(50% -4px -4px -4px); }
+/* a cream cake stand: the plate, a slim stem and its foot */
+.fl-end__stand { position: absolute; z-index: 2; left: 50%; top: var(--plate); width: calc(var(--pw, var(--cw)) * 1.08); height: calc(var(--foot) - var(--plate)); translate: -50% 0; background: radial-gradient(closest-side, #fff 40%, #f1e1d6 92%, transparent) 50% 100% / 44% 16px no-repeat; filter: drop-shadow(0 8px 8px rgba(109, 8, 9, 0.12)); }
+.fl-end__stand { transition: width 0.5s var(--expo), opacity 0.4s; }
+.is-own-stand .fl-end__stand { opacity: 0; }
+.fl-end__stand::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 18px; border-radius: 50%; background: linear-gradient(#fff 0 45%, #f2e3d8 46%, #e9d3c4); box-shadow: inset 0 -3px 0 rgba(194, 91, 114, 0.25); }
+.fl-end__stand::after { content: ""; position: absolute; left: 50%; top: 14px; bottom: 6px; width: 9%; min-width: 10px; translate: -50% 0; border-radius: 0 0 40% 40% / 0 0 20% 20%; background: linear-gradient(90deg, #ead6c8, #fff 45%, #ead6c8); }
+.fl-end__cake { position: absolute; z-index: 3; left: 50%; top: calc(var(--plate) - var(--ch) + 5px); display: grid; place-items: end center; width: var(--cw); height: var(--ch); translate: -50% 0; }
+.fl-end__cake .fl-pic { width: auto; height: auto; filter: drop-shadow(0 20px 16px rgba(109, 8, 9, 0.22)); }
+.fl-end__cake .fl-pic img { max-width: var(--cw); max-height: var(--ch); }
+.fl-end__cake .fl-flag { top: -6%; left: 58%; }
+/* every filling's little cake rides the track; JS places them, the ones at the back go behind the stand */
+.fl-end__ride { position: absolute; inset: 0; }
+.fl-orb { position: absolute; left: 0; top: 0; width: var(--ow, 120px); height: var(--oh, 120px); padding: 0; border: 0; background: none; cursor: pointer; transform-origin: 50% 100%; will-change: transform; outline: none; -webkit-tap-highlight-color: transparent; }
+.fl-orb img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; filter: drop-shadow(0 10px 8px rgba(109, 8, 9, 0.18)); transform-origin: 50% 100%; transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s; }
+.fl-orb:hover img, .fl-orb:focus-visible img { transform: translateY(-12%) rotate(-3deg) scale(1.06); }
+.fl-orb.is-out { pointer-events: none; }
+.fl-orb.is-out img { transform: translateY(-40%) scale(0); opacity: 0; }
+.fl-end__ride.is-wait .fl-orb img { transform: translateY(40%) scale(0); opacity: 0; }
+.fl-end__ride.is-intro .fl-orb img { transition-delay: calc(var(--i) * 0.06s); }
+.fl-orb__name { position: absolute; left: 50%; bottom: 100%; padding: 0.25rem 0.8rem 0.35rem; border-radius: 999px; background: #fff; color: var(--cherry); font-family: "Pacifico", var(--font-script); font-size: 0.9rem; line-height: 1.2; white-space: nowrap; box-shadow: 0 10px 20px -10px rgba(109, 8, 9, 0.4); opacity: 0; transform: translate(-50%, 10px) scale(0.7); transition: opacity 0.25s, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; }
+.fl-orb:hover .fl-orb__name, .fl-orb:focus-visible .fl-orb__name { opacity: 1; transform: translate(-50%, -6px) scale(1); }
+/* a cake on its way from the track to the stand */
+.fl-fly { position: fixed; z-index: 90; left: 0; top: 0; object-fit: contain; object-position: 50% 100%; pointer-events: none; transform-origin: 0 0; }
+.fl-end__copy { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1.4rem 2.4rem; margin-top: clamp(2.4rem, 4vw, 3.2rem); }
+.fl-end__pick { max-width: 22rem; color: var(--cherry); text-align: center; }
+.fl-end__go { position: relative; width: clamp(130px, 13vw, 160px); box-shadow: 0 18px 34px -16px rgba(109, 8, 9, 0.45), inset 0 -8px 0 rgba(109, 8, 9, 0.1), inset 0 6px 0 rgba(255, 255, 255, 0.5); }
+.fl-end__go:hover { background: var(--cherry); color: var(--fl-cream); }
+.fl-end__cherry { position: absolute; left: 50%; top: -36%; width: 60%; translate: -50% 0; filter: drop-shadow(0 6px 6px rgba(109, 8, 9, 0.25)); animation: fl-sway 3.4s ease-in-out infinite; transform-origin: 50% 0; pointer-events: none; }
+.fl-end__hint { position: relative; z-index: 3; margin-top: clamp(1.8rem, 3vw, 2.4rem); color: rgba(109, 8, 9, 0.45); }
 
 /* ═══════════════ Smaller screens ═══════════════ */
 @media (max-width: 1100px) {
@@ -876,8 +916,8 @@ img[data-edge~="b"] { --m-y: linear-gradient(to top, transparent, #000 18%); }
   .fl-set__in { grid-template-columns: minmax(0, 1fr); }
   .fl-set__ribbon { left: 0; top: auto; bottom: 30%; clip-path: none; }
   .fl-gift { margin-top: 3.6rem; }
-  .fl-end__in { grid-template-columns: minmax(0, 1fr); }
-  .fl-end__cake { height: clamp(240px, 70vw, 360px); }
+  .fl-end__stage { height: clamp(270px, 74vw, 360px); }
+  .fl-end__copy { flex-direction: column; gap: 2.6rem; }
 }
 /* phones and tall screens: the passport is a sheet at the bottom, the legend runs along the top */
 @media (max-width: 899px), (max-aspect-ratio: 20/23) {
@@ -925,4 +965,5 @@ img[data-edge~="b"] { --m-y: linear-gradient(to top, transparent, #000 18%); }
 
 @media (prefers-reduced-motion: reduce) {
   .fl-top__shine, .fl-top__cherry, .fl-peek__cake img, .fl-stamp svg, .fl-end__cherry { animation: none; }
+  .fl-orb img, .fl-orb__name { transition: none; }
 }

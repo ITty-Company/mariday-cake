@@ -1,0 +1,267 @@
+/* ═══════════════════════════════════════════
+   MARIDAY — ⑥ Seasonal flavours as a year through the kitchen window (pages/desserts.html, js/desserts-year.js)
+   A garland of month tags strung over an arched window, a cherry riding the rope. Wherever the cherry stops,
+   the sky, the garden and the weather on the glass turn to that season, its desserts rise onto the sill
+   and the menu card on the wall changes. Winter frosts the pane over — wipe it with a finger.
+   ═══════════════════════════════════════════ */
+
+@property --wash { syntax: "<color>"; inherits: true; initial-value: #fbe1e8; }
+@property --ct { syntax: "<number>"; inherits: true; initial-value: 0.1; }
+
+.ds-year { --wash: #fbe1e8; --tint: #fbd3de; transition: --wash 1.1s ease; }
+.ds-year[data-season="summer"] { --wash: #ffe4c6; --tint: #ffe0a8; }
+.ds-year[data-season="autumn"] { --wash: #f6dcc0; --tint: #f6c08e; }
+.ds-year[data-season="winter"] { --wash: #d9e6f3; --tint: #d5e4f4; }
+
+/* the wall takes the season's colour, fading out to the page at both ends */
+.ds-year::before {
+  inset: 0;
+  left: 0;
+  top: 0;
+  width: auto;
+  aspect-ratio: auto;
+  border-radius: 0;
+  filter: none;
+  opacity: 1;
+  background:
+    radial-gradient(48% 42% at 30% 58%, var(--wash), transparent 78%),
+    radial-gradient(38% 40% at 76% 52%, color-mix(in srgb, var(--wash) 75%, transparent), transparent 80%);
+}
+
+@media (min-width: 961px) { .ds-year__in { grid-template-columns: minmax(0, 1fr) minmax(0, 27rem); } }
+
+/* ─────────── the window ─────────── */
+.yr-win { position: relative; container-type: inline-size; width: min(100%, 31rem); margin: 0 auto; padding-top: 3cqw; }
+.yr-frame { position: relative; }
+.yr-glass {
+  position: relative;
+  aspect-ratio: 5 / 6;
+  overflow: hidden;
+  border: 3cqw solid #fffaf3;
+  border-radius: 50cqw 50cqw 1.6cqw 1.6cqw / 42cqw 42cqw 1.6cqw 1.6cqw;
+  background: #cfe3f1;
+  box-shadow: 0 0 0 0.5cqw rgba(109, 8, 9, 0.1), 0 4cqw 7cqw -3cqw rgba(61, 4, 5, 0.5);
+  touch-action: pan-y;
+  isolation: isolate;
+}
+.yr-glass > * { position: absolute; pointer-events: none; }
+.yr-sky { inset: 0; opacity: 0; transition: opacity 1.1s ease; }
+.yr-sky--spring { background: linear-gradient(180deg, #bfe0f3 0%, #e7f1f4 55%, #fbe1e9 100%); }
+.yr-sky--summer { background: linear-gradient(180deg, #67bdec 0%, #a6dcf3 50%, #ffe7b3 100%); }
+.yr-sky--autumn { background: linear-gradient(180deg, #a99bbd 0%, #dcb2a2 52%, #f7c58c 100%); }
+.yr-sky--winter { background: linear-gradient(180deg, #3e4f86 0%, #7e93c2 50%, #c9d7ec 100%); }
+.ds-year[data-season="spring"] .yr-sky--spring,
+.ds-year[data-season="summer"] .yr-sky--summer,
+.ds-year[data-season="autumn"] .yr-sky--autumn,
+.ds-year[data-season="winter"] .yr-sky--winter { opacity: 1; }
+
+/* the sun walks the sky through the year; in winter it is the moon */
+.yr-sun {
+  --sx: 24%; --sy: 15%; --sz: 15%;
+  --sc: radial-gradient(circle at 40% 38%, #fff, #fff6dc 70%);
+  --sg: rgba(255, 246, 214, 0.85);
+  left: var(--sx);
+  top: var(--sy);
+  width: var(--sz);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--sc);
+  box-shadow: 0 0 6cqw 2cqw var(--sg), 0 0 18cqw 6cqw color-mix(in srgb, var(--sg) 40%, transparent);
+  translate: -50% -50%;
+  transition: left 1.2s var(--ease), top 1.2s var(--ease), width 1.2s var(--ease), box-shadow 1.2s;
+}
+.ds-year[data-season="summer"] .yr-sun { --sx: 72%; --sy: 14%; --sz: 21%; --sc: radial-gradient(circle at 40% 38%, #fffbe0, #ffd75e 75%); --sg: rgba(255, 210, 90, 0.9); }
+.ds-year[data-season="autumn"] .yr-sun { --sx: 66%; --sy: 50%; --sz: 18%; --sc: radial-gradient(circle at 40% 38%, #ffe2b0, #ff9f55 80%); --sg: rgba(255, 140, 70, 0.75); }
+.ds-year[data-season="winter"] .yr-sun { --sx: 27%; --sy: 15%; --sz: 11%; --sc: radial-gradient(circle at 62% 36%, #3e4f86 0 34%, transparent 35%), radial-gradient(circle, #f6f8ff, #dfe7fb); --sg: rgba(220, 232, 255, 0.6); }
+
+/* the garden behind the window */
+.yr-hill { border-radius: 50%; transition: background-color 1.1s ease; }
+.yr-hill--a { left: -25%; right: 10%; bottom: -26%; height: 52%; background-color: var(--h1, #b6dba0); }
+.yr-hill--b { left: 25%; right: -40%; bottom: -20%; height: 50%; background-color: var(--h2, #d4ebbe); }
+.ds-year[data-season="summer"] .yr-hill { --h1: #7cbd67; --h2: #a5d688; }
+.ds-year[data-season="autumn"] .yr-hill { --h1: #d4823f; --h2: #eab15f; }
+.ds-year[data-season="winter"] .yr-hill { --h1: #f6f9fd; --h2: #e1eaf5; }
+
+.yr-fx, .yr-frost { inset: 0; width: 100%; height: 100%; }
+.yr-frost { opacity: 0; transition: opacity 1s ease; }
+.ds-year[data-season="winter"] .yr-frost { opacity: 1; }
+
+/* the glazing bars and a little light on the glass */
+.yr-bars {
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent calc(50% - 1cqw), #fffaf3 0 calc(50% + 1cqw), transparent 0),
+    linear-gradient(180deg, transparent calc(40% - 1cqw), #fffaf3 0 calc(40% + 1cqw), transparent 0);
+  filter: drop-shadow(0 0.6cqw 0.5cqw rgba(61, 4, 5, 0.22));
+}
+.yr-shine {
+  inset: 0;
+  background: linear-gradient(118deg, transparent 18%, rgba(255, 255, 255, 0.28) 24%, transparent 31%, transparent 60%, rgba(255, 255, 255, 0.14) 64%, transparent 69%);
+  box-shadow: inset 0 1.6cqw 3cqw rgba(30, 10, 20, 0.22);
+}
+
+/* the sill, and the desserts rising from behind its edge */
+.yr-ledge {
+  position: relative;
+  z-index: 1;
+  display: block;
+  height: 5cqw;
+  margin: -1.4cqw -5cqw 0;
+  border-radius: 1.2cqw;
+  background: linear-gradient(180deg, #fffdf8 0 42%, #efe1d3 42% 100%);
+  box-shadow: 0 2.6cqw 3.6cqw -1.8cqw rgba(61, 4, 5, 0.45);
+}
+.yr-shelf { position: absolute; z-index: 2; left: 2cqw; right: 2cqw; bottom: 3cqw; height: 56cqw; clip-path: inset(-40% -20% 0 -20%); pointer-events: none; }
+.yr-sill { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; gap: 1.2cqw; }
+.yr-sill figure {
+  position: relative;
+  flex: 0 0 26cqw;
+  margin: 0;
+  translate: 0 115%;
+  transition: translate 0.32s cubic-bezier(0.5, 0, 0.9, 0.4);
+}
+.yr-sill figure:nth-child(2) { flex-basis: 34cqw; z-index: 1; }
+.yr-sill.is-on figure { translate: 0 0; transition: translate 0.7s cubic-bezier(0.3, 1.45, 0.5, 1) calc(0.18s + var(--i) * 0.08s); }
+.yr-sill img { display: block; width: 100%; height: auto; max-height: 34cqw; object-fit: contain; object-position: 50% 100%; filter: drop-shadow(0 1.4cqw 1.2cqw rgba(61, 4, 5, 0.35)); }
+.yr-sill figure:nth-child(2) img { max-height: 40cqw; }
+/* a paper flag on a cocktail pick in every dessert */
+.yr-sill figcaption {
+  position: absolute;
+  left: 52%;
+  bottom: 70%;
+  padding: 0.5cqw 1.4cqw 0.6cqw;
+  border-radius: 0.6cqw;
+  background: #fffaf3;
+  font-family: var(--font-hand);
+  font-size: max(13px, 3.6cqw);
+  line-height: 1;
+  color: var(--cherry);
+  white-space: nowrap;
+  box-shadow: 0 0.8cqw 1.4cqw -0.6cqw rgba(61, 4, 5, 0.45);
+  rotate: var(--r);
+  transform-origin: 0 100%;
+}
+.yr-sill figcaption::before { content: ""; position: absolute; left: 0.4cqw; top: 0.3cqw; width: 0.4cqw; height: 9cqw; border-radius: 0.2cqw; background: linear-gradient(#e2c79d, #b58f5d); z-index: -1; }
+.yr-sill.is-on figcaption { animation: yr-flag 0.6s var(--pop, ease) calc(0.6s + var(--i) * 0.08s) both; }
+@keyframes yr-flag { from { scale: 0.2; opacity: 0; } 60% { scale: 1.08; } }
+
+.yr-note { margin-top: 1.4rem; text-align: center; font-size: clamp(1.15rem, 1.6vw, 1.4rem); color: var(--pink-deep); min-height: 1.4em; }
+.yr-note.is-new { animation: yr-note 0.5s var(--ease) both; }
+@keyframes yr-note { from { opacity: 0; translate: 0 8px; } }
+
+/* ─────────── the garland of months ─────────── */
+.yr-garland { --sag: 9cqw; --drop: 9cqw; position: absolute; z-index: 4; left: -5cqw; right: -5cqw; top: 6cqw; height: 26cqw; touch-action: pan-y; cursor: grab; }
+.yr-garland.is-drag { cursor: grabbing; }
+.yr-garland__rope { position: absolute; left: 0; top: 0; width: 100%; height: var(--sag); overflow: visible; pointer-events: none; }
+.yr-garland__rope path { fill: none; stroke: #a8655b; stroke-width: 2; stroke-linecap: round; vector-effect: non-scaling-stroke; filter: drop-shadow(0 2px 1px rgba(61, 4, 5, 0.25)); }
+.yr-garland__nail { position: absolute; left: 0; top: 0; width: 2.2cqw; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #c9b4a6 60%, #8d6f62); translate: -50% -50%; box-shadow: 0 0.4cqw 0.6cqw rgba(61, 4, 5, 0.35); }
+.yr-garland__nail--r { left: 100%; }
+
+.yr-m {
+  --dr: 0cqw;
+  position: absolute;
+  left: calc(var(--t) * 100%);
+  top: calc(var(--sag) * 4 * var(--t) * (1 - var(--t)));
+  width: 6.6cqw;
+  height: 22cqw;
+  padding: 0;
+  border: 0;
+  background: none;
+  translate: -50% 0;
+  rotate: var(--r);
+  transform-origin: 50% 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.yr-m::before { content: ""; position: absolute; left: 50%; top: 0; width: 1.5px; height: calc(1.6cqw + var(--dr)); background: rgba(109, 8, 9, 0.45); transition: height 0.55s cubic-bezier(0.3, 1.4, 0.5, 1); }
+.yr-m span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(1.6cqw + var(--dr));
+  display: block;
+  padding: 1.1cqw 0 0.9cqw;
+  border-radius: 0.7cqw 0.7cqw 1.2cqw 1.2cqw;
+  background: #fffaf3;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: max(8px, 2.1cqw);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cherry);
+  box-shadow: 0 0.8cqw 1.4cqw -0.6cqw rgba(61, 4, 5, 0.5);
+  transition: top 0.55s cubic-bezier(0.3, 1.4, 0.5, 1), background-color 0.4s, color 0.4s;
+}
+/* a punched hole */
+.yr-m span::before { content: ""; position: absolute; left: 50%; top: 0.35cqw; width: 0.7cqw; aspect-ratio: 1; border-radius: 50%; background: rgba(109, 8, 9, 0.35); translate: -50% 0; }
+.ds-year[data-season="spring"] .yr-m[data-s="spring"] span,
+.ds-year[data-season="summer"] .yr-m[data-s="summer"] span,
+.ds-year[data-season="autumn"] .yr-m[data-s="autumn"] span,
+.ds-year[data-season="winter"] .yr-m[data-s="winter"] span { background-color: var(--tint); }
+.yr-m[aria-checked="true"] { --dr: var(--drop); }
+.yr-m[aria-checked="true"] span { background-color: var(--cherry) !important; color: #fff8f0; }
+.yr-m.is-now span::after { content: ""; position: absolute; left: 50%; bottom: -1.5cqw; width: 1cqw; aspect-ratio: 1; border-radius: 50%; background: var(--pink-deep); translate: -50% 0; }
+.yr-m:focus-visible { outline: none; }
+.yr-m:focus-visible span { box-shadow: 0 0 0 0.6cqw var(--pink-deep); }
+@media (hover: hover) { .yr-m:hover { animation: yr-tag 0.7s ease-out; } }
+@keyframes yr-tag { 25% { rotate: calc(var(--r) + 9deg); } 55% { rotate: calc(var(--r) - 6deg); } 80% { rotate: calc(var(--r) + 2deg); } }
+
+/* the cherry rides the rope */
+.yr-cherry {
+  position: absolute;
+  z-index: 2;
+  left: calc(var(--ct) * 100%);
+  top: calc(var(--sag) * 4 * var(--ct) * (1 - var(--ct)));
+  width: 9cqw;
+  translate: -50% -5%;
+  pointer-events: none;
+  transition: --ct 0.9s cubic-bezier(0.3, 1.25, 0.5, 1);
+}
+.yr-garland.is-drag .yr-cherry, .yr-garland.is-run .yr-cherry { transition: none; }
+.yr-cherry img { display: block; width: 100%; transform-origin: 50% 4%; filter: drop-shadow(0 1.2cqw 1cqw rgba(61, 4, 5, 0.4)); transition: rotate 0.4s ease-out; }
+.yr-cherry.is-swing img { animation: yr-swing 1.2s ease-out; }
+@keyframes yr-swing {
+  15% { rotate: calc(var(--dir, 1) * -18deg); }
+  40% { rotate: calc(var(--dir, 1) * 11deg); }
+  62% { rotate: calc(var(--dir, 1) * -6deg); }
+  82% { rotate: calc(var(--dir, 1) * 2.5deg); }
+}
+
+/* ─────────── the menu card on the wall ─────────── */
+.yr-card { rotate: 1.5deg; transition: box-shadow 0.6s; }
+.yr-card__tape { position: absolute; left: 50%; top: -0.9rem; width: 7.5rem; height: 1.9rem; translate: -50% 0; rotate: -3deg; background: color-mix(in srgb, var(--tint) 80%, #fff); opacity: 0.9; box-shadow: 0 2px 4px rgba(61, 4, 5, 0.12); transition: background-color 1s; clip-path: polygon(0 8%, 4% 0, 8% 10%, 12% 0, 88% 0, 92% 10%, 96% 0, 100% 8%, 100% 92%, 96% 100%, 92% 90%, 88% 100%, 12% 100%, 8% 90%, 4% 100%, 0 92%); }
+.yr-card__now {
+  position: absolute;
+  right: -1.2rem;
+  top: -1.6rem;
+  display: grid;
+  place-items: center;
+  width: 6.2rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--cherry);
+  box-shadow: inset 0 0 0 4px var(--cherry), inset 0 0 0 5.5px rgba(255, 248, 240, 0.7), 0 10px 18px -8px rgba(61, 4, 5, 0.6);
+  font-family: var(--font-hand);
+  font-size: 1.2rem;
+  line-height: 1;
+  text-align: center;
+  color: #fff8f0;
+  rotate: 12deg;
+}
+.yr-card__now[hidden] { display: none; }
+.yr-card__now:not([hidden]) { animation: yr-stamp 0.55s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+@keyframes yr-stamp { from { scale: 1.8; opacity: 0; rotate: -10deg; } }
+
+@media (max-width: 960px) {
+  .yr-win { width: min(100%, 27rem); }
+  .yr-card { rotate: 0.6deg; }
+}
+@media (max-width: 640px) {
+  .yr-card__now { right: -0.4rem; top: -2rem; width: 5.2rem; font-size: 1.05rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .yr-sill figure, .yr-sill.is-on figure, .yr-cherry, .yr-m span, .yr-m::before { transition: none; }
+  .yr-sill.is-on figcaption, .yr-cherry.is-swing img, .yr-m:hover, .yr-card__now[hidden] { display: none; }
+.yr-card__now:not([hidden]) { animation: none; }
+}

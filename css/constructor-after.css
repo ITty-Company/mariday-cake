@@ -1,0 +1,205 @@
+/* ═══════════════════════════════════════════
+   The constructor page's ending (pages/constructor.html, js/constructor-after.js), brought back from the earlier
+   workshop page: a pastry tape measure runs across as the way in, the order's four steps hang as tickets on a kitchen
+   rail, and the way out is a piping bag running a shell border along the top of the footer with cherries dropping on it.
+   Its own file, so the constructor itself (css/constructor.css) can change without touching it.
+   ═══════════════════════════════════════════ */
+.kc-page {
+  --mk-cream: #fff8f0;
+  --mk-glaze: radial-gradient(circle 1.6em at 28% -0.5em, #ff9c94 0, #d8323a 18%, #a3161b 40%, var(--cherry) 66%, #3a0304 100%);
+}
+/* the tape is wider than the page and tilted: clipped here, so it never makes the page scroll sideways */
+/* the page sits over the footer so the piped border can lie across the footer's top edge; its cream background stops
+   where that overlap starts (half the border's height), so the footer's pink shows under the lower half of the shells */
+.kc-page main { --mk-lap: 46px; position: relative; z-index: 2; overflow-x: clip; background: linear-gradient(var(--kc-bg), var(--kc-bg)) 0 0 / 100% calc(100% - var(--mk-lap)) no-repeat; }
+.mk-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.mk-hand { margin: 0; font-family: var(--font-hand); font-weight: 500; font-size: clamp(1.2rem, 1.7vw, 1.5rem); line-height: 1.15; color: var(--cherry); }
+
+/* the glazed title, its letters jumping in, the script piped across */
+.mk-h2__w {
+  display: block;
+  filter:
+    drop-shadow(0 0.025em 0 #fff8ef)
+    drop-shadow(0 0.02em 0 #f0dccb)
+    drop-shadow(0 0.025em 0 #fff8ef)
+    drop-shadow(0 0.015em 0 #e2c3aa)
+    drop-shadow(0 0.16em 0.14em rgba(61, 4, 5, 0.22));
+}
+.mk-ch { display: inline-block; padding-bottom: 0.06em; background: var(--mk-glaze); -webkit-background-clip: text; background-clip: text; color: transparent; will-change: transform; }
+.mk-h2__s {
+  position: absolute;
+  z-index: 2;
+  right: -0.5em;
+  bottom: -0.5em;
+  padding: 0.05em 0.2em 0.25em;
+  font-family: "Pacifico", var(--font-script);
+  font-weight: 400;
+  font-size: 0.42em;
+  line-height: 1.15;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+  color: var(--mk-cream);
+  rotate: -7deg;
+  filter:
+    drop-shadow(0.025em 0 0 var(--cherry)) drop-shadow(-0.025em 0 0 var(--cherry))
+    drop-shadow(0 0.025em 0 var(--cherry)) drop-shadow(0 -0.025em 0 var(--cherry))
+    drop-shadow(0 0.06em 0 #470304)
+    drop-shadow(0 10px 18px rgba(61, 4, 5, 0.3));
+  clip-path: inset(-150% -30% -150% -20%);
+}
+@keyframes mk-ch-in { from { transform: translateY(110%) rotate(var(--cr, 0deg)); opacity: 0; } }
+@keyframes mk-pipe { from { clip-path: inset(-150% 100% -150% -20%); opacity: 0.3; } to { clip-path: inset(-150% -30% -150% -20%); opacity: 1; } }
+
+/* ─── the way in: a pastry tape measure ─── */
+.mk-tape {
+  position: relative;
+  z-index: 5;
+  margin: -10px -3vw 0;
+  overflow: hidden;
+  rotate: -1.1deg;
+  background: linear-gradient(180deg, #fbe39b, #f2cd66);
+  border-block: 2px solid #d6a63d;
+  box-shadow: 0 12px 24px rgba(61, 4, 5, 0.2);
+  white-space: nowrap;
+  color: var(--cherry);
+}
+.mk-tape__track {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.6rem;
+  padding: 22px 1.6rem 10px;
+  /* the marks of the tape move with it */
+  background:
+    repeating-linear-gradient(90deg, rgba(109, 8, 9, 0.75) 0 1.5px, transparent 1.5px 10px) 0 0 / 100% 8px no-repeat,
+    repeating-linear-gradient(90deg, rgba(109, 8, 9, 0.85) 0 2px, transparent 2px 50px) 0 0 / 100% 15px no-repeat;
+  will-change: transform;
+}
+.mk-tape__track span { font-family: var(--font-wide); font-size: clamp(0.78rem, 1.3vw, 1.05rem); font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; }
+.mk-tape__track b { color: #c2263f; }
+
+
+/* ─────────────── ③ after the cart: tickets on the rail ─────────────── */
+.mk-next { position: relative; max-width: var(--max); margin: 0 auto; padding: clamp(4.4rem, 9vw, 7.4rem) var(--gutter) clamp(3rem, 6vw, 5rem); }
+.mk-h2 {
+  position: relative;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 auto;
+  font-family: "Dela Gothic One", var(--font-wide);
+  font-weight: 400;
+  font-size: clamp(2.8rem, 8vw, 7.4rem);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.mk-h2__s { right: -0.5em; bottom: -0.5em; font-size: 0.42em; }
+.mk-js .mk-h2:not(.is-in) .mk-h2__s { clip-path: inset(-150% 100% -150% -20%); }
+.mk-js .mk-h2.is-in .mk-h2__s { animation: mk-pipe 1.4s var(--expo) 0.45s both; }
+.mk-js .mk-h2:not(.is-in) .mk-ch { transform: translateY(110%) rotate(var(--cr, 0deg)); opacity: 0; }
+.mk-js .mk-h2.is-in .mk-ch { animation: mk-ch-in 1.1s var(--expo) calc(var(--i) * 0.05s) both; }
+
+.mk-rail { position: relative; margin-top: clamp(3.6rem, 7vw, 5.4rem); }
+.mk-rail__bar {
+  position: absolute;
+  left: -1%;
+  right: -1%;
+  top: 0;
+  height: 16px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fbfcfc, #c5cdd2 40%, #8d979c 58%, #e8ecee);
+  box-shadow: 0 8px 14px rgba(61, 4, 5, 0.18);
+}
+.mk-rail__bar::before, .mk-rail__bar::after { content: ""; position: absolute; top: -6px; width: 18px; height: 28px; border-radius: 6px; background: linear-gradient(90deg, #8d979c, #e8ecee 50%, #8d979c); }
+.mk-rail__bar::before { left: -4px; }
+.mk-rail__bar::after { right: -4px; }
+.mk-rail__list { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(12px, 2vw, 28px); margin: 0; padding: 0 clamp(4px, 1vw, 16px); list-style: none; }
+.mk-tk { position: relative; padding-top: 2px; }
+.mk-tk:nth-child(1) { --r: -2.5deg; }
+.mk-tk:nth-child(2) { --r: 2deg; }
+.mk-tk:nth-child(3) { --r: -1.4deg; }
+.mk-tk:nth-child(4) { --r: 2.8deg; }
+.mk-tk__clip {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: -8px;
+  width: 38px;
+  height: 34px;
+  margin-left: -19px;
+  border-radius: 6px 6px 10px 10px;
+  background: linear-gradient(90deg, #8d979c, #f3f6f7 45%, #aab4ba);
+  box-shadow: 0 4px 8px rgba(61, 4, 5, 0.25);
+}
+.mk-tk__clip::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: 6px; height: 3px; border-radius: 2px; background: rgba(61, 4, 5, 0.25); }
+.mk-tk__paper {
+  margin-top: 16px;
+  padding: 26px clamp(16px, 1.6vw, 22px) 30px;
+  background: repeating-linear-gradient(180deg, rgba(109, 8, 9, 0) 0 27px, rgba(109, 8, 9, 0.04) 27px 28px), #fffdf8;
+  box-shadow: 0 18px 30px rgba(61, 4, 5, 0.12);
+  transform-origin: 50% 0;
+  rotate: var(--r, 0deg);
+  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 16px 100%;
+  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 16px 100%;
+}
+.mk-tk__ico { display: block; width: 74px; height: 60px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1.5px dashed rgba(109, 8, 9, 0.22); box-sizing: content-box; overflow: visible; }
+.mk-tk h3 { margin: 0 0 0.45rem; font-family: "Dela Gothic One", var(--font-wide); font-weight: 400; font-size: clamp(1.1rem, 1.6vw, 1.45rem); letter-spacing: -0.01em; text-transform: uppercase; background: var(--mk-glaze); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.mk-tk p { margin: 0; font-size: 0.92rem; line-height: 1.55; color: var(--ink-soft); }
+.mk-next__ask { margin-top: clamp(2.2rem, 4vw, 3.2rem); text-align: center; color: var(--pink-deep); }
+.mk-next__ask a { color: var(--cherry); text-decoration: underline; text-decoration-style: wavy; text-decoration-color: rgba(109, 8, 9, 0.35); text-underline-offset: 4px; }
+
+/* ─────────────── ④ the finish: the footer gets a piped shell border and cherries on top ─────────────── */
+@property --mk-p { syntax: "<number>"; inherits: true; initial-value: 1; }
+.mk-outro {
+  --sh: 92px;          /* the border's height; its middle sits on the footer's top edge */
+  --mk-p: 1;
+  position: relative;
+  z-index: 3;
+  height: clamp(130px, 11vw, 160px);
+  margin-bottom: calc(var(--sh) / -2);
+  pointer-events: none;
+}
+.mk-outro__shells { position: absolute; left: 0; bottom: 0; display: block; width: 100%; height: var(--sh); overflow: visible; filter: drop-shadow(0 3px 0 #e6c9b8) drop-shadow(0 8px 8px rgba(61, 4, 5, 0.16)); clip-path: inset(-40px calc((1 - var(--mk-p)) * 100%) -40px -40px); }
+.mk-outro__cherry { position: absolute; left: calc(var(--x) * 100%); bottom: calc(var(--sh) * 0.64); width: clamp(50px, 4.8vw, 72px); translate: -50% 0; rotate: var(--r); transform-origin: 50% 100%; filter: drop-shadow(0 8px 8px rgba(61, 4, 5, 0.25)); }
+.mk-outro__note { position: absolute; right: calc(12% + 40px); bottom: calc(var(--sh) + 34px); color: var(--pink-deep); rotate: -4deg; }
+.mk-outro__note::after { content: "↘"; display: inline-block; margin-left: 0.3em; translate: 0 0.25em; }
+/* the piping bag, its nozzle on the line it pipes */
+.mk-outro__bag { position: absolute; left: calc(var(--mk-p) * 100%); bottom: calc(var(--sh) * 0.58); width: clamp(58px, 5.4vw, 78px); translate: -38% 0; rotate: 32deg; transform-origin: 50% 100%; opacity: 0; }
+.mk-outro__bag svg { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 12px 12px rgba(61, 4, 5, 0.22)); }
+
+/* with js: the bag pipes the border left to right, a cherry drops as it passes, then the bag lifts away */
+.mk-outro.is-armed { --mk-p: 0; }
+.mk-outro.is-armed .mk-outro__cherry { opacity: 0; translate: -50% -140px; rotate: calc(var(--r) - 60deg); }
+.mk-outro.is-armed .mk-outro__note { opacity: 0; translate: 0 10px; }
+.mk-outro.is-armed.is-in { --mk-p: 1; transition: --mk-p 2.6s cubic-bezier(0.45, 0.05, 0.4, 1); }
+.mk-outro.is-armed.is-in .mk-outro__bag { opacity: 1; transition: opacity 0.3s; }
+.mk-outro.is-armed.is-in .mk-outro__bag svg { animation: mk-squeeze 0.34s ease-in-out infinite alternate; }
+@keyframes mk-squeeze { from { scale: 1 1; } to { scale: 0.94 1.04; } }
+.mk-outro.is-armed.is-in .mk-outro__cherry { opacity: 1; translate: -50% 0; rotate: var(--r); transition: translate 0.8s cubic-bezier(0.3, 1.6, 0.5, 1) calc(var(--x) * 2.6s + 0.25s), rotate 0.8s cubic-bezier(0.3, 1.6, 0.5, 1) calc(var(--x) * 2.6s + 0.25s), opacity 0.2s calc(var(--x) * 2.6s + 0.25s); }
+.mk-outro.is-armed.is-done .mk-outro__bag { opacity: 0; translate: 10% -90px; rotate: 50deg; transition: opacity 0.6s 0.2s, translate 0.9s var(--expo), rotate 0.9s var(--expo); }
+.mk-outro.is-armed.is-done .mk-outro__bag svg { animation: none; }
+.mk-outro.is-armed.is-done .mk-outro__note { opacity: 1; translate: 0 0; transition: opacity 0.6s 0.3s, translate 0.8s var(--pop) 0.3s; }
+/* the cherries on top bob a little once they're settled */
+.mk-outro.is-done .mk-outro__cherry { animation: mk-cherry-bob 4s ease-in-out calc(var(--x) * -6s + 1s) infinite alternate; }
+@keyframes mk-cherry-bob { to { rotate: calc(var(--r) * -0.4); } }
+
+
+@media (max-width: 899px) {
+  .mk-tape { margin-top: 0; }
+  .mk-rail__list { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 40px; }
+  .mk-rail__bar { display: none; }
+  .mk-tk::before { content: ""; position: absolute; left: -8px; right: -8px; top: 0; height: 12px; border-radius: 6px; background: linear-gradient(180deg, #fbfcfc, #c5cdd2 40%, #8d979c 58%, #e8ecee); }
+}
+@media (max-width: 520px) {
+  .kc-page main { --mk-lap: 32px; }
+  .mk-outro { --sh: 64px; height: 120px; }
+  .mk-outro__cherry:nth-of-type(2) { display: none; }
+  .mk-outro__note { right: auto; left: var(--gutter); bottom: calc(var(--sh) + 40px); }
+  .mk-h2 { font-size: 13vw; }
+  .mk-h2__s { right: -0.2em; }
+  .mk-rail__list { grid-template-columns: 1fr; padding: 0 6%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk-outro__cherry { animation: none !important; }
+}

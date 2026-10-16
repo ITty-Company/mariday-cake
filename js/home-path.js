@@ -474,14 +474,14 @@
 
   // ─── behind every stop: a little 3D diorama ───
   // real sweets at different depths (the far ones out of focus) and a CSS object: a macaron, a stack of plates,
-  // chat bubbles, a wax seal, a gift box. Positions are % of the diorama box, z is depth in px.
+  // chat bubbles, a gift box. Positions are % of the diorama box, z is depth in px.
   // odd stops keep their diorama to the right of the scene, even stops to the left — in the free zones
   const DEEP = [
     [{ img: "candy-mac", w: 150, x: 70, y: -4, z: 80 }, { img: "candy-mac", w: 90, x: 92, y: 44, z: -120, b: 2 }, { img: "cherries", w: 120, x: 68, y: 74, z: 40 }],
     [{ img: "candy-mac", w: 200, x: -8, y: 56, z: 60, r: -14 }, { img: "cherrycup", w: 140, x: 4, y: 88, z: -80, b: 1.5 }, { img: "cherries", w: 110, x: 62, y: 70, z: 120 }],
     [{ plates: 1, s: 210, x: 66, y: 44, z: 40 }, { img: "candy-cake", w: 170, x: 70, y: -10, z: -100, b: 1.5 }, { img: "cherries", w: 90, x: 60, y: 86, z: 110 }],
     [{ bubble: "Привіт! Хочу торт 🍰", me: 1, x: 5, y: 12, z: 100 }, { bubble: "♥", x: 8, y: 44, z: 160 }, { bubble: "✓✓ прочитано", x: 2, y: 68, z: -60, b: 1 }, { img: "gl-piping", w: 170, x: -2, y: 84, z: -140, b: 2 }],
-    [{ seal: 1, s: 140, x: 70, y: 46, z: 120 }, { img: "gl-gold", w: 200, x: 64, y: -10, z: -120, b: 2 }, { img: "cherries", w: 90, x: 62, y: 86, z: 60 }],
+    [{ img: "gl-gold", w: 200, x: 64, y: -10, z: -120, b: 2 }, { img: "cherries", w: 90, x: 62, y: 86, z: 60 }],
     [{ balloon: "#f5bcc8", s: 110, x: 0, y: 2, z: 100 }, { balloon: "#fbe6b8", s: 80, x: 20, y: 30, z: -60, b: 1 }, { balloon: "#bcd6f3", s: 96, x: 4, y: 52, z: 160 }, { img: "gl-drip", w: 190, x: -2, y: 74, z: -110, b: 1.5 }, { img: "cherries", w: 100, x: 30, y: -6, z: 150 }],
   ];
   function diorama(st, layers) {
@@ -511,7 +511,6 @@
         b.textContent = L.bubble;
         el.appendChild(b);
       } else if (L.plates) el.innerHTML = `<span class="x-3d-plates" style="--s:${L.s}px">${[0, 1, 2, 3, 4, 5].map((k) => `<i style="--i:${k}"></i>`).join("")}</span>`;
-      else if (L.seal) el.innerHTML = `<span class="x-3d-seal" style="--s:${L.s}px"><b>♥</b><small>дата — ваша</small></span>`;
       else if (L.balloon) el.innerHTML = `<span class="x-3d-balloon" style="--s:${L.s}px;--c:${L.balloon}"><i></i></span>`;
       tilt.appendChild(el);
     });

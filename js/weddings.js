@@ -1,5 +1,5 @@
 /* Mariday — the wedding page as the story of a wedding day (pages/weddings.html, css/weddings.css).
-   ① the invitation: the envelope opens and a wedding cake from the catalogue rises out of it; the seal brings the next one
+   ① the proposal: a velvet ring box opens and a wedding cake from the catalogue rises out of it; a passed note says «так» or asks for the next one
    ② «про вас двох»: each of you ticks tastes, the tiers of a real cake get their fillings (top — yours, bottom — theirs)
    ③ the way of the cake: it fills in from the bottom tier up while the steps scroll past; each step plays its scene
    ④ toss the bouquet: it flies onto one of the wedding cakes on the columns and opens that cake's style
@@ -133,106 +133,344 @@
     seen($$(".wd-h2"), "is-in", "0px 0px -8% 0px");
   }
 
-  /* ───────── ① the invitation ───────── */
+  /* ───────── ① the proposal ───────── */
   const HERO = ["floral-poetry", "white-symphony", "burgundy-orchid", "pearl-bow", "cherry-romance", "a-little-bite-of-love", "berry-romance", "blue-heart"];
-  function invitation() {
-    const box = $("[data-wd-inv]");
+  function proposal() {
+    const box = $("[data-wd-prop]");
     if (!box) return;
     const list = ordered(HERO);
     if (!list.length) return;
     used.add(list[0].id);
+    const stage = $("[data-wd-stage]", box);
     const host = $("[data-wd-hero-cake]", box);
     const name = $("[data-wd-hero-name]", box);
     const price = $("[data-wd-hero-price]", box);
     const link = $("[data-wd-hero-link]", box);
+    const ask = $("[data-wd-ask]", box);
+    const yes = $("[data-wd-yes]", box);
+    const next = $("[data-wd-next]", box);
     let i = 0;
     let busy = false;
+    const later = (ms) => new Promise((r) => setTimeout(r, T(ms)));
     const label = (c) => {
       name.textContent = c.name;
       price.textContent = Number(c.price) ? `від ${eur(c.price)} →` : "подивитися →";
       link.href = href(c.id);
       link.setAttribute("aria-label", `${c.name} — відкрити торт`);
     };
-    // the next one is measured while this one is on show
+    const show = (c, b) => {
+      host.innerHTML = pic(c, b);
+      host.style.setProperty("--ar", (b ? b.ar : 1.2).toFixed(3));
+      label(c);
+    };
+    // the next ones are measured while this one is on show
     const warm = () => list.slice(i + 1, i + 3).forEach((c) => trim(whole(c)));
-    place(host, list[0]).then(() => {
-      label(list[0]);
+    const setYes = (on) => {
+      yes.setAttribute("aria-pressed", String(on));
+      ask.classList.toggle("is-yes", on);
+      link.classList.toggle("is-loved", on);
+    };
+    yes.setAttribute("aria-pressed", "false");
+    next.setAttribute("aria-pressed", "false");
+
+    // the box opens a beat after the page lands, then the cake rises out of the cushion
+    trim(whole(list[0])).then(async (b) => {
+      show(list[0], b);
       warm();
+      await later(250);
       box.classList.add("is-open");
-      setTimeout(() => box.classList.add("is-up"), T(420));
+      await later(380);
+      box.classList.add("is-up");
     });
-    $("[data-wd-seal]", box).addEventListener("click", async () => {
+
+    // «покажи інший»: the cake sinks, the lid shuts with a little hop and opens on the next one
+    next.addEventListener("click", async () => {
       if (busy || list.length < 2) return;
       busy = true;
-      box.classList.add("is-sink");
+      next.setAttribute("aria-pressed", "true");
+      setYes(false);
       i = (i + 1) % list.length;
       const c = list[i];
-      const b = await trim(whole(c));
-      setTimeout(() => {
-        host.innerHTML = pic(c, b);
-        label(c);
-        warm();
-        requestAnimationFrame(() => requestAnimationFrame(() => box.classList.remove("is-sink")));
-        setTimeout(() => (busy = false), T(700));
-      }, T(480));
+      const pending = trim(whole(c));
+      box.classList.remove("is-up");
+      await later(380);
+      box.classList.remove("is-open");
+      await later(560);
+      box.classList.remove("is-thud");
+      void box.offsetWidth;
+      box.classList.add("is-thud");
+      show(c, await pending);
+      warm();
+      await later(300);
+      box.classList.add("is-open");
+      next.setAttribute("aria-pressed", "false");
+      await later(380);
+      box.classList.add("is-up");
+      await later(500);
+      busy = false;
     });
+
+    // «так!»: petals and hearts thrown up out of the box, the card gets its stamp, the date link shows up
+    yes.addEventListener("click", () => {
+      const on = yes.getAttribute("aria-pressed") !== "true";
+      setYes(on);
+      if (!on || reduce) return;
+      const sr = stage.getBoundingClientRect();
+      const br = $(".wd-box__front", box).getBoundingClientRect();
+      const x0 = br.left - sr.left + br.width / 2;
+      const y0 = br.top - sr.top;
+      for (let k = 0; k < 26; k++) {
+        const p = document.createElement("i");
+        p.className = "wd-throw" + (k % 4 === 0 ? " is-heart" : "");
+        if (k % 4 === 0) p.textContent = "♥";
+        stage.appendChild(p);
+        const ang = -Math.PI / 2 + (Math.random() - 0.5) * 2.2;
+        const up = 160 + Math.random() * 200;
+        const dx = Math.cos(ang) * up * 0.9;
+        const dy = Math.sin(ang) * up;
+        const spin = (Math.random() - 0.5) * 720;
+        p.animate(
+          [
+            { transform: `translate(${x0}px, ${y0}px) rotate(0deg) scale(0.4)`, opacity: 1 },
+            { transform: `translate(${x0 + dx}px, ${y0 + dy}px) rotate(${spin / 2}deg) scale(1)`, opacity: 1, offset: 0.45 },
+            { transform: `translate(${x0 + dx * 1.4}px, ${y0 + dy + 260}px) rotate(${spin}deg) scale(0.9)`, opacity: 0 },
+          ],
+          { duration: 1500 + Math.random() * 700, easing: "cubic-bezier(0.2, 0.6, 0.4, 1)" }
+        ).onfinish = () => p.remove();
+      }
+    });
+
+    // the box turns a little after the pointer, as if it were held out across the table
+    if (!reduce && matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      const tilt = $(".wd-box", box);
+      stage.addEventListener("pointermove", (e) => {
+        const r = stage.getBoundingClientRect();
+        const nx = (e.clientX - r.left) / r.width - 0.5;
+        const ny = (e.clientY - r.top) / r.height - 0.5;
+        tilt.style.setProperty("--ry", `${(-9 + nx * 22).toFixed(1)}deg`);
+        tilt.style.setProperty("--rx", `${(ny * -6).toFixed(1)}deg`);
+      });
+      stage.addEventListener("pointerleave", () => {
+        tilt.style.removeProperty("--ry");
+        tilt.style.removeProperty("--rx");
+      });
+    }
   }
 
-  /* ───────── ② about the two of you ───────── */
+  /* ───────── ② about the two of you: a tasting duet ───────── */
+  // each taste: how it reads in a flavour, its taste "diagnosis" as the main love, and as an extra
   const TASTES = [
-    { id: "choc", label: "шоколад", e: "🍫", re: /шокол|kinder|bueno|снікерс|какао|брауні/i },
-    { id: "berry", label: "ягоди", e: "🍓", re: /ягід|ягод|малин|полун|вишн|смородин|лохин|ожин/i },
-    { id: "nut", label: "горіхи", e: "🥜", re: /горіх|фісташ|арахіс|фундук|bueno|снікерс|мигдал|пекан/i },
-    { id: "caramel", label: "карамель", e: "🍯", re: /карамел|банан|снікерс|ірис/i },
-    { id: "citrus", label: "цитрус", e: "🍋", re: /лимон|цитрус|апельсин|лайм|маракуй|манго/i },
-    { id: "vanilla", label: "ваніль і вершки", e: "🍦", re: /ваніл|пломбір|вершк|kinder|молоч/i },
+    { id: "choc", label: "шоколад", e: "🍫", re: /шокол|kinder|bueno|снікерс|какао|брауні/i, who: "шоколадне серце", plus: "з шоколадом" },
+    { id: "berry", label: "ягоди", e: "🍓", re: /ягід|ягод|малин|полун|вишн|смородин|лохин|ожин/i, who: "ягідна душа", plus: "з ягідкою" },
+    { id: "nut", label: "горіхи", e: "🥜", re: /горіх|фісташ|арахіс|фундук|bueno|снікерс|мигдал|пекан/i, who: "горіховий гурман", plus: "з горішками" },
+    { id: "caramel", label: "карамель", e: "🍯", re: /карамел|банан|снікерс|ірис/i, who: "карамельний ласун", plus: "з карамеллю" },
+    { id: "citrus", label: "цитрус", e: "🍋", re: /лимон|цитрус|апельсин|лайм|маракуй|манго/i, who: "цитрусова іскра", plus: "з кислинкою" },
+    { id: "vanilla", label: "ваніль і вершки", e: "🍦", re: /ваніл|пломбір|вершк|kinder|молоч/i, who: "ніжний класик", plus: "з вершками" },
   ];
+  const tasteOf = (id) => TASTES.find((t) => t.id === id);
   function twoOfYou() {
     const box = $("[data-wd-two]");
     if (!box) return;
     const flavors = (M().flavors || []).filter((f) => f && f.name);
-    const picked = { a: new Set(["berry", "citrus"]), b: new Set(["choc", "nut"]) };
+    const metaOf = (f) => ((M().flavorMeta || {})[f && f.id] || { layers: ["#f0dca0", "#f7efe6", "#c2263f"] });
+    const picked = { a: new Set(["berry", "citrus", "vanilla"]), b: new Set(["choc", "nut", "berry"]) };
+    const cakeHost = $("[data-wd-two-cake]", box);
+
     $$("[data-side]", box).forEach((wrap) => {
       const side = wrap.dataset.side;
       wrap.innerHTML = TASTES.map((t) => `<button type="button" class="wd-chip" data-t="${t.id}" aria-pressed="${picked[side].has(t.id)}"><span aria-hidden="true">${t.e}</span>${t.label}</button>`).join("");
       wrap.addEventListener("click", (e) => {
         const btn = e.target.closest("[data-t]");
         if (!btn) return;
+        const id = btn.dataset.t;
         const s = picked[side];
-        s.has(btn.dataset.t) ? s.delete(btn.dataset.t) : s.add(btn.dataset.t);
-        btn.setAttribute("aria-pressed", s.has(btn.dataset.t));
-        paint();
+        const on = !s.has(id);
+        on ? s.add(id) : s.delete(id);
+        btn.setAttribute("aria-pressed", on);
+        say(side);
+        if (!on) return paint();
+        // it lands in the tier it now feeds: shared — the middle one, otherwise this side's own
+        const other = picked[side === "a" ? "b" : "a"];
+        const k = other.has(id) ? "mid" : side === "a" ? "top" : "low";
+        fly($("span", btn), slices[k], tasteOf(id).e).then(() => land(k));
       });
     });
-    place($("[data-wd-two-cake]", box), take(["burgundy-orchid", "white-symphony", "floral-poetry", "a-little-bite-of-love"]));
+    place(cakeHost, take(["burgundy-orchid", "white-symphony", "floral-poetry", "a-little-bite-of-love"]));
 
+    /* the taste diagnosis: the first love, then what it comes with */
+    const says = { a: $("[data-say=a]", box), b: $("[data-say=b]", box) };
+    const diagnosis = (set) => {
+      const l = TASTES.filter((t) => set.has(t.id));
+      if (!l.length) return "поки думає…";
+      if (l.length >= 5) return "смакує все й одразу";
+      const extra = l.slice(1).map((t, i) => (i ? t.plus.replace(/^з /, "") : t.plus));
+      const tail = extra.length > 1 ? `${extra.slice(0, -1).join(", ")} і ${extra[extra.length - 1]}` : extra.join("");
+      return [l[0].who, tail].filter(Boolean).join(" ");
+    };
+    const say = (side) => {
+      const t = diagnosis(picked[side]);
+      if (says[side].textContent === t) return;
+      says[side].textContent = t;
+      bump(says[side]);
+    };
+    const bump = (el, cls = "is-new") => {
+      if (reduce || !el) return;
+      el.classList.remove(cls);
+      void el.offsetWidth;
+      el.classList.add(cls);
+    };
+
+    /* the tiers: a filling for each, shown as a slice of its layers with the reason underneath */
     const text = (f) => `${f.name} ${f.desc || ""}`;
-    const score = (f, set) => TASTES.reduce((n, t) => n + (set.has(t.id) && t.re.test(text(f)) ? 1 : 0), 0);
+    const hits = (f, set) => TASTES.filter((t) => set.has(t.id) && t.re.test(text(f)));
+    const score = (f, set) => hits(f, set).length;
     const best = (rank, not) => {
       const left = flavors.filter((f) => !not.includes(f));
       return left.slice().sort((p, q) => rank(q) - rank(p))[0] || left[0];
     };
     const outs = { top: $("[data-tier=top]", box), mid: $("[data-tier=mid]", box), low: $("[data-tier=low]", box) };
-    const show = (k, f) => {
+    const whys = { top: $("[data-why=top]", box), mid: $("[data-why=mid]", box), low: $("[data-why=low]", box) };
+    const slices = { top: $("[data-slice=top]", box), mid: $("[data-slice=mid]", box), low: $("[data-slice=low]", box) };
+    const cut = (f) => {
+      const ls = metaOf(f).layers;
+      const rows = [];
+      ls.forEach((c, i) => {
+        rows.push(c);
+        if (i < ls.length - 1) rows.push("#fbf3e6");
+      });
+      return `<span class="wd-slice__in">${rows.reverse().map((c) => `<i style="background:${c}"></i>`).join("")}</span>`;
+    };
+    const show = (k, f, why) => {
       const t = f ? f.name : "—";
+      whys[k].textContent = why;
       if (outs[k].textContent === t) return;
       outs[k].textContent = t;
-      if (reduce) return;
-      outs[k].classList.remove("is-new");
-      void outs[k].offsetWidth;
-      outs[k].classList.add("is-new");
+      slices[k].innerHTML = f ? cut(f) : "";
+      bump(outs[k]);
+      bump(slices[k], "is-cut");
     };
+    const list = (ts) => ts.map((t) => t.label).join(" · ");
     const paint = () => {
+      match();
       if (!flavors.length) return;
-      const top = best((f) => score(f, picked.a) * 2 - score(f, picked.b) * 0.5, []);
-      const low = best((f) => score(f, picked.b) * 2 - score(f, picked.a) * 0.5, [top]);
+      const A = picked.a;
+      const B = picked.b;
+      const both = new Set([...A].filter((id) => B.has(id)));
+      const top = best((f) => score(f, A) * 2 - score(f, B) * 0.5, []);
+      const low = best((f) => score(f, B) * 2 - score(f, A) * 0.5, [top]);
       // the shared tier: something both of you would pick, the more of both the better
-      const mid = best((f) => Math.min(score(f, picked.a), score(f, picked.b)) * 3 + score(f, picked.a) + score(f, picked.b), [top, low]);
-      show("top", top);
-      show("mid", mid);
-      show("low", low);
+      const mid = best((f) => score(f, both) * 4 + Math.min(score(f, A), score(f, B)) * 3 + score(f, A) + score(f, B), [top, low]);
+      const why = (f, set, none) => {
+        const h = f ? hits(f, set) : [];
+        return h.length ? `бо: ${list(h)}` : none;
+      };
+      show("top", top, why(top, A, "наш сюрприз для вас"));
+      show("mid", mid, both.size ? why(mid, both, "те, що любите обоє") : "компроміс на двох");
+      show("low", low, why(low, B, "наш сюрприз для половинки"));
     };
+
+    /* the match: two gold rings come together as your tastes do */
+    const mBox = $("[data-wd-match]", box);
+    const mN = $("[data-wd-match-n]", mBox);
+    const mSay = $("[data-wd-match-say]", mBox);
+    const hearts = $(".wd-match__hearts", mBox);
+    let shown = 0;
+    let shared = -1;
+    let raf = 0;
+    const match = () => {
+      const all = new Set([...picked.a, ...picked.b]);
+      const common = TASTES.filter((t) => picked.a.has(t.id) && picked.b.has(t.id));
+      const j = all.size ? common.length / all.size : 0;
+      const pct = all.size ? Math.round(35 + 65 * j) : 0;
+      mBox.style.setProperty("--m", j.toFixed(3));
+      mBox.classList.toggle("is-perfect", all.size > 0 && j === 1);
+      const t = !all.size ? "позначте смаки — і торт підкаже ♥"
+        : j === 1 ? "ідеальна пара: ви навіть смакуєте однаково ♥"
+        : !common.length ? "протилежності притягуються — середній ярус вас помирить"
+        : `вас єднає: ${list(common)}`;
+      if (mSay.textContent !== t) {
+        mSay.textContent = t;
+        bump(mSay);
+      }
+      if (shared >= 0 && common.length > shared) love();
+      shared = common.length;
+      // the number counts to the new value
+      cancelAnimationFrame(raf);
+      if (reduce) return (mN.textContent = `${(shown = pct)}%`);
+      const from = shown;
+      const t0 = performance.now();
+      const step = (now) => {
+        const k = Math.min(1, (now - t0) / 600);
+        shown = Math.round(from + (pct - from) * (1 - Math.pow(1 - k, 3)));
+        mN.textContent = `${shown}%`;
+        if (k < 1) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    };
+    const love = () => {
+      if (reduce) return;
+      bump(mBox, "is-love");
+      hearts.innerHTML = Array.from({ length: 9 }, (_, i) => {
+        const a = (-90 + (i - 4) * 19 + (Math.random() * 10 - 5)) * (Math.PI / 180);
+        const d = 70 + Math.random() * 50;
+        return `<i style="--x:${(Math.cos(a) * d).toFixed(0)}px;--y:${(Math.sin(a) * d).toFixed(0)}px;--d:${(i * 0.03).toFixed(2)}s;--s:${(0.7 + Math.random() * 0.6).toFixed(2)}">♥</i>`;
+      }).join("");
+    };
+
+    /* the flight: the ingredient arcs from its chip into the slice of its tier */
+    const fly = (from, to, emoji, delay = 0) => {
+      if (reduce || !from || !to || !document.body.animate) return Promise.resolve();
+      const a = from.getBoundingClientRect();
+      const b = to.getBoundingClientRect();
+      if (!a.width || !b.width) return Promise.resolve();
+      const x0 = a.left + a.width / 2, y0 = a.top + a.height / 2;
+      const x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
+      const cx = (x0 + x1) / 2, cy = Math.min(y0, y1) - 80 - Math.abs(x1 - x0) * 0.18;
+      const N = 12;
+      const frames = Array.from({ length: N + 1 }, (_, i) => {
+        const t = i / N;
+        const x = (1 - t) * (1 - t) * x0 + 2 * (1 - t) * t * cx + t * t * x1;
+        const y = (1 - t) * (1 - t) * y0 + 2 * (1 - t) * t * cy + t * t * y1;
+        const sc = 1 + Math.sin(t * Math.PI) * 0.6 - t * 0.45;
+        return { transform: `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -50%) rotate(${(t * 340 * (x1 > x0 ? 1 : -1)).toFixed(0)}deg) scale(${sc.toFixed(2)})`, opacity: i === N ? 0.2 : 1 };
+      });
+      const el = document.createElement("span");
+      el.className = "wd-fly";
+      el.textContent = emoji;
+      el.setAttribute("aria-hidden", "true");
+      document.body.appendChild(el);
+      const an = el.animate(frames, { duration: 760 + Math.min(300, Math.hypot(x1 - x0, y1 - y0) * 0.3), delay, easing: "cubic-bezier(.4,.1,.6,1)", fill: "both" });
+      return an.finished.catch(() => {}).then(() => el.remove());
+    };
+    // where it lands the slice squashes, the cake hops, the tier picks its filling again
+    const land = (k) => {
+      paint();
+      bump(slices[k], "is-plop");
+      bump(cakeHost, "is-hop");
+    };
+
     paint();
+    say("a");
+    say("b");
+
+    // when the section comes in, the tastes already ticked fly over once, so the game shows itself
+    if (reduce) return;
+    box.classList.add("is-armed");
+    box.addEventListener("wd:in", () => {
+      let n = 0;
+      ["a", "b"].forEach((side) => {
+        $$(`[data-side=${side}] [aria-pressed=true]`, box).forEach((btn) => {
+          const id = btn.dataset.t;
+          const other = picked[side === "a" ? "b" : "a"];
+          const k = other.has(id) ? "mid" : side === "a" ? "top" : "low";
+          fly($("span", btn), slices[k], tasteOf(id).e, 650 + n++ * 140).then(() => {
+            bump(slices[k], "is-plop");
+            bump(cakeHost, "is-hop");
+          });
+        });
+      });
+    }, { once: true });
+    seen([box], "is-in", "0px 0px -20% 0px");
   }
 
   /* ───────── ③ the way of the cake ───────── */
@@ -621,7 +859,7 @@
     if (!M() || !M().cakes) return;
     if (!reduce) document.documentElement.classList.add("wd-js");
     headings();
-    invitation();
+    proposal();
     twoOfYou();
     way();
     toss();

@@ -1,5 +1,5 @@
 /* Mariday — the flavour map (pages/flavors.html, css/flavors.css). From the glaze on top to the board at the bottom:
-   ① the top: cherry glaze, the title in pink sugar; every filling's real cake peeks over the piped cream edge —
+   ① the top: strawberry-milk glaze, the title in cherry glaze; every filling's real cake peeks over the piped cream edge —
      they pop up on arrival and sink back behind the cream as you scroll in; touch one to fly to its place on the map
    ② the island: a cream island in a mint sea, every filling is a place on it (its land comes from its mood) with its
      real cake standing there; the stage stays on screen while you scroll — the camera drops from the whole island
@@ -9,7 +9,8 @@
      a cherry lands, the ring lifts and the real cake of your filling stands in its place
    ④ the gift box: the lid lifts as it scrolls in, a little cake pops up in every paper cup; «Замовити сет» puts the lid
      back on and sends the box to the cart
-   ⑤ the board: the filling you found stands here as a real cake next to the button that builds it
+   ⑤ the carousel: the filling you found stands on a cake stand, every filling's little cake rides round it on a track;
+     touch one and it flies up onto the stand, the button builds the one standing there
    Works without GSAP; with reduced motion everything is simply shown. */
 (function () {
   const $ = (s, r = document) => r.querySelector(s);
@@ -82,6 +83,8 @@
   const POOL = ["gl-roses", "gl-lilac", "gl-meringue", "gl-tiramisu", "ds-choccup", "ds-redvelvet", "gl-pink", "ds-cupcake", "ds-mint"];
   // some cut-outs end where their photo ended: those edges are faded out instead of showing a straight cut
   const EDGE = { "gl-slice": "r b", "gl-berries": "l b", "ds-blackoreo": "l", "gl-gold": "l", "gl-tiramisu": "r", "ds-redvelvet": "b" };
+  // these cut-outs already stand on a cake stand of their own: the carousel's stand steps aside for them
+  const OWN_STAND = { "gl-piping": 1 };
   const nameOf = (f, k) => CAKE_OF[f.id] || POOL[k % POOL.length];
   const cakeOf = (f, k) => `${M().root}img/cutouts/${nameOf(f, k)}.webp`;
   const imgOf = (f, k, extra = "") => {
@@ -90,7 +93,7 @@
   };
   const cakes = () => M().flavors.map((f, k) => ({ f, src: cakeOf(f, k), k }));
 
-  /* ───────── the filling the visitor found: the board at the end shows its cake ───────── */
+  /* ───────── the filling the visitor found: the stand at the end shows its cake ───────── */
   let chosen = null;
   let mapApi = null;
   const choose = (f, from) => {
@@ -156,7 +159,7 @@
     const fit = () => document.documentElement.style.setProperty("--fl-hdr", `${hdr ? hdr.offsetHeight : 0}px`);
     fit();
     if (hdr && "ResizeObserver" in window) new ResizeObserver(fit).observe(hdr);
-    // Safari paints its status bar with the body colour: cherry while the glaze is up there
+    // Safari paints its status bar with the body colour: blush while the glaze is up there
     const edge = () => document.body.classList.toggle("is-edge-dark", scrollY < 2);
     addEventListener("scroll", edge, { passive: true });
     edge();
@@ -486,7 +489,7 @@
       V.s0 = tall ? (V.w - 14) / P.W : Math.min((V.w - 40) / P.W, (V.h - V.top - legendH) / P.H);
       V.s1 = tall ? Math.max(V.s0 * 1.6, Math.min(0.5, V.w / 820)) : Math.max(V.s0 * 1.7, Math.min(0.92, V.w / 1900));
     }
-    let last = { k: -1, here: -1 };
+    let last = { k: -1, here: -1, z: "", inv: "" };
     function render(p) {
       if (!P) return;
       const st = live ? stateAt(p) : { z: 0, d: total, q: sel, move: 0 };
@@ -503,8 +506,11 @@
       const fx = V.tall ? V.w / 2 : (V.w - V.side) * 0.5, fy = V.tall ? V.top + (V.h - V.top - V.under) * 0.62 : V.top + (V.h - V.top) * 0.6;
       const tx = ox + (fx - ox) * z - lx * s, ty = oy + (fy - oy) * z - ly * s;
       world.style.transform = `translate3d(${tx.toFixed(1)}px, ${ty.toFixed(1)}px, 0) scale(${s.toFixed(4)})`;
-      world.style.setProperty("--z", z.toFixed(3));
-      world.style.setProperty("--inv", (1 / s).toFixed(3));
+      // the zoom is read by every pin and flag on the island: written only when it changes, or a phone restyles the
+      // whole island on every frame of the trip
+      const zs = z.toFixed(3), inv = (1 / s).toFixed(3);
+      if (zs !== last.z) { last.z = zs; world.style.setProperty("--z", zs); }
+      if (inv !== last.inv) { last.inv = inv; world.style.setProperty("--inv", inv); }
       $("[data-fl-done]", land).style.strokeDashoffset = (total - d).toFixed(1);
       // the cherry leans the way the road turns, bounces as it rolls
       const lean = Math.max(-28, Math.min(28, (Math.atan2(c.dy, c.dx) * 180) / Math.PI * (c.dx < 0 ? -0.2 : 0.2)));
@@ -815,24 +821,133 @@
     });
   }
 
-  /* ───────── ⑤ the board: the cake of the filling you found ───────── */
+  /* ───────── ⑤ the carousel: the cake of the filling you found stands on the stand, the others ride round it ───────── */
+  let ride = null;
   function endCake(f) {
     const host = $("[data-fl-end-cake]");
     if (!host) return;
     const k = Math.max(0, M().flavors.indexOf(f));
-    host.style.setProperty("--tone", meta(f.id).tone);
-    host.innerHTML = `<span class="fl-pic">${imgOf(f, k)}</span><span class="fl-flag"><i></i><b>${esc(f.name)}</b></span>`;
+    (host.closest("[data-fl-orbit]") || host).style.setProperty("--tone", meta(f.id).tone);
+    // the flag goes inside the picture, so it stands in the cake whatever its shape
+    host.innerHTML = `<span class="fl-pic">${imgOf(f, k)}<span class="fl-flag"><i></i><b>${esc(f.name)}</b></span></span>`;
+    if (ride) ride.mark(f.id);
+    // the plate of the stand is as wide as the cake standing on it
+    const stage = host.closest("[data-fl-orbit]");
+    const img = $("img", host);
+    const plate = () => { if (stage && img.offsetWidth) stage.style.setProperty("--pw", `${img.offsetWidth}px`); };
+    if (stage) stage.classList.toggle("is-own-stand", !!OWN_STAND[nameOf(f, k)]);
+    if (img.complete) plate(); else img.addEventListener("load", plate, { once: true });
     if (live && host.dataset.ready) {
       gsap.fromTo($(".fl-pic", host), { yPercent: 30, scale: 0.6, opacity: 0 }, { yPercent: 0, scale: 1, opacity: 1, duration: 0.8, ease: "back.out(1.8)" });
       gsap.fromTo($(".fl-flag", host), { scale: 0 }, { scale: 1, duration: 0.5, delay: 0.3, ease: "back.out(3)" });
     }
     host.dataset.ready = "1";
   }
+  function carousel() {
+    const stage = $("[data-fl-orbit]");
+    const box = $("[data-fl-ride]");
+    const host = $("[data-fl-end-cake]");
+    if (!stage || !box || !host) return null;
+    const list = cakes();
+    const n = list.length;
+    box.innerHTML = list.map(({ f, k }) => `<button type="button" class="fl-orb" data-k="${k}" style="--i:${k}" aria-label="${esc(f.name)} — поставити на підставку">${imgOf(f, k)}<span class="fl-orb__name" aria-hidden="true">${esc(f.name)}</span></button>`).join("");
+    const orbs = $$(".fl-orb", box);
+
+    // the track is a flat ellipse round the stand; its size comes from the stage
+    let G = null;
+    function measure() {
+      const W = stage.clientWidth;
+      const H = stage.clientHeight;
+      const oh = Math.max(74, Math.min(W * 0.14, 160));
+      const ow = oh * 1.15;
+      const rx = Math.min(W / 2 - ow * 0.42, 540);
+      const ry = Math.max(24, rx * 0.2);
+      const cy = H - ry - 4;
+      const plate = cy - ry * 0.3 - 16;
+      G = { W, rx, ry, cy, oh, ow };
+      const vars = { "--cy": cy, "--rx": rx, "--ry": ry, "--plate": plate, "--foot": cy + ry * 0.2, "--ch": Math.min(plate - 4, H * (W < 600 ? 0.62 : 0.6)), "--cw": W < 600 ? W * 0.52 : rx * 0.72, "--oh": oh, "--ow": ow };
+      Object.entries(vars).forEach(([v, x]) => stage.style.setProperty(v, `${x.toFixed(1)}px`));
+    }
+    // the ones behind go under the stand, smaller and paler; the ones in front come over it
+    let turn = Math.PI / 2 + Math.PI / n;
+    let scrolled = 0;
+    function place() {
+      if (!G) return;
+      orbs.forEach((o, i) => {
+        const t = turn + scrolled + (i / n) * Math.PI * 2;
+        const s = Math.sin(t);
+        const d = (s + 1) / 2;
+        const x = G.W / 2 + Math.cos(t) * G.rx - G.ow / 2;
+        const y = G.cy + s * G.ry - G.oh;
+        o.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${(0.68 + 0.32 * d).toFixed(3)})`;
+        o.style.zIndex = s < 0 ? 1 : 5 + Math.round(d * 10);
+        o.style.opacity = (0.7 + 0.3 * d).toFixed(2);
+      });
+    }
+    measure();
+    place();
+    if ("ResizeObserver" in window) new ResizeObserver(() => {
+      measure();
+      place();
+      const img = $("img", host);
+      if (img && img.offsetWidth) stage.style.setProperty("--pw", `${img.offsetWidth}px`);
+    }).observe(stage);
+
+    // touch a cake on the track: it flies up onto the stand
+    const fly = (o, done) => {
+      const img = $("img", o);
+      if (!live || !img) { done(); return; }
+      const r = img.getBoundingClientRect();
+      const h = host.getBoundingClientRect();
+      const th = h.height * 0.82;
+      const tw = Math.min(h.width, th * 1.25);
+      const c = img.cloneNode();
+      c.className = "fl-fly";
+      document.body.appendChild(c);
+      o.classList.add("is-out");
+      const pic = $(".fl-pic", host);
+      if (pic) gsap.to(pic, { scale: 0.85, opacity: 0, duration: 0.25, ease: "power2.in" });
+      const tl = gsap.timeline({ onComplete: () => { done(); gsap.to(c, { opacity: 0, duration: 0.25, onComplete: () => c.remove() }); } });
+      tl.fromTo(c, { x: r.left, y: r.top, width: r.width, height: r.height }, { x: h.left + (h.width - tw) / 2, width: tw, height: th, duration: 0.65, ease: "power2.inOut" }, 0)
+        .fromTo(c, { y: r.top }, { keyframes: [{ y: Math.min(r.top, h.bottom - th) - 70, duration: 0.36, ease: "power2.out" }, { y: h.bottom - th, duration: 0.29, ease: "power2.in" }] }, 0);
+    };
+    box.addEventListener("click", (e) => {
+      const o = e.target.closest(".fl-orb");
+      if (!o || o.classList.contains("is-out")) return;
+      const f = M().flavors[+o.dataset.k];
+      fly(o, () => choose(f));
+    });
+
+    if (live) {
+      // the little cakes pop up onto the track as it comes into view
+      box.classList.add("is-wait");
+      ScrollTrigger.create({ trigger: stage, start: "top 88%", once: true, onEnter: () => {
+        box.classList.replace("is-wait", "is-intro");
+        setTimeout(() => box.classList.remove("is-intro"), 1300);
+      } });
+      // it turns slowly by itself, and a little further as the page scrolls; a pointer over it holds it still
+      let seen = false;
+      let held = false;
+      if ("IntersectionObserver" in window) new IntersectionObserver(([e]) => { seen = e.isIntersecting; }).observe(stage);
+      if (fine) {
+        stage.addEventListener("pointerenter", () => { held = true; });
+        stage.addEventListener("pointerleave", () => { held = false; });
+      }
+      ScrollTrigger.create({ trigger: stage, start: "top bottom", end: "bottom top", onUpdate: (st) => { scrolled = st.progress * Math.PI * 0.8; if (seen) place(); } });
+      gsap.ticker.add((time, dt) => {
+        if (!seen || held) return;
+        turn += Math.min(dt, 50) * 0.00012;
+        place();
+      });
+    }
+    return { mark: (id) => orbs.forEach((o) => o.classList.toggle("is-out", M().flavors[+o.dataset.k].id === id)) };
+  }
   function end() {
     const host = $("[data-fl-end-cake]");
     const fl = M().flavors;
     if (!host || !fl.length) return;
-    // until something is chosen, the board shows the first filling whose cake is whole (no faded edge)
+    ride = carousel();
+    // until something is chosen, the stand holds the first filling whose cake is whole (no faded edge)
     const first = fl.find((f, k) => !EDGE[nameOf(f, k)]) || fl[0];
     endCake(first);
     const go = $("[data-fl-go]");
@@ -840,7 +955,7 @@
     if (!live) return;
     ScrollTrigger.create({
       trigger: host,
-      start: "top 80%",
+      start: "top 85%",
       once: true,
       onEnter: () => gsap.fromTo($(".fl-pic", host), { yPercent: 40, scale: 0.5, opacity: 0 }, { yPercent: 0, scale: 1, opacity: 1, duration: 0.9, ease: "back.out(1.7)" }),
     });

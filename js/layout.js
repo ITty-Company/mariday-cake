@@ -16,20 +16,18 @@
     const here = location.pathname.split("/").pop() || "index.html";
     const cur = (file) => (here === file ? ' aria-current="page"' : "");
 
-    // The phone menu is a plain list, one section per line; the constructor carries the order tag
+    // The phone menu is a short centred list; the constructor (the way to order on phones) carries a small star
     function menuLinks() {
       const links = [
-        ["cakes.html", "Каталог тортів", "усі наші торти"],
-        ["constructor.html", "Конструктор", "замовити ✦", " mnav__link--cta"],
-        ["bento.html", "Бенто", "маленьке свято"],
-        ["desserts.html", "Десерти", "капкейки й candy bar"],
-        ["weddings.html", "Весілля", "ярусні та квіткові"],
-        ["flavors.html", "Карта смаків", "що всередині"],
+        ["cakes.html", "Каталог тортів"],
+        ["constructor.html", "Конструктор", " mnav__link--cta"],
+        ["bento.html", "Бенто"],
+        ["desserts.html", "Десерти"],
+        ["weddings.html", "Весілля"],
+        ["flavors.html", "Карта смаків"],
       ];
-      return links.map(([file, name, hint, mod = ""], i) => `
-        <a class="mnav__link${mod}" style="--i:${i}" href="${p(`pages/${file}`)}"${cur(file)}>
-          <b>${name}</b><em>${here === file ? "ви тут ♡" : hint}</em>
-        </a>`).join("");
+      return links.map(([file, name, mod = ""], i) => `
+        <a class="mnav__link${mod}" style="--i:${i}" href="${p(`pages/${file}`)}"${cur(file)}>${name}</a>`).join("");
     }
 
     const tickerItems = `
@@ -94,22 +92,22 @@
       </div>
       <div class="mnav" id="mobile-nav" aria-hidden="true" data-lenis-prevent>
         <div class="mnav__in">
-          <p class="mnav__kicker">що сьогодні смакуємо?<img src="${p("img/cakes/cherries.png")}" alt=""></p>
           <nav class="mnav__list" aria-label="Мобільне меню">${menuLinks()}</nav>
-          <nav class="mnav__more" aria-label="Ще сторінки">
-            ${[
-              ["delivery.html", "Доставка"], ["contacts.html", "Контакти"], ["about.html", "Про нас"], ["reviews.html", "Відгуки"],
-              ["faq.html", "FAQ"], ["journal.html", "Журнал"], ["gift.html", "Сертифікат"], ["corporate.html", "Для бізнесу"],
-            ].map(([f, name], i) => `<a style="--i:${i}" href="${p(`pages/${f}`)}"${cur(f)}>${name}</a>`).join("")}
-          </nav>
-          <div class="mnav__foot">
-            <a class="mnav__soc" href="https://www.instagram.com/mariday.cake/" target="_blank" rel="noopener" aria-label="Instagram">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.6"/></svg>
-            </a>
-            <a class="mnav__soc" href="https://wa.me/31600000000" target="_blank" rel="noopener" aria-label="WhatsApp">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5l1.2-3.9A8 8 0 1 1 8.6 18.4Z"/><path d="M9.2 8.6c.3 2.9 3 5.9 6 6.4l1-1.3-1.9-1-.8.8c-1.2-.5-2.5-1.8-3-3l.8-.8-1-1.9Z"/></svg>
-            </a>
-            <p class="mnav__note">з любов'ю з Alkmaar ♥</p>
+          <div class="mnav__end">
+            <nav class="mnav__more" aria-label="Ще сторінки">
+              ${[
+                ["delivery.html", "Доставка"], ["contacts.html", "Контакти"], ["about.html", "Про нас"], ["reviews.html", "Відгуки"],
+                ["faq.html", "FAQ"], ["journal.html", "Журнал"], ["gift.html", "Сертифікат"], ["corporate.html", "Для бізнесу"],
+              ].map(([f, name], i) => `<a style="--i:${i}" href="${p(`pages/${f}`)}"${cur(f)}>${name}</a>`).join("")}
+            </nav>
+            <div class="mnav__foot">
+              <a class="mnav__soc" href="https://www.instagram.com/mariday.cake/" target="_blank" rel="noopener" aria-label="Instagram">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.6"/></svg>
+              </a>
+              <a class="mnav__soc" href="https://wa.me/31600000000" target="_blank" rel="noopener" aria-label="WhatsApp">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5l1.2-3.9A8 8 0 1 1 8.6 18.4Z"/><path d="M9.2 8.6c.3 2.9 3 5.9 6 6.4l1-1.3-1.9-1-.8.8c-1.2-.5-2.5-1.8-3-3l.8-.8-1-1.9Z"/></svg>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -626,7 +624,7 @@
     const sum = document.getElementById("order-summary");
     sum.hidden = false;
     sum.innerHTML = MaridayCart.get().map((i) => `
-      <div class="order-summary__row">${i.image ? `<img src="${escapeHTML(fixSrc(i.image))}" alt="">` : "<span></span>"}<span>${escapeHTML(i.name)} <small>×${i.qty}</small></span><b>${formatEUR(i.price * i.qty)}</b></div>`).join("") +
+      <div class="order-summary__row">${i.image || i.shot ? `<img src="${escapeHTML(i.shot || fixSrc(i.image))}" alt="">` : "<span></span>"}<span>${escapeHTML(i.name)} <small>×${i.qty}</small></span><b>${formatEUR(i.price * i.qty)}</b></div>`).join("") +
       `<div class="order-summary__total"><span>Разом орієнтовно</span><b>${formatEUR(MaridayCart.total())}</b></div>`;
     form.fulfillment.value = wayOf();
     form._sync?.();
@@ -671,7 +669,9 @@
     const d = it.dessert && (M.desserts || []).find((x) => x.id === it.id);
     if (d) return { src: photo(d.img), kind: "photo", bg, ac };
     if (it.image) return { src: fixSrc(it.image), kind: "photo", bg, ac };
-    // a cake of their own design: the cherries stand in for it
+    // a cake of their own design: its snapshot from the constructor stands on the card like a catalogue cut-out…
+    if (it.shot) return { src: it.shot, kind: "cut", bg: "#f9d6e3", ac: "#cf467f" };
+    // …or, for one packed before snapshots existed, the cherries stand in for it
     return { src: p("img/cakes/cherries.png"), kind: "icon", bg: "#f9d6e3", ac: "#cf467f" };
   }
 
@@ -751,12 +751,10 @@
       <div class="cb-empty">
         <div class="cb-box" aria-hidden="true">
           <i class="cb-box__back"></i>
-          <i class="cb-box__flap cb-box__flap--l"></i><i class="cb-box__flap cb-box__flap--r"></i>
           <img class="cb-box__cherry" src="${p("img/cakes/cherries.png")}" alt="">
           <i class="cb-box__front"><b>Mariday</b></i>
         </div>
         <p class="cb-empty__title">Тут поки порожньо</p>
-        <p class="cb-empty__text">Коробка чекає на ваш торт</p>
         <a class="btn btn-primary cb-empty__go" href="${p("pages/cakes.html")}">До каталогу</a>
         <a class="cb-empty__alt" href="${p("pages/constructor.html")}">або зберіть свій у конструкторі →</a>
       </div>`;
@@ -1038,7 +1036,7 @@
     window.MaridayFavNote?.hide();
     const c = window.MARIDAY && MARIDAY.cakes && MARIDAY.cakes.find((k) => k.id === item.id);
     const cut = c ? wholeCut(c) : "";
-    n.img.src = cut || fixSrc(item.image) || p("img/cakes/cherries.png");
+    n.img.src = cut || item.shot || fixSrc(item.image) || p("img/cakes/cherries.png");
     n.img.classList.toggle("is-photo", !cut && !!item.image);
     n.el.style.setProperty("--c", (c && c.bg) || "#f6dbe0");
     const total = MaridayCart.count();

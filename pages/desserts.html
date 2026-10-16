@@ -4,15 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Десерти і candy bar — Mariday Cake</title>
-  <meta name="description" content="Капкейки, макарони, брауні, донати та candy bar під ключ від Mariday Cake в Alkmaar. Солодкий автомат, меню, пакети S/M/L, сезонні смаки й тест «Який ви десерт?».">
+  <meta name="description" content="Капкейки, макарони, брауні, донати та candy bar під ключ від Mariday Cake в Alkmaar. Солодкий автомат, меню, пакети S/M/L, сезонні смаки.">
   <meta name="theme-color" content="#6d0809">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236d0809'/%3E%3Cpath d='M14 44h36v6H14z' fill='%23dbefed'/%3E%3Cpath d='M20 28h24v16H20z' fill='%23f5bcc8'/%3E%3Cpath d='M25 18h14v10H25z' fill='%23dbefed'/%3E%3Ccircle cx='32' cy='13' r='5' fill='%23f5bcc8'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="../css/main.css?v=20">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Unbounded:wght@300;400;600;800&family=Great+Vibes&family=Caveat:wght@500;700&family=Manrope:wght@300;400;500;600;700&family=Dela+Gothic+One&family=Pacifico&display=swap">
+  <link rel="stylesheet" href="../css/main.css?v=25">
   <link rel="stylesheet" href="../css/pages.css?v=14">
   <link rel="stylesheet" href="../css/glaze.css?v=1">
-  <link rel="stylesheet" href="../css/desserts.css?v=3">
+  <link rel="stylesheet" href="../css/desserts.css?v=5">
+  <link rel="stylesheet" href="../css/desserts-year.css?v=1">
+  <link rel="stylesheet" href="../css/desserts-faq.css?v=1">
+  <link rel="stylesheet" href="../css/adapt.css?v=1">
 </head>
 <body data-page="desserts" class="inner inner--default ds">
   <div class="grain" aria-hidden="true"></div>
@@ -116,11 +120,18 @@
           </div>
           <div class="ds-range__ends" aria-hidden="true"><span>10</span><span>60</span></div>
           <p class="ds-hand ds-dial__d">≈ <b data-g-d>84</b> десерти на стіл</p>
+          <ul class="ds-list" data-g-list aria-live="polite"></ul>
         </div>
-        <div class="ds-party" aria-hidden="true">
-          <span class="ds-party__bunting"></span>
-          <div class="ds-party__top" data-g-table></div>
-          <div class="ds-party__skirt"></div>
+        <div class="ds-party" data-g-party aria-hidden="true">
+          <div class="ds-party__ring">
+            <span class="ds-party__disc"><b>Mariday</b><small data-g-sign>candy bar · S</small></span>
+            <div class="ds-party__balloons" data-g-balloons></div>
+            <div class="ds-party__confetti"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="ds-party__stage">
+            <div class="ds-party__top" data-g-table></div>
+            <div class="ds-party__skirt"></div>
+          </div>
         </div>
       </div>
       <div class="ds-envs" data-ds-envs></div>
@@ -193,24 +204,55 @@
       <span class="ds-drip ds-drip--bottom" data-ds-drip style="--fill:var(--cherry-deep)" aria-hidden="true"></span>
     </section>
 
-    <!-- ⑥ The wheel of the year: four seasons on a dial; turn it (drag or tap) and the season under the cherry shows its flavours. -->
-    <section class="ds-year" data-ds-year aria-labelledby="ds-year-title">
+    <!-- ⑥ A year through the kitchen window: a garland of months with a cherry riding on it. Slide the cherry and the weather
+         outside, the desserts on the sill and the seasonal menu all turn with it (js/desserts-year.js, css/desserts-year.css). -->
+    <section class="ds-year" data-ds-year data-season="spring" aria-labelledby="ds-year-title">
       <header class="ds-head">
         <h2 class="ds-h2" id="ds-year-title" aria-label="Сезонні смаки"><span class="ds-h2__w" data-ds-split aria-hidden="true">Сезонні</span><span class="ds-h2__s" aria-hidden="true">смаки</span></h2>
-        <p class="ds-hand ds-head__hint">покрутіть колесо року ↻</p>
+        <p class="ds-hand ds-head__hint">посуньте вишню по гірлянді місяців ↔</p>
       </header>
       <div class="ds-year__in">
-        <div class="ds-wheel" data-ds-wheel>
-          <img class="ds-wheel__pin" src="../img/cakes/cherries.png" alt="" aria-hidden="true">
-          <div class="ds-wheel__disc" data-ds-disc>
-            <button type="button" class="ds-wheel__s" style="--a:0deg;--c:#f8d3dc" data-season="spring" aria-pressed="true"><img src="../img/cakes/strawslice.jpg" alt=""><b>Весна</b></button>
-            <button type="button" class="ds-wheel__s" style="--a:90deg;--c:#f6c2c9" data-season="summer" aria-pressed="false"><img src="../img/cakes/raspberries.jpg" alt=""><b>Літо</b></button>
-            <button type="button" class="ds-wheel__s" style="--a:180deg;--c:#f3d9a8" data-season="autumn" aria-pressed="false"><img src="../img/cakes/pour.jpg" alt=""><b>Осінь</b></button>
-            <button type="button" class="ds-wheel__s" style="--a:270deg;--c:#cfe3f1" data-season="winter" aria-pressed="false"><img src="../img/cakes/blackoreo.jpg" alt=""><b>Зима</b></button>
+        <div class="yr-win" data-yr-win>
+          <div class="yr-garland" data-yr-garland role="radiogroup" aria-label="Місяць">
+            <svg class="yr-garland__rope" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0 Q50 20 100 0"/></svg>
+            <i class="yr-garland__nail" aria-hidden="true"></i><i class="yr-garland__nail yr-garland__nail--r" aria-hidden="true"></i>
+            <button type="button" class="yr-m" role="radio" aria-checked="false" tabindex="-1" data-m="0" data-s="winter" style="--t:0.0967;--r:-6deg" aria-label="Січень"><span>січ</span></button>
+            <button type="button" class="yr-m" role="radio" aria-checked="false" tabindex="-1" data-m="1" data-s="winter" style="--t:0.1700;--r:4deg" aria-label="Лютий"><span>лют</span></button>
+            <button type="button" class="yr-m" role="radio" aria-checked="false" tabindex="-1" data-m="2" data-s="winter" style="--t:0.2433;--r:-3deg" aria-label="Березень"><span>бер</span></button>
+            <button type="button" class="yr-m" role="radio" aria-checked="false" tabindex="-1" data-m="3" data-s="spring" style="--t:0.3167;--r:5deg" aria-label="Квітень"><span>кві</span></button>
+            <button type="button" class="yr-m" role="radio" aria-checked="false" tabindex="-1" data-m="4" data-s="spring" style="--t:0.3900;--r:-5deg" aria-label="Травень"><span>тра</span></button>
+            <button type="button" class="yr-m" role="radio" aria-checked="false" tabindex="-1" data-m="5" data-s="summer" style="--t:0.4633;--r:3deg" aria-label="Червень"><span>чер</span></button>
+            <button type="button" class="yr-m" role="radio" aria-checked="false" tabindex="-1" data-m="6" data-s="summer" style="--t:0.5367;--r:-4deg" aria-label="Липень"><span>лип</span></button>
+            <button type="button" class="yr-m" role="radio" aria-checked="false" tabindex="-1" data-m="7" data-s="summer" style="--t:0.6100;--r:6deg" aria-label="Серпень"><span>сер</span></button>
+            <button type="button" class="yr-m" role="radio" aria-checked="false" tabindex="-1" data-m="8" data-s="autumn" style="--t:0.6833;--r:-3deg" aria-label="Вересень"><span>вер</span></button>
+            <button type="button" class="yr-m" role="radio" aria-checked="false" tabindex="-1" data-m="9" data-s="autumn" style="--t:0.7567;--r:4deg" aria-label="Жовтень"><span>жов</span></button>
+            <button type="button" class="yr-m" role="radio" aria-checked="false" tabindex="-1" data-m="10" data-s="autumn" style="--t:0.8300;--r:-6deg" aria-label="Листопад"><span>лис</span></button>
+            <button type="button" class="yr-m" role="radio" aria-checked="false" tabindex="-1" data-m="11" data-s="winter" style="--t:0.9033;--r:3deg" aria-label="Грудень"><span>гру</span></button>
+            <span class="yr-cherry" data-yr-cherry aria-hidden="true"><img src="../img/cakes/cherries.png" alt="" draggable="false"></span>
           </div>
-          <span class="ds-wheel__hub" aria-hidden="true"><b data-season-emoji>🌸</b></span>
+          <div class="yr-frame">
+            <div class="yr-glass" data-yr-glass aria-hidden="true">
+              <i class="yr-sky yr-sky--spring"></i><i class="yr-sky yr-sky--summer"></i><i class="yr-sky yr-sky--autumn"></i><i class="yr-sky yr-sky--winter"></i>
+              <i class="yr-sun"></i>
+              <i class="yr-hill yr-hill--b"></i><i class="yr-hill yr-hill--a"></i>
+              <canvas class="yr-fx" data-yr-fx></canvas>
+              <canvas class="yr-frost" data-yr-frost></canvas>
+              <i class="yr-bars"></i>
+              <i class="yr-shine"></i>
+            </div>
+            <div class="yr-shelf" aria-hidden="true">
+              <div class="yr-sill is-on" data-sill="spring"><figure style="--i:0;--r:-7deg"><img src="../img/cutouts/candy-mac.webp" alt="" loading="lazy" draggable="false"><figcaption>бузина</figcaption></figure><figure style="--i:1;--r:5deg"><img src="../img/cutouts/gl-strawslice.webp" alt="" loading="lazy" draggable="false"><figcaption>ревінь</figcaption></figure><figure style="--i:2;--r:-4deg"><img src="../img/cutouts/ds-vanilla.webp" alt="" loading="lazy" draggable="false"><figcaption>фіалка</figcaption></figure></div>
+              <div class="yr-sill" data-sill="summer"><figure style="--i:0;--r:-7deg"><img src="../img/cutouts/ds-donut5.webp" alt="" loading="lazy" draggable="false"><figcaption>лохина</figcaption></figure><figure style="--i:1;--r:5deg"><img src="../img/cutouts/gl-slice.webp" alt="" loading="lazy" draggable="false"><figcaption>малина</figcaption></figure><figure style="--i:2;--r:-4deg"><img src="../img/cutouts/gl-meringue.webp" alt="" loading="lazy" draggable="false"><figcaption>безе</figcaption></figure></div>
+              <div class="yr-sill" data-sill="autumn"><figure style="--i:0;--r:-7deg"><img src="../img/cutouts/ds-brownie.webp" alt="" loading="lazy" draggable="false"><figcaption>карамель</figcaption></figure><figure style="--i:1;--r:5deg"><img src="../img/cutouts/ds-choccup.webp" alt="" loading="lazy" draggable="false"><figcaption>кориця</figcaption></figure><figure style="--i:2;--r:-4deg"><img src="../img/cutouts/gl-tiramisu.webp" alt="" loading="lazy" draggable="false"><figcaption>спеції</figcaption></figure></div>
+              <div class="yr-sill" data-sill="winter"><figure style="--i:0;--r:-7deg"><img src="../img/cutouts/ds-blackoreo.webp" alt="" loading="lazy" draggable="false"><figcaption>шоколад</figcaption></figure><figure style="--i:1;--r:5deg"><img src="../img/cutouts/forest.webp" alt="" loading="lazy" draggable="false"><figcaption>вишня</figcaption></figure><figure style="--i:2;--r:-4deg"><img src="../img/cutouts/ds-cookie.webp" alt="" loading="lazy" draggable="false"><figcaption>пряник</figcaption></figure></div>
+            </div>
+            <span class="yr-ledge" aria-hidden="true"></span>
+          </div>
+          <p class="ds-hand yr-note" data-yr-note aria-hidden="true">торкніться скла — пелюстки розлетяться</p>
         </div>
-        <div class="ds-year__card" aria-live="polite">
+        <div class="ds-year__card yr-card" aria-live="polite">
+          <span class="yr-card__tape" aria-hidden="true"></span>
+          <span class="yr-card__now" data-yr-now hidden>зараз<br>у вітрині</span>
           <div class="ds-season" data-panel="spring">
             <p class="ds-hand">квітень — травень</p>
             <h3>Ніжність і перші ягоди</h3>
@@ -240,80 +282,28 @@
       </div>
     </section>
 
-    <!-- ⑦ Which dessert are you? Three cards fly off the deck, then a fortune cookie — break it to read the answer. -->
-    <section class="ds-quiz" id="quiz" data-sprinkles aria-labelledby="ds-quiz-title">
-      <span class="ds-drip ds-drip--top" data-ds-drip style="--fill:var(--bg)" aria-hidden="true"></span>
-      <div class="ds-quiz__in" data-ds-quiz>
-        <header class="ds-head">
-          <h2 class="ds-h2 ds-h2--sm" id="ds-quiz-title" aria-label="Який ви десерт?"><span class="ds-h2__w" data-ds-split aria-hidden="true">Який ви</span><span class="ds-h2__s" aria-hidden="true">десерт?</span></h2>
-          <p class="ds-hand ds-head__hint">розвага на 20 секунд</p>
-        </header>
-        <div class="ds-deck" data-ds-deck>
-          <div class="ds-q" data-q style="--r:-2deg">
-            <h3>Ідеальна субота — це…</h3>
-            <div class="ds-q__as">
-              <button type="button" data-a="tiramisu-box brownie-box">☕ Кава, книжка й тиша</button>
-              <button type="button" data-a="unicorn-cupcakes">🎉 Вечірка до ранку</button>
-              <button type="button" data-a="macaron-set red-velvet-cupcakes">🛍 Виставка й шопінг</button>
-              <button type="button" data-a="brownie-box">🛋 Плед, серіал і доставка</button>
-            </div>
-          </div>
-          <div class="ds-q" data-q style="--r:1.5deg">
-            <h3>Ваш колір настрою?</h3>
-            <div class="ds-q__as">
-              <button type="button" data-a="red-velvet-cupcakes">❤️ Глибокий вишневий</button>
-              <button type="button" data-a="macaron-set">🩷 Пудровий рожевий</button>
-              <button type="button" data-a="unicorn-cupcakes">🌈 Усі одразу</button>
-              <button type="button" data-a="tiramisu-box brownie-box">🤎 Шоколадний</button>
-            </div>
-          </div>
-          <div class="ds-q" data-q style="--r:-1deg">
-            <h3>На вечірці ви…</h3>
-            <div class="ds-q__as">
-              <button type="button" data-a="unicorn-cupcakes">💃 Перші на танцполі</button>
-              <button type="button" data-a="red-velvet-cupcakes">🥂 Ті, хто говорить тост</button>
-              <button type="button" data-a="tiramisu-box">🗣 Ведете глибокі розмови на кухні</button>
-              <button type="button" data-a="macaron-set">📸 Фотографуєте все красиве</button>
-            </div>
-          </div>
-          <div class="ds-cookie" data-ds-cookie hidden>
-            <button type="button" class="ds-cookie__btn" data-ds-crack aria-label="Розламати печиво з передбаченням">
-              <svg class="ds-cookie__half ds-cookie__half--l" viewBox="0 0 165 150" aria-hidden="true"><path d="M14,86 C6,46 52,14 104,24 C130,29 150,44 160,60 C170,44 190,29 216,24 C268,14 314,46 306,86 C300,122 250,136 214,122 C192,113 176,104 160,104 C144,104 128,113 106,122 C70,136 20,122 14,86 Z" fill="url(#ds-cookie-g)"/><path d="M160,60 C150,76 150,92 160,104" fill="none" stroke="#a8641f" stroke-width="5" stroke-linecap="round"/><path d="M40,58 C62,38 92,32 118,40" fill="none" stroke="#fff3d6" stroke-opacity=".75" stroke-width="7" stroke-linecap="round"/><path d="M30,96 C52,116 84,118 112,106" fill="none" stroke="#b9772c" stroke-opacity=".5" stroke-width="4" stroke-linecap="round"/></svg>
-              <svg class="ds-cookie__half ds-cookie__half--r" viewBox="155 0 165 150" aria-hidden="true"><path d="M14,86 C6,46 52,14 104,24 C130,29 150,44 160,60 C170,44 190,29 216,24 C268,14 314,46 306,86 C300,122 250,136 214,122 C192,113 176,104 160,104 C144,104 128,113 106,122 C70,136 20,122 14,86 Z" fill="url(#ds-cookie-g)"/><path d="M160,60 C170,76 170,92 160,104" fill="none" stroke="#a8641f" stroke-width="5" stroke-linecap="round"/><path d="M208,106 C236,118 268,116 290,96" fill="none" stroke="#b9772c" stroke-opacity=".5" stroke-width="4" stroke-linecap="round"/></svg>
-              <span class="ds-cookie__slip" aria-hidden="true">✦ ✦ ✦</span>
-            </button>
-            <p class="ds-hand ds-cookie__note">розламайте печиво ✦</p>
-            <svg width="0" height="0" aria-hidden="true" focusable="false"><defs><radialGradient id="ds-cookie-g" cx="0.4" cy="0.3" r="0.8"><stop offset="0" stop-color="#f8d79a"/><stop offset="0.55" stop-color="#e5ac5c"/><stop offset="1" stop-color="#b9772c"/></radialGradient></defs></svg>
-          </div>
-          <div class="ds-fortune" data-ds-fortune hidden aria-live="polite"></div>
-        </div>
-      </div>
-      <span class="ds-drip ds-drip--bottom" data-ds-drip style="--fill:var(--ds-blush)" aria-hidden="true"></span>
-    </section>
-
-    <!-- ⑧ Short answers: notes that unfold -->
+    <!-- ⑧ Short answers: the desserts answer for themselves — pick one on the shelf, it speaks in the bubble -->
     <section class="ds-faq" aria-labelledby="ds-faq-title">
       <header class="ds-head">
         <h2 class="ds-h2 ds-h2--sm" id="ds-faq-title" aria-label="Коротко про важливе"><span class="ds-h2__w" data-ds-split aria-hidden="true">Коротко</span><span class="ds-h2__s" aria-hidden="true">про важливе</span></h2>
       </header>
-      <div class="ds-acc" data-ds-acc>
-        <details style="--c:#f5bcc8"><summary><h3>За скільки замовляти десерти й candy bar?</h3><i aria-hidden="true"></i></summary><div class="ds-acc__body"><p>Бокси й сети — за 2–3 дні. Candy bar — бажано за тиждень, а у вихідні травня–вересня та грудня краще за 2–3 тижні: макаронам потрібна доба на дозрівання, а палітру ми підбираємо індивідуально.</p></div></details>
-        <details style="--c:#fbe6b8"><summary><h3>Скільки десертів брати на гостя?</h3><i aria-hidden="true"></i></summary><div class="ds-acc__body"><p>Якщо є торт — 2–3 десерти на гостя. Якщо candy bar замість торта — 4–5. Для дитячих свят рахуйте 2 капкейки на дитину й не забудьте про батьків 🙂</p></div></details>
-        <details style="--c:#dbefed"><summary><h3>Як довго зберігаються макарони й капкейки?</h3><i aria-hidden="true"></i></summary><div class="ds-acc__body"><p>Макарони — до 5 днів у холодильнику в закритій коробці, найсмачніші на 2–3 день. Капкейки й трайфли — до 48 годин при +2…+6 °C. Діставайте за 20–30 хвилин до подачі.</p></div></details>
-        <details style="--c:#e9d3f3"><summary><h3>Чи можна змішати десерти з різних пакетів?</h3><i aria-hidden="true"></i></summary><div class="ds-acc__body"><p>Так. Пакети S, M і L — лише зручна відправна точка. Ви можете збирати стіл вручну у вітрині вище або написати менеджеру — складемо меню під ваш бюджет.</p></div></details>
-        <details style="--c:#c9dcf3"><summary><h3>Чи є варіанти без горіхів?</h3><i aria-hidden="true"></i></summary><div class="ds-acc__body"><p>Макарони роблять на мигдальному борошні, тому вони точно з горіхами. Капкейки, брауні й донати можна приготувати без горіхових начинок, але ми працюємо в одному цеху, тож сліди можливі. Напишіть про алергії в коментарі.</p></div></details>
+      <div class="dq" data-dq>
+        <div class="dq__bubble">
+          <div class="dq__panel" role="tabpanel" id="dq-p-terms" aria-labelledby="dq-t-terms" tabindex="0"><h3>За скільки замовляти десерти й candy bar?</h3><p>Бокси й сети — за 2–3 дні. Candy bar — бажано за тиждень, а у вихідні травня–вересня та грудня краще за 2–3 тижні: макаронам потрібна доба на дозрівання, а палітру ми підбираємо індивідуально.</p><span class="dq__sign" aria-hidden="true">— макарон, якому треба доба, щоб дозріти</span></div>
+          <div class="dq__panel" role="tabpanel" id="dq-p-guests" aria-labelledby="dq-t-guests" tabindex="0"><h3>Скільки десертів брати на гостя?</h3><p>Якщо є торт — 2–3 десерти на гостя. Якщо candy bar замість торта — 4–5. Для дитячих свят рахуйте 2 капкейки на дитину й не забудьте про батьків 🙂</p><span class="dq__sign" aria-hidden="true">— капкейк, який уже рахує гостей</span></div>
+          <div class="dq__panel" role="tabpanel" id="dq-p-keep" aria-labelledby="dq-t-keep" tabindex="0"><h3>Як довго зберігаються макарони й капкейки?</h3><p>Макарони — до 5 днів у холодильнику в закритій коробці, найсмачніші на 2–3 день. Капкейки й трайфли — до 48 годин при +2…+6 °C. Діставайте за 20–30 хвилин до подачі.</p><span class="dq__sign" aria-hidden="true">— червоний оксамит, щойно з холодильника</span></div>
+          <div class="dq__panel" role="tabpanel" id="dq-p-mix" aria-labelledby="dq-t-mix" tabindex="0"><h3>Чи можна змішати десерти з різних пакетів?</h3><p>Так. Пакети S, M і L — лише зручна відправна точка. Ви можете збирати стіл вручну у вітрині вище або написати менеджеру — складемо меню під ваш бюджет.</p><span class="dq__sign" aria-hidden="true">— печиво, яке дружить з усіма</span></div>
+          <div class="dq__panel" role="tabpanel" id="dq-p-nuts" aria-labelledby="dq-t-nuts" tabindex="0"><h3>Чи є варіанти без горіхів?</h3><p>Макарони роблять на мигдальному борошні, тому вони точно з горіхами. Капкейки, брауні й донати можна приготувати без горіхових начинок, але ми працюємо в одному цеху, тож сліди можливі. Напишіть про алергії в коментарі.</p><span class="dq__sign" aria-hidden="true">— брауні, можна й без горішків</span></div>
+        </div>
+        <div class="dq__shelf" role="tablist" aria-label="Питання">
+          <button type="button" class="dq__tab" role="tab" id="dq-t-terms" aria-controls="dq-p-terms" aria-selected="false" style="--c:#f5bcc8"><span class="dq__stand" aria-hidden="true"><span class="dq__d"><img src="../img/cutouts/candy-mac.webp" alt="" draggable="false" loading="lazy" style="--h:0.5"></span></span><span class="dq__tag">Терміни</span></button>
+          <button type="button" class="dq__tab" role="tab" id="dq-t-guests" aria-controls="dq-p-guests" aria-selected="false" style="--c:#fbe6b8"><span class="dq__stand" aria-hidden="true"><span class="dq__d"><img src="../img/cutouts/ds-cupcake.webp" alt="" draggable="false" loading="lazy" style="--h:0.98"></span></span><span class="dq__tag">На гостя</span></button>
+          <button type="button" class="dq__tab" role="tab" id="dq-t-keep" aria-controls="dq-p-keep" aria-selected="false" style="--c:#dbefed"><span class="dq__stand" aria-hidden="true"><span class="dq__d"><img src="../img/cutouts/ds-redvelvet.webp" alt="" draggable="false" loading="lazy" style="--h:0.92"></span></span><span class="dq__tag">Зберігання</span></button>
+          <button type="button" class="dq__tab" role="tab" id="dq-t-mix" aria-controls="dq-p-mix" aria-selected="false" style="--c:#e9d3f3"><span class="dq__stand" aria-hidden="true"><span class="dq__d"><img src="../img/cutouts/ds-cookie.webp" alt="" draggable="false" loading="lazy" style="--h:0.62"></span></span><span class="dq__tag">Мікс пакетів</span></button>
+          <button type="button" class="dq__tab" role="tab" id="dq-t-nuts" aria-controls="dq-p-nuts" aria-selected="false" style="--c:#c9dcf3"><span class="dq__stand" aria-hidden="true"><span class="dq__d"><img src="../img/cutouts/ds-brownie.webp" alt="" draggable="false" loading="lazy" style="--h:1"></span></span><span class="dq__tag">Без горіхів</span></button>
+        </div>
       </div>
       <p class="ds-faq__more">Не знайшли відповіді? Наш чат-помічник на сторінці <a class="p-link" href="faq.html">FAQ</a> знає ще понад 40.</p>
-    </section>
-
-    <section class="p-cta" data-sprinkles>
-      <div class="p-cta__inner">
-        <p class="p-eyebrow light" data-up>( Ваша черга )</p>
-        <h2 class="p-cta__title" data-rise>Великий <em>солодкий стіл?</em></h2>
-        <a class="p-magnet" href="contacts.html"><span>Обговорити</span></a>
-        <nav class="p-cta__links" aria-label="Швидкі посилання"><a href="cakes.html">Торти</a><a href="bento.html">Бенто</a><a href="weddings.html">Весільні</a><a href="gift.html">Сертифікат</a></nav>
-        <p class="p-cta__hint">Клікніть будь-де — буде посипка ✦</p>
-      </div>
     </section>
   </main>
   <div id="site-footer"></div>
@@ -323,8 +313,11 @@
   <script src="../js/data.js?v=16"></script>
   <script src="../js/content.js?v=3"></script>
   <script src="../js/cart.js?v=12"></script>
-  <script src="../js/layout.js?v=24"></script>
+  <script src="../js/layout.js?v=27"></script>
   <script src="../js/pages.js?v=14"></script>
-  <script src="../js/desserts.js?v=1"></script>
+  <script src="../js/desserts.js?v=2"></script>
+  <script src="../js/desserts-year.js?v=1"></script>
+  <script src="../js/desserts-faq.js?v=1"></script>
+  <script src="../js/speed.js?v=1"></script>
 </body>
 </html>

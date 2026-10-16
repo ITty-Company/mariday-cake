@@ -77,9 +77,33 @@ html.lenis, html.lenis body { height: auto; }
 .home { --edge-bleed: 0px; }
 /* …and Safari fills its status bar (and the strip under its bottom bar) with the body colour:
    cherry while the loader / hero cover the screen, mint once the page scrolls (js/home.js edgeTint) */
+/* phones, once the page scrolls: the strip under the bottom bar wears the colour of the section at the screen's foot
+   (body), the status bar the colour of the section at its top (.x-tint, a fixed 2px box) — js/home.js edgeColors.
+   A section's own --edge-top / --edge-bot win over its background colour */
+.x-hero, .x-drop { --edge-top: var(--cherry); --edge-bot: var(--cherry); }
+.gl { --edge-top: var(--edge-gl, var(--bg)); --edge-bot: var(--edge-gl, var(--bg)); }
+.x-path { --edge-top: #fdefe9; }
+.x-dress { --edge-top: var(--bg); --edge-bot: var(--wash); }
+/* the edge colours are set on the body as the page scrolls; they do not pass down to its children, so a new colour
+   restyles the body alone, not the whole page (a phone would stutter at every section edge); ::before takes it from the body */
+@property --edge-b { syntax: "*"; inherits: false; }
+@property --edge-gl { syntax: "*"; inherits: false; }
+.home.is-edge-sec { background: var(--edge-b, var(--bg)); }
+.home.is-edge-sec::before { background: inherit; }
+.x-tint { position: fixed; z-index: 10003; top: 0; left: 0; width: 100%; height: 2px; pointer-events: none; visibility: hidden; }
+.is-edge-sec .x-tint { visibility: visible; }
+.is-edge-sec .x-progress, .mnav-open .x-tint { visibility: hidden; }
+/* the header's fixed wrapper stays along the top after the bar has slid away, and Safari tints the status bar from it
+   (cherry): once the bar is out of sight the wrapper goes too, and comes back the moment the bar does */
+.is-edge-sec #site-header:has(.hdr--hidden) { visibility: hidden; transition: visibility 0s 0.6s; }
+/* the tinted body shows through sections without a background of their own: they keep the page mint */
+.is-edge-sec .x-cut__pin, .is-edge-sec .x-order__pin { background: var(--bg); }
 .home.is-edge-dark, .home.is-edge-dark::before { background: var(--cherry); }
+/* while the loader's cream brush covers the screen the bar goes cream with it (js/home.js edgeLoader) */
+.home.is-edge-cream.is-edge-cream, .home.is-edge-cream.is-edge-cream::before { background: #b9d3e2; }
 /* the gallery room's colour while the gallery holds the screen, so its top and bottom run into Safari's bars (js/home.js horizontal) */
-.home.is-edge-gl:not(.mnav-open), .home.is-edge-gl:not(.mnav-open)::before { background: var(--edge-gl, var(--bg)); }
+.home.is-edge-gl:not(.mnav-open) { background: var(--edge-gl, var(--bg)); }
+.home.is-edge-gl:not(.mnav-open)::before { background: inherit; }
 @supports (height: 100lvh) {
   @media (hover: none) and (pointer: coarse) {
     .home { --edge-bleed: calc(100lvh - 100svh + 72px); }
@@ -232,6 +256,14 @@ html.lenis, html.lenis body { height: auto; }
 /* --vis: the hero height without the bleed under Safari's bar, so stops and offsets match the visible screen */
 .x-hero { --vis: calc(100% - var(--edge-bleed, 0px)); }
 .x-hero__shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(71, 3, 4, 0.55) 0%, rgba(71, 3, 4, 0.05) calc(var(--vis) * 0.26), rgba(71, 3, 4, 0.08) calc(var(--vis) * 0.6), rgba(71, 3, 4, 0.72) var(--vis)), rgba(109, 8, 9, 0.12); }
+/* Phones: Safari's status bar can only be one flat colour, never the video. The film's top edge melts into that same
+   cherry (an eased fade, no visible band), so the strip and the video read as one picture without a line between */
+@media (hover: none) and (pointer: coarse) {
+  .x-hero__shade::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 90px;
+    background: linear-gradient(180deg, #6d0809 0, rgba(109, 8, 9, 0.82) 10px, rgba(109, 8, 9, 0.55) 28px, rgba(109, 8, 9, 0.26) 52px, rgba(109, 8, 9, 0.08) 74px, rgba(109, 8, 9, 0) 90px);
+  }
+}
 
 .x-hero__cherry { position: absolute; z-index: 3; pointer-events: none; will-change: transform; filter: drop-shadow(0 24px 30px rgba(30, 0, 0, 0.45)); }
 .x-hero__cherry--1 { width: clamp(90px, 11vw, 170px); left: 4%; top: calc(var(--vis) * 0.22); rotate: -18deg; filter: blur(3px) drop-shadow(0 30px 30px rgba(30, 0, 0, 0.5)); }
@@ -734,15 +766,42 @@ html.lenis, html.lenis body { height: auto; }
   user-select: none;
   -webkit-user-select: none;
   cursor: grab;
-  touch-action: none;
+  /* a vertical swipe over the letters still scrolls the page; taps and sideways throws are theirs (js/home.js) */
+  touch-action: pan-y;
   will-change: transform;
   text-shadow: 0 6px 0 rgba(71, 3, 4, 0.55), 0 14px 24px rgba(30, 0, 0, 0.35);
 }
 .x-drop__letter.is-pink { color: var(--pink); }
 .x-drop__letter.is-drag { cursor: grabbing; }
 .x-drop__letter img { width: 100%; pointer-events: none; -webkit-user-drag: none; filter: drop-shadow(0 10px 14px rgba(30, 0, 0, 0.35)); }
-.x-drop__hint { margin: 0.6rem 0 0; color: rgba(219, 239, 237, 0.7); opacity: 0; transition: opacity 0.6s 2.8s; }
+.x-drop__hint { margin: 0.5rem 0 0; font-size: 1.15rem; color: rgba(219, 239, 237, 0.72); opacity: 0; transition: opacity 0.6s 2.2s; }
 .x-drop.is-done .x-drop__hint { opacity: 1; }
+@media (min-width: 761px) {
+  .x-drop__hint { display: none; }
+}
+
+/* phone: the cake on top of the letter pile, under a soft beam (cakeStage() in js/home.js) */
+.x-stage { position: absolute; left: 0; top: 0; transform-origin: 50% 100%; will-change: transform; cursor: pointer; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
+.x-stage__cake { position: absolute; inset: 0; transform-origin: 50% 100%; }
+.x-stage__cake img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; filter: drop-shadow(0 16px 18px rgba(30, 0, 0, 0.5)); pointer-events: none; -webkit-user-drag: none; user-select: none; }
+/* the light pooling on the letters under the cake */
+.x-stage__pool { position: absolute; left: -12%; right: -12%; bottom: -14%; height: 30%; background: radial-gradient(closest-side, rgba(255, 228, 214, 0.42), rgba(245, 188, 200, 0.14) 60%, transparent); opacity: 0; transition: opacity 0.8s; pointer-events: none; }
+.x-stage__beam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  background: conic-gradient(at 50% 0%, transparent 163deg, rgba(255, 226, 216, 0.3) 171deg, rgba(255, 242, 234, 0.46) 180deg, rgba(255, 226, 216, 0.3) 189deg, transparent 197deg);
+  -webkit-mask-image: linear-gradient(180deg, transparent 8%, #000 50%, #000 82%, transparent);
+  mask-image: linear-gradient(180deg, transparent 8%, #000 50%, #000 82%, transparent);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 1.2s;
+  pointer-events: none;
+}
+.x-drop.is-lit .x-stage__beam, .x-drop.is-lit .x-stage__pool { opacity: 1; }
+.x-stage__spark { position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%; background: #fff4ee; box-shadow: 0 0 10px rgba(255, 220, 230, 0.9); pointer-events: none; }
+.x-stage__spark:nth-of-type(3n) { background: var(--pink); }
 
 /* 2/3 zoom through photos */
 .x-zoom { position: relative; background: var(--cherry); }
@@ -803,7 +862,8 @@ html.lenis, html.lenis body { height: auto; }
 @keyframes x-beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(0.95); } 45% { transform: scale(1.15); } }
 
 @media (max-width: 760px) {
-  .x-drop { height: 64svh; min-height: 500px; }
+  /* a full screen: the cake stands on the letters between the cream line and the floor */
+  .x-drop { min-height: 580px; }
 }
 /* soft out-of-focus cherries drifting behind the letters */
 .x-drop__bokeh { position: absolute; inset: 0; z-index: 0; pointer-events: none; -webkit-mask-image: linear-gradient(180deg, transparent, #000 30%); mask-image: linear-gradient(180deg, transparent, #000 30%); }

@@ -5,7 +5,6 @@
    ④ the palette: a fan of paint chips, a roller repaints the backdrop and the whole section follows
    ⑤ the countdown: a tear-off calendar that loses a page as you scroll
    ⑥ the wheel of the year: turn it and the season under the cherry tells its flavours
-   ⑦ the quiz: three cards fly off the deck, then a fortune cookie breaks open with your dessert
    Works without GSAP; with reduced motion everything is simply shown. */
 (function () {
   const $ = (s, r = document) => r.querySelector(s);
@@ -342,14 +341,33 @@
   };
   const STAMPS = ["candy-mac", "candy-cup", "candy-cake"];
   const ENV = [["#fde3ea", "#f5bcc8"], ["#fff1d6", "#f3d48a"], ["#e2f3f0", "#a9d8d1"]];
-  // the party table: 36 places in three rows, filled from the middle outwards
-  const SLOTS = (() => {
-    const rows = [[13, 0.6, 58], [12, 0.78, 32], [11, 1, 6]];
-    const out = [];
-    rows.forEach(([n, s, y], r) => {
-      for (let k = 0; k < n; k++) out.push({ x: 4 + ((k + 0.5) / n) * 92 + (r === 1 ? 1.5 : 0), y, s, d: Math.abs(k - (n - 1) / 2) + r * 0.4 });
-    });
-    return out.sort((a, b) => a.d - b.d);
+  // what lands on the table for each candy bar, as shares of the desserts (the accent cake comes on top for L)
+  const MENU = {
+    S: [["cup", 0.4], ["mac", 0.4], ["tri", 0.2]],
+    M: [["cup", 0.3], ["mac", 0.3], ["bro", 0.2], ["tri", 0.2]],
+    L: [["cup", 0.3], ["mac", 0.25], ["bro", 0.15], ["tri", 0.15], ["coo", 0.15]],
+  };
+  const KINDS = { cup: ["Капкейки", "ds-cupcake"], mac: ["Макарони", "candy-mac"], bro: ["Брауні", "ds-brownie"], tri: ["Міні-трайфли", "gl-slice"], coo: ["Печиво", "ds-cookie"], cake: ["Торт-акцент", "candy-cake"] };
+  const CUPS = ["ds-cupcake", "cherrycup", "candy-cup", "ds-redvelvet", "ds-mint", "ds-choccup", "ds-blackoreo"];
+  const FRONT = ["ds-cupcake", "ds-brownie", "cherrycup", "candy-mac", "ds-redvelvet", "ds-mint", "ds-choccup", "ds-brownie", "candy-cup", "ds-blackoreo", "candy-mac", "ds-vanilla"];
+  // macarons tinted to the party palette
+  const MACF = ["none", "sepia(0.3) saturate(2.6) hue-rotate(-28deg)", "saturate(1.6) hue-rotate(60deg) brightness(1.04)", "sepia(0.2) saturate(2.2) hue-rotate(-40deg) brightness(0.96)"];
+  // the balloon garland wraps the round backdrop from the left foot over the top — closed at a full house
+  const BALLOONS = (() => {
+    const n = 30, out = [];
+    const tone = ["var(--p1)", "#fff", "var(--p3)", "var(--butter, #fbe6b8)", "var(--p1)", "cherry", "#fff", "var(--p3)"];
+    for (let k = 0; k < n; k++) {
+      const a = ((205 - (k / (n - 1)) * 230) * Math.PI) / 180;
+      const r = 50 + ((k * 7) % 3 - 1) * 3.2;
+      const big = 13 + ((k * 5) % 4) * 1.6;
+      const t = Math.max(0, (k - 3) / (n - 4));
+      out.push({ x: 50 + r * Math.cos(a), y: 50 - r * Math.sin(a), s: big, c: tone[k % tone.length], t });
+      if (k % 2 === 0) {
+        const a2 = a + 0.09, r2 = r + 7;
+        out.push({ x: 50 + r2 * Math.cos(a2), y: 50 - r2 * Math.sin(a2), s: 6.5 + (k % 3), c: tone[(k + 3) % tone.length], t });
+      }
+    }
+    return out;
   })();
   function guests() {
     const box = $("[data-ds-guests]");
@@ -363,10 +381,69 @@
     const list = packs();
     const span = (d) => { const m = String(d.unit || "").match(/(\d+)\D+(\d+)/); return m ? [+m[1], +m[2]] : [0, 999]; };
 
-    const minis = [...["cupcakes-6", "macaron-set", "donuts-6", "cherry-cupcakes", "cookie-box", "red-velvet-cupcakes", "pastel-macarons", "oreo-cupcakes", "brownie-box", "unicorn-cupcakes"]
-      .map((id) => M().desserts.find((d) => d.id === id)).filter(Boolean).map(cut).filter(Boolean), ...EXTRA];
-    table.innerHTML = SLOTS.map((s, i) => `<span class="ds-party__it" style="--x:${s.x.toFixed(1)};--y:${s.y};--s:${s.s};--r:${[-6, 5, -3, 7, -8, 4][i % 6]}deg;z-index:${100 - s.y}"><img src="${esc(minis[(i * 7) % minis.length])}" alt="" draggable="false"></span>`).join("");
-    const its = $$(".ds-party__it", table);
+    const party = $("[data-g-party]", box);
+    const listEl = $("[data-g-list]", box);
+    const signEl = $("[data-g-sign]", box);
+    const letterOf = (d) => (d.name.match(/\b([SML])$/) || [])[1] || "";
+    // where M and L start on the slider (from the packs' guest ranges), so the table changes with the envelope
+    const p0 = (g) => clamp((g - range.min) / (range.max - range.min), 0, 1);
+    const hiOf = (L) => { const d = list.find((x) => letterOf(x) === L); return d ? span(d)[1] : 0; };
+    const pM = hiOf("S") ? p0(hiOf("S") + 1) : 0.12;
+    const pL = hiOf("M") ? p0(hiOf("M") + 1) : 0.42;
+
+    // the table, from the back: two cake stands, the macaron tower (the accent cake takes its place for L),
+    // two little stands at the ends, then a front row filling from the middle outwards
+    const img = (n, cls = "") => `<img class="${cls}" src="${esc(file(n))}" alt="" draggable="false">`;
+    const step = (a, b, i, n) => (a + ((b - a) * i) / Math.max(1, n - 1)).toFixed(3);
+    const stand = (x, side) => {
+      const lo = [20, 50, 80].map((sx, i) => `<i class="ds-on" data-t="${step(pM + 0.03, pM + 0.14, i, 3)}" style="--x:${sx};--y:23;--w:31;z-index:${i === 1 ? 3 : 2}">${img(CUPS[(i + side * 2) % CUPS.length])}</i>`).join("");
+      const up = [34, 66].map((sx, i) => `<i class="ds-on" data-t="${step(pM + 0.16, pM + 0.24, i, 2)}" style="--x:${sx};--y:65;--w:27;z-index:2">${img(CUPS[(i + 3 + side * 2) % CUPS.length])}</i>`).join("");
+      return `<span class="ds-stand ds-on" data-t="${pM.toFixed(3)}" style="--x:${x};--y:30;--w:15;z-index:12"><span class="ds-stand__glass"></span>${lo}${up}</span>`;
+    };
+    const tower = (() => {
+      const rows = [4, 3, 2, 1];
+      let j = 0;
+      const macs = rows.map((n, r) => Array.from({ length: n }, (_, k) => {
+        const t = Math.max(0, j - 3) * (pM / 7);
+        const html = `<i class="ds-on" data-t="${t.toFixed(3)}" style="--x:${50 + (k - (n - 1) / 2) * 24};--y:${r * 17};--w:27;--f:${MACF[(j * 3 + r) % MACF.length]};z-index:${r + 1}">${img("candy-mac")}</i>`;
+        j++;
+        return html;
+      }).join("")).join("");
+      return `<span class="ds-mtower ds-on" data-t="0" data-t2="${pL.toFixed(3)}" style="--x:50;--y:30;--w:14;z-index:14">${macs}<i class="ds-mtower__top ds-on" data-t="${(pM * 0.95).toFixed(3)}"><img src="../img/cakes/cherries.png" alt="" draggable="false"></i></span>`;
+    })();
+    const ends = [[7, "gl-tiramisu", pL + 0.2], [93, "gl-strawslice", pL + 0.3]].map(([x, n, t]) =>
+      `<span class="ds-stand ds-stand--one ds-on" data-t="${t.toFixed(3)}" style="--x:${x};--y:30;--w:11;z-index:11"><span class="ds-stand__glass"></span><i class="ds-on" data-t="${(t + 0.04).toFixed(3)}" style="--x:50;--y:30;--w:84;z-index:2">${img(n)}</i></span>`).join("");
+    const front = Array.from({ length: 16 }, (_, k) => ({ x: 6 + (k / 15) * 88, k })).filter((s) => Math.abs(s.x - 50) > 5)
+      .sort((a, b) => Math.abs(a.x - 50) - Math.abs(b.x - 50))
+      .map((s, i) => `<i class="ds-on ds-front" data-t="${(Math.max(0, i - 3) / 11 * 0.96).toFixed(3)}" style="--x:${s.x.toFixed(1)};--y:25.5;--w:5.6;--r:${[-5, 4, -2, 6, -6, 3][s.k % 6]}deg;z-index:${40 + (s.k % 2)}">${img(FRONT[s.k % FRONT.length])}</i>`).join("");
+    table.innerHTML = `${stand(25, 0)}${stand(75, 1)}${tower}
+      <span class="ds-place ds-on" data-t="${pL.toFixed(3)}" style="--x:50;--y:29.5;--w:12.5;z-index:15">${img("candy-cake")}</span>
+      ${ends}${front}`;
+    const its = $$(".ds-on", table);
+    const balloons = $("[data-g-balloons]", box);
+    balloons.innerHTML = BALLOONS.map((b, i) => `<i class="ds-on${b.c === "cherry" ? " is-cherry" : ""}" data-t="${b.t.toFixed(3)}" style="--x:${b.x.toFixed(1)};--y:${b.y.toFixed(1)};--s:${b.s};--c:${b.c === "cherry" ? "var(--cherry)" : b.c};--bob:${(i % 5) * -0.7}s"><b></b></i>`).join("");
+    const bs = $$(".ds-on", balloons);
+
+    // the shopping list on the left: one line per dessert, the numbers follow the slider
+    const ORDER = ["cup", "mac", "bro", "tri", "coo", "cake"];
+    listEl.innerHTML = ORDER.map((k) => `<li data-k="${k}"><div><span class="ds-list__pic">${img(KINDS[k][1])}</span><span class="ds-list__name">${KINDS[k][0]}</span><b>0</b></div></li>`).join("");
+    const rows = Object.fromEntries($$("li", listEl).map((li) => [li.dataset.k, li]));
+    const fillList = (L, nd) => {
+      const menu = MENU[L] || MENU.M;
+      const counts = Object.fromEntries(menu.map(([k, s]) => [k, Math.round(nd * s)]));
+      counts[menu[0][0]] += nd - Object.values(counts).reduce((a, b) => a + b, 0);
+      if (L === "L") counts.cake = 1;
+      ORDER.forEach((k) => {
+        const li = rows[k];
+        const on = k in counts;
+        li.classList.toggle("is-on", on);
+        if (!on) return;
+        const b = $("b", li);
+        const v = k === "cake" ? "1" : String(counts[k]);
+        if (b.textContent !== v) { b.textContent = v; if (!reduce) replay(b, "is-tick"); }
+      });
+    };
+    let lastL = "";
 
     // the envelopes, addressed by hand, a dessert stamp in the corner; the chosen one opens and its letter rises
     if (host && list.length) {
@@ -425,7 +502,7 @@
       }
     };
 
-    let lastN = 0;
+
     const set = (g, user) => {
       const p = (g - range.min) / (range.max - range.min);
       box.style.setProperty("--p", p.toFixed(4));
@@ -434,15 +511,28 @@
       const nd = Math.round(g * 3.5);
       dEl.textContent = nd;
       if (dEl.nextSibling) dEl.nextSibling.textContent = ` ${plural(nd, "десерт", "десерти", "десертів")} на стіл`;
-      const n = Math.round(6 + p * (SLOTS.length - 6));
-      its.forEach((it, i) => {
-        const on = i < n;
+      // everything whose moment has come pops on, one after another; what is past its moment (the tower for L) bows out
+      let k = 0;
+      [...its, ...bs].forEach((it) => {
+        const t = +it.dataset.t, t2 = it.dataset.t2 ? +it.dataset.t2 : 2;
+        const on = p >= t - 1e-4 && p < t2 - 1e-4;
         if (on === it.classList.contains("is-on")) return;
-        it.style.setProperty("--dl", `${(on ? Math.max(0, i - lastN) : 0) * 0.025}s`);
+        it.style.setProperty("--dl", `${on ? Math.min(k++, 14) * 0.035 : 0}s`);
         it.classList.toggle("is-on", on);
       });
-      lastN = n;
-      if (list.length) open((list.find((d) => span(d)[1] >= g) || list[list.length - 1]).id, user);
+      const pack = list.length ? list.find((d) => span(d)[1] >= g) || list[list.length - 1] : null;
+      const L = (pack && letterOf(pack)) || (p >= pL ? "L" : p >= pM ? "M" : "S");
+      fillList(L, nd);
+      if (L !== lastL) {
+        signEl.textContent = `candy bar · ${L}`;
+        if (lastL && !reduce) replay(signEl.parentNode, "is-swing");
+        lastL = L;
+      }
+      // a full house: the garland closes and the confetti goes up
+      const full = g >= +range.max;
+      if (full && !party.classList.contains("is-full") && !reduce) replay(party, "is-full");
+      else if (!full) party.classList.remove("is-full");
+      if (pack) open(pack.id, user);
     };
     range.addEventListener("input", () => set(+range.value, true));
     host?.addEventListener("click", (e) => {
@@ -540,6 +630,8 @@
   }
 
   /* ───────── ⑤ the countdown calendar: scroll tears the pages off ───────── */
+  // every torn page flies over to the clothesline under the heading and stays pegged there,
+  // so by the party the line holds the whole story; the room glows in the colour of the page on top
   function calendar() {
     const sec = $("[data-ds-cal]");
     if (!sec || reduce) return;
@@ -547,11 +639,30 @@
     sec.style.setProperty("--n", pages.length);
     sec.classList.add("is-js");
     pages.forEach((p, i) => (p.style.zIndex = pages.length - i));
+
+    const line = document.createElement("div");
+    line.className = "ds-line";
+    line.setAttribute("aria-hidden", "true");
+    line.innerHTML = `<svg viewBox="0 0 100 48" preserveAspectRatio="none"><path d="M0 2 Q50 46 100 2"/></svg>` +
+      pages.map((pg, i) => {
+        const x = (i + 0.6) / (pages.length + 0.2);
+        return `<span class="ds-line__p" style="--c:${pg.style.getPropertyValue("--c")};--x:${x.toFixed(3)};--k:${i}"><b>${esc($(".ds-page__big", pg).textContent)}</b><small>${esc($("h3", pg).textContent)}</small></span>`;
+      }).join("");
+    $(".ds-cal__copy", sec).append(line);
+    const minis = $$(".ds-line__p", line);
+
     const run = () => {
       const r = sec.getBoundingClientRect();
       const len = sec.offsetHeight - innerHeight;
       const p = len > 0 ? clamp(-r.top / len, 0, 1) * (pages.length + 0.3) : 0;
-      pages.forEach((pg, i) => pg.style.setProperty("--t", clamp((p - i - 0.25) / 0.75, 0, 1).toFixed(3)));
+      let top = pages.length;
+      pages.forEach((pg, i) => {
+        const t = clamp((p - i - 0.25) / 0.75, 0, 1);
+        pg.style.setProperty("--t", t.toFixed(3));
+        minis[i].classList.toggle("is-hung", t > 0.9);
+        if (t < 0.5 && top === pages.length) top = i;
+      });
+      sec.style.setProperty("--glow", top < pages.length ? pages[top].style.getPropertyValue("--c") : "#f5bcc8");
       sec.classList.toggle("is-done", p > pages.length);
     };
     track(sec, run);
@@ -671,95 +782,6 @@
     setRot(0);
   }
 
-  /* ───────── ⑦ the quiz and the fortune cookie ───────── */
-  const RES = {
-    "red-velvet-cupcakes": ["Ви — Red velvet", "Елегантні, трішки драматичні й завжди в центрі уваги. Оксамит, кремчиз і малина — ваш стиль."],
-    "macaron-set": ["Ви — макарон", "Витончені, кольорові й неймовірно фотогенічні. Маленькі, але з характером."],
-    "brownie-box": ["Ви — брауні", "Теплі, щирі й без зайвих церемоній. Шоколадна душа компанії."],
-    "unicorn-cupcakes": ["Ви — капкейк «Єдиноріг»", "Свято ходить за вами по п'ятах. Посипка, веселка й гучний сміх."],
-    "tiramisu-box": ["Ви — тірамісу", "Дорослий шарм, кава зранку й розмови до ночі. Класика, яка не втомлює."],
-  };
-  function quiz() {
-    const box = $("[data-ds-quiz]");
-    if (!box) return;
-    const sec = box.closest("[data-sprinkles]") || box;
-    const cards = $$("[data-q]", box);
-    const cookie = $("[data-ds-cookie]", box);
-    const fortune = $("[data-ds-fortune]", box);
-    let score = {};
-    let step = 0;
-    let result = null;
-    const deal = () => cards.forEach((c, i) => {
-      c.classList.toggle("is-gone", i < step);
-      c.classList.toggle("is-top", i === step);
-      c.style.setProperty("--k", Math.max(0, i - step));
-      c.inert = i !== step;
-    });
-    const finish = () => {
-      const id = Object.entries(score).sort((a, b) => b[1] - a[1])[0][0];
-      result = M().desserts.find((x) => x.id === id) || shelf()[0];
-      cookie.hidden = false;
-      cookie.classList.remove("is-cracked");
-      replay(cookie, "is-in");
-      setTimeout(() => $("[data-ds-crack]", cookie).focus({ preventScroll: true }), T(400));
-    };
-    const crack = () => {
-      if (!result || cookie.classList.contains("is-cracked")) return;
-      cookie.classList.add("is-cracked");
-      const [title, text] = RES[result.id] || [`Ви — ${result.name}`, result.desc || ""];
-      setTimeout(() => {
-        cookie.hidden = true;
-        fortune.hidden = false;
-        fortune.innerHTML = `
-          <div class="ds-fortune__pic">${pic(result)}</div>
-          <div class="ds-fortune__slip">
-            <p class="ds-hand">ваше передбачення:</p>
-            <h3>${esc(title)}</h3>
-            <p>${esc(text)}</p>
-            <div class="ds-fortune__row">
-              <button type="button" class="ds-candy" data-ds-take><span>+ на мій стіл · ${eur(result.price)}</span></button>
-              <button type="button" class="ds-again" data-ds-again>ще раз ↻</button>
-            </div>
-          </div>`;
-        replay(fortune, "is-in");
-        const s = sec.getBoundingClientRect();
-        const r = fortune.getBoundingClientRect();
-        window.MaridayMotion?.burst?.(sec, r.left + r.width / 2 - s.left, r.top - s.top + 40, 90);
-      }, T(650));
-    };
-    box.addEventListener("click", (e) => {
-      const a = e.target.closest("[data-a]");
-      if (a && a.closest(".is-top")) {
-        a.dataset.a.split(" ").forEach((id) => (score[id] = (score[id] || 0) + 1));
-        replay(a, "is-pick");
-        step++;
-        setTimeout(() => {
-          deal();
-          if (step >= cards.length) finish();
-          else $(".is-top button", box)?.focus({ preventScroll: true });
-        }, T(260));
-        return;
-      }
-      if (e.target.closest("[data-ds-crack]")) return crack();
-      const take = e.target.closest("[data-ds-take]");
-      if (take && result) {
-        tray.add(result, $(".ds-fortune__pic img", fortune));
-        document.dispatchEvent(new CustomEvent("ds:sel"));
-        replay(take, "is-pop");
-        return;
-      }
-      if (e.target.closest("[data-ds-again]")) {
-        score = {};
-        step = 0;
-        result = null;
-        fortune.hidden = true;
-        cookie.hidden = true;
-        deal();
-      }
-    });
-    deal();
-  }
-
   /* ───────── short answers: one note open at a time ───────── */
   function faq() {
     const acc = $("[data-ds-acc]");
@@ -780,7 +802,6 @@
     calendar();
     drips();
     year();
-    quiz();
     faq();
     tray.paint(false);
   });

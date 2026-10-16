@@ -906,6 +906,15 @@
     return runPath(creamPath(W, H, bw), duration, 6, stamp);
   }
 
+  // Safari fills its status bar with the body colour (css/home.css .is-edge-cream) and re-reads it only while the page
+  // scrolls, so a 1px scroll there and back makes it notice
+  function edgeLoader(on) {
+    document.body.classList.toggle("is-edge-cream", on);
+    const y = scrollY;
+    scrollTo(0, y + 1);
+    requestAnimationFrame(() => requestAnimationFrame(() => scrollTo(0, y)));
+  }
+
   function runLoader(onReveal) {
     const loader = $(".x-loader");
     if (!loader) return onReveal();
@@ -949,7 +958,8 @@
         .to(logo, { scale: 1.05, duration: 0.55, ease: "power2.inOut" }, "<")
         .add(() => {
           const paintTime = quick ? 0.85 : 1.35;
-          gsap.to($(".x-loader__cream-base", loader), { opacity: 1, duration: 0.4, delay: paintTime * 0.75 });
+          // the cream has covered the screen: Safari's status bar turns cream with it (bordeaux until now)
+          gsap.to($(".x-loader__cream-base", loader), { opacity: 1, duration: 0.4, delay: paintTime * 0.75, onStart: () => edgeLoader(true) });
           let lifted = false;
           const lift = () => {
             if (lifted) return;
@@ -959,7 +969,8 @@
             gsap.set([".x-loader__curtain", ".x-loader__canvas", ".x-loader__center"], { autoAlpha: 0 });
             gsap.timeline({ onComplete: () => { loader.remove(); markIntro(); } })
               .to(cream, { yPercent: -100, duration: 1.0, ease: "power1.inOut" }, 0)
-              .add(onReveal, 0.3);
+              .add(onReveal, 0.3)
+              .add(() => edgeLoader(false), 0.85);
           };
           paintCream($(".x-loader__brush", loader), paintTime, lift).then(lift);
         }, "+=0.05");
@@ -1778,26 +1789,59 @@
     });
   }
 
-  // Manifesto 1/3: letters (and cherries) fall, pile up and can be thrown around; then a piping bag writes in cream
+  // Manifesto 1/3: letters (and cherries) fall, pile up and can be thrown around; then a piping bag writes in cream.
+  // On a phone the pile is a stage: a catalogue cake stands on «МИ НЕ» under a beam and rides whatever its letters do.
+  // A tap makes a letter jump, a sideways swipe throws it (vertical swipes still scroll), tilting the phone rolls cherries
   function dropLetters() {
     const sec = $(".x-drop");
     if (!sec) return;
     sideCakes(sec);
     const world = $(".x-drop__world", sec);
+    const phoneMQ = matchMedia("(max-width: 760px)");
     let started = false;
     let visible = false;
+    let stop = null;
+    let builtW = 0;
+    // -1…1: how far the phone leans sideways (deviceorientation gamma), 0 until motion is allowed
+    let tilt = 0;
+    let asked = false;
     // starts once a quarter of the section is in view, so even a visitor scrolling straight on sees the phrase land
     new IntersectionObserver(([e]) => {
       visible = e.isIntersecting;
       if (visible && !started) {
         started = true;
-        start();
+        stop = start(true);
       }
     }, { threshold: 0.25 }).observe(sec);
+    // a phone turned sideways gets the phrase dropped anew for its new width
+    let rt = 0;
+    addEventListener("resize", () => {
+      if (!stop || Math.abs(sec.clientWidth - builtW) < 40) return;
+      clearTimeout(rt);
+      rt = setTimeout(() => { stop(); stop = start(false); }, 300);
+    });
+    // iOS asks for motion on the first tap in the section; elsewhere it simply starts
+    const motion = () => {
+      if (asked || !phoneMQ.matches || !window.DeviceOrientationEvent) return;
+      asked = true;
+      const listen = () => addEventListener("deviceorientation", (e) => {
+        const g = e.gamma || 0;
+        tilt = Math.abs(g) < 5 ? 0 : Math.max(-1, Math.min(1, (g - Math.sign(g) * 5) / 25));
+      });
+      if (typeof DeviceOrientationEvent.requestPermission === "function") DeviceOrientationEvent.requestPermission().then((s) => s === "granted" && listen()).catch(() => {});
+      else listen();
+    };
+    if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function") world.addEventListener("click", motion);
+    else motion();
 
-    function start() {
+    function start(first) {
+      const ac = new AbortController();
+      const on = { signal: ac.signal };
+      const timers = [];
       const W = sec.clientWidth;
       const H = sec.clientHeight;
+      const phone = phoneMQ.matches;
+      builtW = W;
       // rows from the floor up; "*" is a cherry, " " an empty slot. Each row sits on the grid of the row below
       const rows = [
         { t: "*ТОРТИ»*", pink: true },
@@ -1829,6 +1873,9 @@
         return el;
       };
 
+      // made before the letters, so the beam and the cake stay behind them
+      const stage = phone ? cakeStage(W, r, floor, bodies, on, timers) : null;
+
       let delay = 0;
       rows.forEach((row, ri) => {
         const offset = Math.floor((slots - row.t.length) / 2 + 0.5);
@@ -1839,7 +1886,8 @@
             if (ch !== "*") {
               el.className = `x-drop__letter${row.pink ? " is-pink" : ""}`;
               el.textContent = ch;
-              el.style.fontSize = `${fs}px`;
+              // the wide letters are set a touch smaller, so «М» doesn't climb over its neighbours
+              el.style.fontSize = `${fs * ("МШЖЮ".includes(ch) ? 0.9 : 1)}px`;
             }
             const rad = ch === "*" ? r * 0.92 : r;
             makeBody(el, rad, x, -rad - Math.random() * 30, delay, 4, floor - r - ri * r * 2 + (r - rad));
@@ -1848,35 +1896,76 @@
         });
         delay += 80;
       });
-      for (let i = 0; i < 12; i++) {
-        makeBody(cherry(), fs * 0.3, r + Math.random() * (W - 2 * r), -200 - Math.random() * 300, delay - 200 + i * 60, 1);
+      for (let i = 0, n = phone ? 6 : 12; i < n; i++) {
+        // on a phone they land on the pyramid's shoulders, clear of the cake on top
+        const x = phone ? (i % 2 ? W - r - Math.random() * r * 2.5 : r + Math.random() * r * 2.5) : r + Math.random() * (W - 2 * r);
+        makeBody(cherry(), fs * 0.3, x, -200 - Math.random() * 300, delay - 200 + i * 60, 1);
       }
-      ingredients(W, r, floor);
+      if (stage) stage.drop(performance.now() + delay + 250);
+      else ingredients(W, r, floor, on, timers);
 
-      // drag & throw
+      const wake = (b) => bodies.forEach((o) => { if (o !== b && Math.hypot(o.x - b.x, o.y - b.y) < (o.r + b.r) * 2.2) { o.sleep = false; o.still = 0; } });
+      const grab = (b) => {
+        b.grab = true;
+        b.sleep = false;
+        b.landY = undefined;
+        wake(b);
+        b.el.classList.add("is-drag");
+        if (stage) stage.hold();
+      };
+      const release = (b) => {
+        b.grab = false;
+        lastPlay = performance.now();
+        b.el.classList.remove("is-drag");
+      };
+      // a tap: the letter jumps and flips, knocking whatever stands on it — the cake included
+      const kick = (b) => {
+        b.sleep = false;
+        b.landY = undefined;
+        b.still = 0;
+        b.vy = -(9 + Math.random() * 2.5);
+        b.vx = (Math.random() - 0.5) * 5;
+        b.va = (Math.random() < 0.5 ? -1 : 1) * (0.5 + Math.random() * 0.2);
+        wake(b);
+        lastPlay = performance.now();
+        if (stage) stage.hold();
+        if (navigator.vibrate) navigator.vibrate(8);
+      };
+
+      // mouse: grab & throw (a click without moving kicks). Touch: vertical swipes stay the page's (touch-action: pan-y),
+      // a sideways swipe takes the letter and throws it, a tap kicks it
       bodies.forEach((b) => {
         b.el.addEventListener("pointerdown", (e) => {
-          e.preventDefault();
-          b.el.setPointerCapture(e.pointerId);
-          b.grab = true;
-          b.sleep = false;
-          b.landY = undefined;
-          bodies.forEach((o) => { if (o !== b && Math.hypot(o.x - b.x, o.y - b.y) < (o.r + b.r) * 2.2) { o.sleep = false; o.still = 0; } });
-          b.el.classList.add("is-drag");
           const rect = sec.getBoundingClientRect();
-          const move = (ev) => { b.tx = ev.clientX - rect.left; b.ty = ev.clientY - rect.top; };
-          move(e);
-          const up = () => {
-            b.grab = false;
-            lastPlay = performance.now();
-            b.el.classList.remove("is-drag");
+          const sx = e.clientX, sy = e.clientY, t0 = performance.now();
+          const mouse = e.pointerType === "mouse";
+          let held = mouse;
+          const follow = (ev) => { b.tx = ev.clientX - rect.left; b.ty = ev.clientY - rect.top; };
+          if (mouse) {
+            e.preventDefault();
+            b.el.setPointerCapture(e.pointerId);
+            grab(b);
+            follow(e);
+          }
+          const move = (ev) => {
+            const dx = Math.abs(ev.clientX - sx);
+            if (!held && dx > 8 && dx > Math.abs(ev.clientY - sy)) {
+              held = true;
+              grab(b);
+            }
+            if (held) follow(ev);
+          };
+          const end = (ev) => {
             b.el.removeEventListener("pointermove", move);
-            b.el.removeEventListener("pointerup", up);
-            b.el.removeEventListener("pointercancel", up);
+            b.el.removeEventListener("pointerup", end);
+            b.el.removeEventListener("pointercancel", end);
+            const tap = ev.type === "pointerup" && performance.now() - t0 < 450 && Math.hypot(ev.clientX - sx, ev.clientY - sy) < 10;
+            if (held) release(b);
+            if (tap) kick(b);
           };
           b.el.addEventListener("pointermove", move);
-          b.el.addEventListener("pointerup", up);
-          b.el.addEventListener("pointercancel", up);
+          b.el.addEventListener("pointerup", end);
+          b.el.addEventListener("pointercancel", end);
         });
       });
 
@@ -1911,6 +2000,8 @@
             b.vy = (b.ty - b.y) * 0.3;
           } else {
             b.vy += 0.55;
+            // the loose cherries roll downhill when the phone leans
+            if (tilt && b.m === 1) b.vx += tilt * 0.35;
           }
           b.vx *= 0.995;
           if (!b.grab && b.m > 1 && Math.abs(b.vy) < 1.2) b.vx *= 0.8;
@@ -1963,11 +2054,12 @@
             }
           }
         }
+        if (stage) stage.step(now);
       };
       let acc = 0;
       // keeps falling off-screen until everything has landed: scrolled past mid-drop, the phrase is waiting on the way back
       const landBy = performance.now() + delay + 2500;
-      gsap.ticker.add((time, dt) => {
+      const tick = (time, dt) => {
         const now = performance.now();
         if (!visible && now > landBy) return;
         acc = Math.min(acc + dt, 70);
@@ -1976,16 +2068,147 @@
           if (now < b.born) continue;
           b.el.style.transform = `translate3d(${(b.x - b.r).toFixed(1)}px, ${(b.y - b.r).toFixed(1)}px, 0) rotate(${b.a.toFixed(3)}rad)`;
         }
-      });
+        if (stage) stage.render();
+      };
+      gsap.ticker.add(tick);
 
       // the cream line is piped while the letters are still falling, not after them
-      setTimeout(pipe, 150);
-      setTimeout(() => sec.classList.add("is-done"), delay);
+      if (first) setTimeout(pipe, 150);
+      timers.push(setTimeout(() => sec.classList.add("is-done"), delay));
+
+      return () => {
+        gsap.ticker.remove(tick);
+        ac.abort();
+        timers.forEach(clearTimeout);
+        world.textContent = "";
+        sec.classList.remove("is-lit");
+        const box = $(".x-drop__ing", sec);
+        box?.classList.remove("is-off");
+        $$(".x-ing__item", sec).forEach((el) => gsap.set(el, { visibility: "hidden" }));
+      };
+    }
+
+    // Phone: no room for the side walls, so the cake takes the stage — it stands on top of the letter pile under a soft
+    // beam, rides whatever the letters under it do (a kicked «И» throws it up, a thrown «М» tips it over), leans with
+    // the phone, and a tap (or every few seconds) serves the next cake from the catalogue, dropped in from above
+    function cakeStage(W, r, floor, bodies, on, timers) {
+      const srcs = [...new Set($$(".x-ing__item img", sec).filter((i) => !i.classList.contains("is-photo")).map((i) => i.src))];
+      const topY = $(".x-drop__top", sec).getBoundingClientRect().bottom - sec.getBoundingClientRect().top + 10;
+      // the top of «МИ НЕ» at rest; the cake's foot sinks a little into the letters' round bodies
+      const base = floor - r * 7.8;
+      const h = Math.min(base - topY, W * 0.8);
+      if (!srcs.length || h < 120) return null;
+      const w = Math.min(W * 0.74, h);
+      srcs.forEach((s) => { new Image().src = s; });
+
+      const beam = document.createElement("i");
+      beam.className = "x-stage__beam";
+      beam.style.height = `${(base + r * 4).toFixed(0)}px`;
+      const el = document.createElement("div");
+      el.className = "x-stage";
+      el.style.width = `${w.toFixed(0)}px`;
+      el.style.height = `${h.toFixed(0)}px`;
+      el.innerHTML = '<i class="x-stage__pool"></i><span class="x-stage__cake"><img alt="" draggable="false"></span>';
+      world.append(beam, el);
+      const cake = $(".x-stage__cake", el);
+      const img = $("img", el);
+      let k = 0;
+      img.src = srcs[0];
+
+      const c = { x: W / 2, vx: 0, y: -h - 60, vy: 0, a: 0, prev: null, born: Infinity, touched: 0, landed: false };
+      // sugar dust thrown up where the cake lands
+      const sparks = () => {
+        for (let i = 0; i < 12; i++) {
+          const s = document.createElement("i");
+          s.className = "x-stage__spark";
+          world.appendChild(s);
+          const side = i % 2 ? 1 : -1;
+          gsap.fromTo(s,
+            { x: c.x + side * gsap.utils.random(w * 0.1, w * 0.42), y: c.y - 6, scale: gsap.utils.random(0.6, 1.4), opacity: 1 },
+            { x: `+=${side * gsap.utils.random(20, 70)}`, y: `-=${gsap.utils.random(30, 110)}`, opacity: 0, duration: gsap.utils.random(0.6, 1.1), ease: "power2.out", onComplete: () => s.remove() });
+        }
+      };
+      const land = (v) => {
+        c.landed = true;
+        sec.classList.add("is-lit");
+        gsap.fromTo(cake, { scaleX: 1 + Math.min(0.2, v * 0.006), scaleY: 1 - Math.min(0.24, v * 0.007) }, { scaleX: 1, scaleY: 1, duration: 0.9, ease: "elastic.out(1.1, 0.35)", overwrite: true });
+        if (v < 14) return;
+        sparks();
+        // the thud makes the cherries on the shoulders hop
+        for (const b of bodies) {
+          if (b.m !== 1 || Math.abs(b.x - c.x) > w * 0.8) continue;
+          b.vy -= 3 + Math.random() * 4;
+          b.vx += Math.sign(b.x - c.x) * (1 + Math.random() * 2);
+        }
+      };
+      const serve = () => {
+        if (srcs.length < 2 || !c.landed) return;
+        c.landed = false;
+        k = (k + 1) % srcs.length;
+        gsap.to(cake, { scale: 0, rotation: gsap.utils.random(-25, 25), duration: 0.3, ease: "back.in(2)", overwrite: true, onComplete: () => {
+          img.src = srcs[k];
+          gsap.set(cake, { scale: 1, rotation: 0 });
+          c.y = -h - 60;
+          c.vy = 0;
+          c.prev = null;
+        } });
+      };
+      el.addEventListener("click", () => { c.touched = performance.now(); serve(); }, on);
+      timers.push(setInterval(() => {
+        if (visible && !document.hidden && performance.now() - c.touched > 5000) serve();
+      }, 4200));
+
+      return {
+        drop(at) { c.born = at; },
+        // while someone plays with the letters, the cake on show stays
+        hold() { c.touched = performance.now(); },
+        step(now) {
+          if (now < c.born) return;
+          // a leaning phone slides it along the top of the phrase as on a tray; level again, it drifts back to the middle
+          c.vx = (c.vx + (c.landed ? tilt * 0.5 : 0) + (W / 2 - c.x) * 0.004) * 0.9;
+          c.x = Math.max(W / 2 - r * 2.6, Math.min(W / 2 + r * 2.6, c.x + c.vx));
+          // the highest letter under each half of the cake's foot holds that half up
+          const reach = Math.max(40, -c.vy * 2);
+          let yl = Infinity, yr = Infinity, xl = 0, xr = 0;
+          for (const b of bodies) {
+            if (b.m === 1 || now < b.born) continue;
+            const dx = b.x - c.x;
+            const top = b.y - b.r * 0.8;
+            if (Math.abs(dx) > w * 0.4 || top < c.y - reach) continue;
+            if (dx < 0 && top < yl) { yl = top; xl = dx; }
+            if (dx >= 0 && top < yr) { yr = top; xr = dx; }
+          }
+          const both = yl < Infinity && yr < Infinity;
+          const hi = Math.min(yl, yr, floor);
+          const rest = both ? (yl + yr) / 2 : hi;
+          let lean = both ? Math.atan2(yr - yl, Math.max(r * 2, xr - xl)) : yl < Infinity ? 0.3 : yr < Infinity ? -0.3 : 0;
+          lean = Math.max(-0.4, Math.min(0.4, lean + tilt * 0.12));
+          c.a += (lean - c.a) * 0.15;
+          const lift = c.prev == null ? 0 : hi - c.prev;
+          c.prev = hi;
+          c.vy += 1.3;
+          c.y += c.vy;
+          if (lift < -2 && hi < c.y) {
+            // a letter shooting up from below throws the cake up with it
+            c.y = hi;
+            c.vy = Math.max(-13, Math.min(c.vy, lift * 1.1));
+          } else if (c.y >= rest) {
+            const v = c.vy;
+            c.y = rest;
+            c.vy = v > 6 ? -v * 0.16 : 0;
+            if (v > 6) land(v);
+          }
+        },
+        render() {
+          el.style.transform = `translate3d(${(c.x - w / 2).toFixed(1)}px, ${(c.y - h).toFixed(1)}px, 0) rotate(${c.a.toFixed(3)}rad)`;
+          beam.style.transform = `translateX(${(c.x - W / 2).toFixed(1)}px)`;
+        },
+      };
     }
 
     // The side walls: one catalogue cake per side pops out, then the sides take turns serving the next one.
     // They hang beside the two upper rows (the widest free wall), between the cream line and «ПРОСТО»
-    function ingredients(W, r, floor) {
+    function ingredients(W, r, floor, on, timers) {
       const box = $(".x-drop__ing", sec);
       if (!box) return;
       if (!$(".x-ing__item", box)) { box.classList.add("is-off"); return; }
@@ -2011,16 +2234,16 @@
       walls.forEach((wl, k) => {
         popIn(wl.items[0], 0.2 + k * 0.12);
         // a click serves the next cake at once; a hover makes the one on show wobble like jelly
-        wl.wall.addEventListener("click", () => { wl.touched = performance.now(); swap(wl); });
+        wl.wall.addEventListener("click", () => { wl.touched = performance.now(); swap(wl); }, on);
         if (fine) wl.wall.addEventListener("pointerenter", () => {
           gsap.fromTo($("img", wl.items[wl.i]), { scaleX: 1.12, scaleY: 0.86, transformOrigin: "50% 100%" }, { scaleX: 1, scaleY: 1, duration: 0.9, ease: "elastic.out(1.2, 0.35)", overwrite: "auto" });
-        });
+        }, on);
       });
       let turn = 0;
-      setInterval(() => {
+      timers.push(setInterval(() => {
         const wl = walls[turn++ % walls.length];
         if (visible && !document.hidden && performance.now() - wl.touched > 2500) swap(wl);
-      }, 1700);
+      }, 1700));
     }
 
     function pipe() {
@@ -2990,21 +3213,103 @@
     // the row travels until its last card stands in the middle, under the lamp
     const tail = items[items.length - 1];
     const dist = () => Math.max(0, tail ? tail.offsetLeft + tail.offsetWidth / 2 - innerWidth / 2 : track.scrollWidth - innerWidth);
+
+    // Phones: nothing travels sideways. The hall becomes a stage with a trapdoor under the lamp: the title rises away
+    // like a curtain, and the cakes come up through the floor on their plinths one at a time — each one holds the light,
+    // then sinks back as the next comes up behind it. Scroll steps are in "stops": the title, then one per cake
+    const liftMQ = matchMedia("(max-width: 760px)");
+    let lift = liftMQ.matches;
+    const hall = $(".gl__hall", sec);
+    const N = items.length;
+    const LIFT_IN = 1, LIFT_OUT = 0.35;
+    const stops = () => LIFT_IN + (N - 1) + LIFT_OUT;
+    const len = () => (lift ? stops() * innerHeight * 0.42 : dist() * 0.75);
+    // how far a cake has come up out of the floor, by its distance in stops from the one being shown: the one leaving
+    // goes down quickly, and the next is already on its way up behind it
+    const liftH = (d) => {
+      const t = d < 0 ? (0.75 + d) / 0.6 : (0.45 - d) / 0.37;
+      const k = Math.min(1, Math.max(0, t));
+      return k * k * (3 - 2 * k);
+    };
+    // a stop never rests half-way through the floor: the scroll settles on the nearest cake standing in full
+    const liftSnap = (v) => {
+      const T = stops();
+      const at = [0, ...items.map((c, i) => (LIFT_IN + i) / T), 1];
+      return at.reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a));
+    };
     const tween = gsap.to(track, {
-      x: () => -dist(),
+      x: () => (lift ? 0 : -dist()),
       ease: "none",
-      scrollTrigger: { trigger: sec, start: "top top", end: () => "+=" + dist() * 0.75, invalidateOnRefresh: true, pin: true, scrub: 0.8, anticipatePin: 1 },
+      scrollTrigger: {
+        trigger: sec, start: "top top", end: () => "+=" + len(), invalidateOnRefresh: true, pin: true, scrub: 0.8, anticipatePin: 1,
+        snap: { snapTo: (v, st) => (lift ? liftSnap(v) : st.progress), duration: { min: 0.2, max: 0.6 }, delay: 0.15, ease: "power2.inOut" },
+      },
     });
-    gsap.timeline({ scrollTrigger: { trigger: sec, start: "top top", end: () => "+=" + dist() * 0.75, scrub: 1 } })
+    gsap.timeline({ scrollTrigger: { trigger: sec, start: "top top", end: () => "+=" + len(), scrub: 1 } })
       .to($$(".gl__berry", sec), { x: (i) => -innerWidth * (0.45 + i * 0.25), y: (i) => (i ? -60 : 40), rotation: (i) => (i ? 40 : -30), ease: "none" }, 0);
     // while the room holds the top of the screen the body wears its colour: Safari paints its status bar and the strip
     // under its bottom bar with the body, so on a phone the room runs edge to edge instead of sitting in cherry/mint bands
     const pinned = tween.scrollTrigger;
     document.body.style.setProperty("--edge-gl", getComputedStyle(sec).getPropertyValue("--bg").trim());
+    sec.style.setProperty("--edge-gl", document.body.style.getPropertyValue("--edge-gl"));
     ScrollTrigger.create({
       start: () => pinned.start,
       end: () => pinned.end + sec.offsetHeight,
       onToggle: (st) => document.body.classList.toggle("is-edge-gl", st.isActive),
+    });
+
+    // the stage floor with its trapdoor, in two sheets of the same floor: the far one behind the plinths with the dark
+    // hole in it, the near one in front with the hole's front half cut out, so a plinth comes up out of the hole
+    const back = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const front = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    back.setAttribute("class", "gl__floor gl__floor--back");
+    front.setAttribute("class", "gl__floor gl__floor--front");
+    [back, front].forEach((s) => s.setAttribute("aria-hidden", "true"));
+    track.prepend(back);
+    track.append(front);
+    let liftHt = [];
+    const layoutLift = () => {
+      if (!lift) return;
+      const W = sec.clientWidth, H = sec.clientHeight;
+      const cw = items[0] ? items[0].offsetWidth : W * 0.6;
+      const F = Math.round(gsap.utils.clamp(84, 130, H * 0.15));
+      const rx = cw * 0.47, ry = rx * 0.24, depth = 22;
+      const y0 = depth + ry, Hf = Math.ceil(F + y0), cx = W / 2;
+      sec.style.setProperty("--floor", F + "px");
+      sec.style.setProperty("--hry", ry.toFixed(1) + "px");
+      [back, front].forEach((s) => { s.setAttribute("viewBox", `0 0 ${W} ${Hf}`); s.style.height = Hf + "px"; });
+      const f = (n) => n.toFixed(1);
+      back.innerHTML = `<defs>
+          <linearGradient id="gl-floor" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${Hf}"><stop offset="0" class="gl__floor-far"/><stop offset="1" class="gl__floor-near"/></linearGradient>
+          <radialGradient id="gl-floor-hi" gradientUnits="userSpaceOnUse" cx="${f(cx)}" cy="${f(y0)}" r="${f(W * 0.62)}" gradientTransform="translate(${f(cx)} ${f(y0)}) scale(1 0.42) translate(${f(-cx)} ${f(-y0)})"><stop offset="0" stop-color="#fffaf0" stop-opacity="0.75"/><stop offset="1" stop-color="#fffaf0" stop-opacity="0"/></radialGradient>
+          <radialGradient id="gl-hole" gradientUnits="userSpaceOnUse" cx="${f(cx)}" cy="${f(y0 - ry * 0.35)}" r="${f(rx)}" gradientTransform="translate(${f(cx)} ${f(y0)}) scale(1 0.3) translate(${f(-cx)} ${f(-y0)})"><stop offset="0" stop-color="#1c0102"/><stop offset="0.7" stop-color="#3d0305"/><stop offset="1" stop-color="#7c1a1c"/></radialGradient>
+          <radialGradient id="gl-puff" gradientUnits="userSpaceOnUse" cx="${f(cx)}" cy="${f(y0)}" r="${f(rx)}" gradientTransform="translate(${f(cx)} ${f(y0)}) scale(1 0.3) translate(${f(-cx)} ${f(-y0)})"><stop offset="0" stop-color="#fff3d6" stop-opacity="0.95"/><stop offset="0.6" stop-color="#ffd9a8" stop-opacity="0.35"/><stop offset="1" stop-color="#ffd9a8" stop-opacity="0"/></radialGradient>
+        </defs>
+        <rect width="${W}" height="${Hf}" fill="url(#gl-floor)"/>
+        <rect class="gl__floor-hi" width="${W}" height="${Hf}" fill="url(#gl-floor-hi)"/>
+        <path class="gl__floor-seam" d="M0,0.75 H${W}"/>
+        <ellipse cx="${f(cx)}" cy="${f(y0)}" rx="${f(rx)}" ry="${f(ry)}" fill="url(#gl-hole)"/>
+        <ellipse class="gl__floor-puff" cx="${f(cx)}" cy="${f(y0)}" rx="${f(rx * 0.92)}" ry="${f(ry * 0.8)}" fill="url(#gl-puff)"/>`;
+      // the near sheet starts a hair under the seam, so the seam line drawn on the far one stays in view
+      front.innerHTML = `<path d="M0,1.5 H${f(cx - rx)} V${f(y0)} A${f(rx)},${f(ry)} 0 0 0 ${f(cx + rx)},${f(y0)} V1.5 H${W} V${Hf} H0 Z" fill="url(#gl-floor)"/>
+        <path class="gl__floor-hi" d="M0,1.5 H${f(cx - rx)} V${f(y0)} A${f(rx)},${f(ry)} 0 0 0 ${f(cx + rx)},${f(y0)} V1.5 H${W} V${Hf} H0 Z" fill="url(#gl-floor-hi)"/>
+        <path class="gl__floor-rim" d="M${f(cx - rx)},${f(y0)} A${f(rx)},${f(ry)} 0 0 0 ${f(cx + rx)},${f(y0)}"/>`;
+      liftHt = items.map((c) => c.offsetHeight);
+    };
+    // leaving the stage for the row: whatever the stage wrote on the hall and the plinths is taken back
+    const unlift = () => {
+      items.forEach((c) => ["--sink", "visibility", "z-index"].forEach((p) => put(c, p, "")));
+      if (hall) ["transform", "opacity"].forEach((p) => put(hall, p, ""));
+      put(sec, "--puff", "");
+    };
+    sec.classList.toggle("is-lift", lift);
+    layoutLift();
+    addEventListener("resize", layoutLift);
+    ScrollTrigger.addEventListener("refreshInit", layoutLift);
+    liftMQ.addEventListener("change", () => {
+      lift = liftMQ.matches;
+      sec.classList.toggle("is-lift", lift);
+      if (lift) layoutLift(); else unlift();
     });
     const FOCUS = 0.5; // where on screen a card counts as "in focus": the middle, under the title
 
@@ -3139,7 +3444,8 @@
     const place = () => {
       const d = dist() || 1;
       const x0 = track.getBoundingClientRect().left;
-      marks = items.map((c) => {
+      marks = items.map((c, i) => {
+        if (lift) return (LIFT_IN + i) / stops();
         const r = c.getBoundingClientRect();
         return gsap.utils.clamp(0, 1, (r.left - x0 + r.width / 2 - innerWidth * FOCUS) / d);
       });
@@ -3192,12 +3498,14 @@
       // set at once, not tweened: a value changing on the body restyles the whole page on every frame,
       // and Safari only re-reads its bar colour while scrolling anyway
       document.body.style.setProperty("--edge-gl", t.bg);
+      sec.style.setProperty("--edge-gl", t.bg); // the body's copy does not reach the room (css/home.css @property)
       swap(nowEl, name);
       dots.forEach((b, k) => b.classList.toggle("is-on", k === i));
     };
 
     let active = false;
     let last = -1;
+    let hallK = 0; // on the stage: how far the title has risen out of the way (1 = gone)
     let aim = -1; // the cake the lamp is lighting right now; -1 while it is on the title
     let lx = null;
     let tilt = 0;
@@ -3237,23 +3545,52 @@
       const tt = titleEl && titleEl.getBoundingClientRect();
       const w1Left = w1 && tt ? w1.getBoundingClientRect().left : 0;
       const goldRects = introDone && tt ? golds.map((g) => g.el.getBoundingClientRect()) : null;
-      items.forEach((c, i) => {
-        const r = rects[i];
-        if (r.right < -100 || r.left > vw + 100) { put(c, "--on", "0"); return; }
-        const d = (r.left + r.width / 2 - vw * FOCUS) / vw;
-        if (Math.abs(d) < best) { best = Math.abs(d); idx = i; }
-        const dc = gsap.utils.clamp(-1, 1, d);
-        put(c, "--on", gsap.utils.clamp(0, 1, 1 - Math.abs(d) * 2.6).toFixed(3));
-        put(c, "--d", dc.toFixed(3));
-        put(c, "--ad", Math.abs(dc).toFixed(3));
-      });
+      let onNote;
+      if (lift) {
+        // the stage: where the scroll is, in stops after the title; each cake's height out of the floor follows from it
+        const s = tween.progress() * stops() - LIFT_IN;
+        idx = gsap.utils.clamp(0, N - 1, Math.round(s));
+        let puff = 0;
+        items.forEach((c, i) => {
+          const d = s - i;
+          // the last one stays up as the stage scrolls away
+          const h = i === N - 1 && d > 0 ? 1 : liftH(d);
+          if (h > 0 && h < 1) puff = Math.max(puff, Math.sin(Math.PI * h));
+          put(c, "--sink", ((1 - h) * ((liftHt[i] || 400) + 30)).toFixed(1) + "px");
+          put(c, "--on", h.toFixed(3));
+          put(c, "visibility", h > 0.001 ? "" : "hidden");
+          // the one coming up stands in front of the one going down
+          put(c, "z-index", d < 0 ? "2" : "1");
+        });
+        put(sec, "--puff", puff.toFixed(3));
+        // the title and the cake stand rise out of the way like a curtain as the first cake comes up
+        hallK = gsap.utils.clamp(0, 1, (s + LIFT_IN) / 0.5);
+        if (hall) {
+          put(hall, "transform", `translateY(${(-hallK * innerHeight * 0.8).toFixed(1)}px)`);
+          put(hall, "opacity", (1 - hallK * hallK).toFixed(3));
+        }
+        onNote = s < -0.45;
+        aim = onNote || (idx < N - 1 || s < idx ? liftH(s - idx) : 1) < 0.97 ? -1 : idx;
+      } else {
+        items.forEach((c, i) => {
+          const r = rects[i];
+          if (r.right < -100 || r.left > vw + 100) { put(c, "--on", "0"); return; }
+          const d = (r.left + r.width / 2 - vw * FOCUS) / vw;
+          if (Math.abs(d) < best) { best = Math.abs(d); idx = i; }
+          const dc = gsap.utils.clamp(-1, 1, d);
+          put(c, "--on", gsap.utils.clamp(0, 1, 1 - Math.abs(d) * 2.6).toFixed(3));
+          put(c, "--d", dc.toFixed(3));
+          put(c, "--ad", Math.abs(dc).toFixed(3));
+        });
+        // while the title is nearer the middle than any cake (at the very start), the lamp lights the title
+        onNote = !!nr && Math.abs(nr.left + nr.width / 2 - vw * FOCUS) / vw < best;
+        aim = onNote ? -1 : idx;
+      }
       if (idx !== last) { last = idx; focus(idx); }
 
-      // the lamp rides the rail towards the cake in focus; on the way its beam tilts so it stays aimed at the cake.
-      // while the title is nearer the middle than any cake (at the very start), the lamp lights the title
-      const onNote = !!nr && Math.abs(nr.left + nr.width / 2 - vw * FOCUS) / vw < best;
+      // the lamp rides the rail towards the cake in focus; on the way its beam tilts so it stays aimed at the cake
+      // (on the stage everything stands in the middle, so the lamp stays put)
       const onIntro = onNote;
-      aim = onIntro ? -1 : idx;
       il += ((onIntro ? 1 : 0) - il) * 0.08;
       put(sec, "--il", il.toFixed(3));
       const tr = onNote ? nr : rects[idx];
@@ -3325,7 +3662,6 @@
       rides.forEach((el) => el.addEventListener("click", () => dots[+el.dataset.i]?.click()));
       // Scrolling on, the stand empties: one after another the cakes leave it in an arc and land on their own plinths.
       // The flight runs while the title's screen slides away; until a cake lands, its place on the plinth stays empty
-      const hall = ring.closest(".gl__hall");
       const homes = rides.map((el, i) => items[i] && $(".ex__cake", items[i]));
       const imgs = rides.map((el) => $("img", el));
       const fly = gsap.parseEase("power2.inOut");
@@ -3335,14 +3671,16 @@
         const kick = p - lastP;
         lastP = p;
         if (!active) return;
-        const f = gsap.utils.clamp(0, 1, -hall.getBoundingClientRect().left / (innerWidth * 0.8));
+        // on the stage the cakes stay on the stand and leave with it, up and away with the title
+        if (lift && hallK >= 1) { homes.forEach((h) => h && put(h, "opacity", "")); return; }
+        const f = lift ? 0 : gsap.utils.clamp(0, 1, -hall.getBoundingClientRect().left / (innerWidth * 0.8));
         if (f >= 1 && settled) return;
         settled = f >= 1;
         spin += (dt / 1000) * (slow ? 0.05 : 0.3) + kick * 14 * (1 - f);
         const rr = ring.getBoundingClientRect();
         const cx = rr.left + rr.width / 2;
         // measure every landing spot before moving any cake (reads between writes would lay the page out per cake)
-        const fis = rides.map((el, i) => gsap.utils.clamp(0, 1, (f - i * 0.045) / 0.62));
+        const fis = rides.map((el, i) => (lift ? 0 : gsap.utils.clamp(0, 1, (f - i * 0.045) / 0.62)));
         const spots = rides.map((el, i) => {
           const home = homes[i];
           if (!(fis[i] > 0 && home)) return null;
@@ -3364,8 +3702,8 @@
           let lit = k;
           const fi = fis[i];
           const home = homes[i];
-          if (home) put(home, "opacity", fi >= 1 ? "" : "0");
-          put(el, "visibility", fi >= 1 ? "hidden" : "");
+          if (home) put(home, "opacity", lift || fi >= 1 ? "" : "0");
+          put(el, "visibility", !lift && fi >= 1 ? "hidden" : "");
           if (spots[i]) {
             const { t, ih } = spots[i];
             const e = fly(fi);
@@ -3378,6 +3716,8 @@
           }
           put(el, "transform", `translate(calc(-50% + ${x.toFixed(1)}px), calc(-100% + ${y.toFixed(1)}px)) rotate(${rot.toFixed(2)}deg) scale(${sc.toFixed(3)})`);
           put(el, "z-index", String(fi > 0 ? 200 + i : 1 + Math.round(k * 100)));
+          // on a touch screen the light moves in fine steps: a new filter value repaints the cake, and a phone repaints all of them every frame
+          if (!fine) lit = Math.round(lit * 16) / 16;
           put(el, "filter", `brightness(${(0.8 + lit * 0.2).toFixed(3)}) saturate(${(0.55 + lit * 0.45).toFixed(3)})`);
         });
       });
@@ -4141,8 +4481,58 @@
     set();
   }
 
+  // Phones: Safari tints its status bar from a fixed box along the top edge and the strip under its bottom bar from
+  // the body, re-reading both as the page scrolls. Past the hero, each takes the colour of the section at that edge of
+  // the screen (css/home.css .x-tint, .is-edge-sec), so every section runs on into both bars. The cherry cap over the
+  // cake section and the header's cherry ticker, when they are up, keep the top cherry
+  function edgeColors() {
+    const touch = matchMedia("(hover: none) and (pointer: coarse)");
+    const box = document.createElement("div");
+    box.className = "x-tint";
+    box.setAttribute("aria-hidden", "true");
+    document.body.appendChild(box);
+    const secs = [...document.querySelectorAll("main section")].filter((s) => !s.parentElement.closest("section"));
+    const foot = $("#site-footer");
+    if (foot) secs.push(foot);
+    const clear = (c) => !c || c === "transparent" || /rgba\(.*,\s*0\)$/.test(c);
+    const colour = (y, side) => {
+      let hit = null;
+      for (const s of secs) {
+        const r = s.getBoundingClientRect();
+        if (r.height && r.top <= y && r.bottom > y) hit = s;
+      }
+      const page = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
+      if (!hit) return page;
+      const cs = getComputedStyle(hit);
+      const own = cs.getPropertyValue(side).trim();
+      return own || (clear(cs.backgroundColor) ? page : cs.backgroundColor);
+    };
+    let queued = false;
+    const set = () => {
+      queued = false;
+      const on = touch.matches && scrollY >= 2;
+      document.body.classList.toggle("is-edge-sec", on);
+      if (!on) return;
+      const tick = $(".hdr__ticker");
+      const t = tick?.getBoundingClientRect();
+      const cherry = $(".x-cap.is-on") || (t && t.height > 1 && t.bottom > 1);
+      box.style.background = cherry ? "var(--cherry)" : colour(1, "--edge-top");
+      document.body.style.setProperty("--edge-b", colour(innerHeight - 2, "--edge-bot"));
+    };
+    const queue = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(set);
+    };
+    addEventListener("scroll", queue, { passive: true });
+    addEventListener("resize", queue);
+    touch.addEventListener?.("change", queue);
+    set();
+  }
+
   function init() {
     edgeTint();
+    edgeColors();
     renderCards();
     renderWheel();
     renderFaq();
@@ -4186,6 +4576,11 @@
     animateEdges();
     cutCap();
     ScrollTrigger.sort();
+    // a breakpoint crossed (a phone turned, a window narrowed): the sections that rebuild themselves for it create their
+    // pins anew, after the pins further down — which then measure from the old page and pin over the manifesto.
+    // Put them back in page order and measure again
+    ["(max-width: 760px)", "(max-width: 900px)", "(min-width: 901px) and (min-height: 620px)"].forEach((q) =>
+      matchMedia(q).addEventListener("change", () => setTimeout(() => { ScrollTrigger.sort(); ScrollTrigger.refresh(); }, 60)));
 
     runLoader(() => {
       lenis.start();

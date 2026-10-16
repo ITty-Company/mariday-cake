@@ -1,0 +1,242 @@
+/* ─────────────── ⑧ Short answers: the desserts answer for themselves ───────────────
+   Five real desserts on a shelf; the chosen one hops up and "speaks" its answer in a bubble,
+   the others lean in to listen. Lives in its own file so the rest of desserts.css stays untouched. */
+
+.dq {
+  --H: clamp(5.6rem, 13vw, 10.5rem);
+  --i: 0;
+  position: relative;
+  max-width: 62rem;
+  margin: clamp(2.4rem, 5vw, 3.4rem) auto 0;
+}
+
+/* the speech bubble */
+.dq__bubble {
+  position: relative;
+  display: grid;
+  margin: 0 auto calc(2.6rem + 14px);
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 100% 0, color-mix(in srgb, var(--c, #f5bcc8) 70%, transparent) 0, transparent 14rem),
+    var(--ds-paper, #fffaf3);
+  box-shadow: 0 30px 60px -34px rgba(61, 4, 5, 0.55), 0 0 0 1.5px rgba(109, 8, 9, 0.06);
+  transform-origin: calc((var(--i) + 0.5) * 20%) 110%;
+  transition: background 0.5s;
+}
+.dq__bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: calc((var(--i) + 0.5) * 20%);
+  width: 34px;
+  height: 22px;
+  margin-left: -17px;
+  margin-top: -1px;
+  background: var(--ds-paper, #fffaf3);
+  clip-path: polygon(0 0, 100% 0, 38% 100%);
+  filter: drop-shadow(0 10px 8px rgba(61, 4, 5, 0.12));
+  transition: left 0.55s var(--pop, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+.dq__panel {
+  grid-area: 1 / 1;
+  padding: clamp(1.5rem, 3.4vw, 2.4rem) clamp(1.4rem, 4vw, 3rem) clamp(1.3rem, 3vw, 2rem);
+  visibility: hidden;
+  opacity: 0;
+  outline: none;
+}
+.dq__panel.is-on { visibility: visible; opacity: 1; }
+.dq__panel:focus-visible { box-shadow: inset 0 0 0 3px var(--cherry); border-radius: 34px; }
+.dq__panel h3 {
+  margin: 0 0 0.7rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.4vw, 1.85rem);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--cherry);
+  text-wrap: balance;
+}
+.dq__panel p { margin: 0; max-width: 40rem; line-height: 1.65; color: var(--ink-soft); }
+.dq__sign {
+  display: block;
+  margin-top: 0.9rem;
+  font-family: var(--font-hand);
+  font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+  color: var(--pink-deep);
+}
+.dq__panel.is-on h3, .dq__panel.is-on p, .dq__panel.is-on .dq__sign { animation: dq-word 0.5s var(--expo, cubic-bezier(0.16, 1, 0.3, 1)) both; }
+.dq__panel.is-on p { animation-delay: 0.06s; }
+.dq__panel.is-on .dq__sign { animation-delay: 0.14s; }
+@keyframes dq-word { from { opacity: 0; transform: translateY(10px); } }
+.dq__bubble.is-pop { animation: dq-pop 0.5s var(--pop, cubic-bezier(0.34, 1.56, 0.64, 1)); }
+@keyframes dq-pop { 40% { transform: scale(0.97) rotate(-0.6deg); } }
+
+/* the shelf */
+.dq__shelf {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+.dq__shelf::before, .dq__shelf::after {
+  content: "";
+  position: absolute;
+  left: -1.2rem;
+  right: -1.2rem;
+  pointer-events: none;
+}
+/* the plank */
+.dq__shelf::before {
+  top: calc(var(--H) - 6px);
+  height: 18px;
+  border-radius: 9px;
+  background: linear-gradient(#fff, #f4e6da 55%, #e8d2c3);
+  box-shadow: 0 16px 24px -16px rgba(61, 4, 5, 0.45);
+  z-index: 1;
+}
+/* the scalloped paper trim under it */
+.dq__shelf::after {
+  top: calc(var(--H) + 11px);
+  height: 16px;
+  background: radial-gradient(circle at 50% 0, var(--pink, #f5bcc8) 0 10px, transparent 10.5px) 0 0 / 22px 16px repeat-x;
+  opacity: 0.85;
+}
+
+.dq__tab {
+  --lean: 0deg;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.dq__tab:focus-visible { outline: none; }
+.dq__tab:focus-visible .dq__tag { outline: 3px solid var(--cherry); outline-offset: 3px; }
+
+.dq__stand {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: var(--H);
+}
+/* contact shadow on the plank */
+.dq__stand::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  width: 62%;
+  height: 12px;
+  margin-left: -31%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(61, 4, 5, 0.32), transparent);
+  z-index: 2;
+  transition: transform 0.5s var(--pop, cubic-bezier(0.34, 1.56, 0.64, 1)), opacity 0.5s;
+}
+.dq__d {
+  position: relative;
+  z-index: 3;
+  display: block;
+  transform-origin: 50% 100%;
+  rotate: var(--lean);
+  transition: rotate 0.6s var(--pop, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+.dq__d img {
+  display: block;
+  height: calc(var(--H) * var(--h, 0.9));
+  width: auto;
+  max-width: 92%;
+  margin: 0 auto;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 10px rgba(61, 4, 5, 0.18));
+  transform-origin: 50% 100%;
+  transition: transform 0.5s var(--pop, cubic-bezier(0.34, 1.56, 0.64, 1)), filter 0.4s;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.dq__tab:hover .dq__d img { transform: translateY(-6%) rotate(-3deg); }
+.dq__tab[aria-selected="true"] .dq__d img {
+  transform: translateY(-16%) scale(1.1);
+  filter: drop-shadow(0 22px 16px rgba(61, 4, 5, 0.26));
+  animation: dq-talk 2.6s ease-in-out 0.6s infinite;
+}
+.dq__tab[aria-selected="true"] .dq__stand::after { transform: scale(0.7); opacity: 0.6; }
+.dq__tab[aria-selected="true"] .dq__d.is-hop img { animation: dq-hop 0.6s var(--pop, cubic-bezier(0.34, 1.56, 0.64, 1)); }
+@keyframes dq-hop {
+  0% { transform: translateY(0) scale(1.1, 0.88); }
+  45% { transform: translateY(-34%) scale(0.94, 1.08) rotate(-4deg); }
+  100% { transform: translateY(-16%) scale(1.1); }
+}
+/* the speaker "talks": a little nod */
+@keyframes dq-talk {
+  0%, 100% { transform: translateY(-16%) scale(1.1) rotate(0); }
+  20% { transform: translateY(-19%) scale(1.1) rotate(-3deg); }
+  40% { transform: translateY(-16%) scale(1.1) rotate(2deg); }
+  60% { transform: translateY(-18%) scale(1.1) rotate(-1deg); }
+}
+
+.dq__tag {
+  position: relative;
+  z-index: 2;
+  margin-top: calc(18px + 1.2rem);
+  padding: 0.42rem 0.85rem;
+  border-radius: 999px;
+  background: var(--ds-paper, #fffaf3);
+  box-shadow: 0 8px 18px -12px rgba(61, 4, 5, 0.5), inset 0 0 0 1.5px color-mix(in srgb, var(--c) 80%, #fff);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--cherry);
+  transition: background 0.3s, color 0.3s, transform 0.4s var(--pop, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+/* a string from the plank to the tag */
+.dq__tag::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: 1.5px;
+  height: 1.3rem;
+  background: rgba(109, 8, 9, 0.3);
+}
+.dq__tab:hover .dq__tag { transform: rotate(-3deg); }
+.dq__tab[aria-selected="true"] .dq__tag { background: var(--cherry); color: #fff; box-shadow: 0 10px 20px -10px rgba(109, 8, 9, 0.7); transform: rotate(2deg); }
+
+.ds-faq .ds-faq__more { margin-top: clamp(2.2rem, 4vw, 3rem); }
+
+/* ── entrance: the desserts drop onto the shelf one by one, then the first one speaks ── */
+.dq.is-wait .dq__d img { opacity: 0; transform: translateY(-140%); }
+.dq.is-wait .dq__bubble { opacity: 0; transform: scale(0.85) translateY(20px); }
+.dq.is-wait .dq__stand::after { opacity: 0; }
+.dq.is-in .dq__tab .dq__d img { animation: dq-drop 0.6s var(--pop, cubic-bezier(0.34, 1.56, 0.64, 1)) backwards; animation-delay: calc(var(--n) * 0.07s); }
+.dq.is-in .dq__bubble { animation: dq-say 0.55s var(--pop, cubic-bezier(0.34, 1.56, 0.64, 1)) 0.4s backwards; }
+@keyframes dq-drop {
+  0% { opacity: 0; transform: translateY(-140%); }
+  55% { opacity: 1; transform: translateY(0) scale(1.08, 0.86); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes dq-say { from { opacity: 0; transform: scale(0.85) translateY(20px); } }
+
+@media (max-width: 640px) {
+  .dq { --H: 5.4rem; }
+  .dq__bubble { border-radius: 26px; }
+  .dq__panel p { font-size: 0.95rem; }
+  .dq__shelf::before, .dq__shelf::after { left: -0.4rem; right: -0.4rem; }
+  .dq__tag { padding: 0.15rem 0.45rem 0.25rem; font-family: var(--font-hand); font-size: 1rem; font-weight: 700; letter-spacing: 0; text-transform: none; line-height: 1.05; }
+  .dq__tab:not([aria-selected="true"]) .dq__tag { background: none; box-shadow: none; }
+  .dq__tab[aria-selected="true"] .dq__d img { transform: translateY(-12%) scale(1.12); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dq *, .dq.is-in * { animation: none !important; }
+  .dq.is-wait .dq__d img, .dq.is-wait .dq__bubble { opacity: 1; transform: none; }
+}
